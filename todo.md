@@ -1,5 +1,12 @@
 # Hạng mục cập nhật — Chạy Đua Cùng Hana
 
+- [x] Hoàn tất audit QA về chồng chéo giao diện, khả năng đọc và luồng gameplay.
+- [x] Loại bỏ sprite nhân vật sai tư thế; thay bằng avatar procedural đứng đúng chiều, có silhouette rõ.
+- [x] Khôi phục bộ chọn tám nhân vật hoạt động thực sự với tạo hình, màu và khả năng riêng.
+- [x] Thiết kế lại HUD/menu theo vùng an toàn, không chồng lớp và ưu tiên thông tin khi chơi.
+- [x] Sửa vòng lặp điều khiển, collision, animation và độ khó bằng kiểm thử hồi quy desktop/mobile.
+- [x] Lập báo cáo QA sau sửa cùng checklist nghiệm thu trực quan và chức năng.
+
 - [x] Xác định nhịp chuyển động chạy, nhảy và trượt riêng cho Hana.
 - [x] Thêm chuyển động chạy với nảy thân, vung tai, vẫy cape và nhịp sneaker.
 - [x] Thêm animation nhảy gồm take-off, tư thế trên không và nén mềm khi tiếp đất.

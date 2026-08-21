@@ -1,11 +1,9 @@
 import { Scene } from "@babylonjs/core/scene";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { GameCommand, GameSnapshot, GameStatus, CharacterId, CHARACTERS } from "@/game/types";
 import { AudioManager } from "@/game/AudioManager";
 
@@ -21,7 +19,13 @@ interface WorldEntity {
 const LANES = [-2.6, 0, 2.6];
 const PLAYER_Z = 0;
 const STAR_GOAL = 10;
-const HANA_RUNNER_URL = "/manus-storage/hana-runner-mascot-v2_672361c8.png";
+const ENTITY_HITBOX: Record<EntityKind, { x: number; z: number }> = {
+  macaron: { x: 0.9, z: 1.05 },
+  storm: { x: 0.95, z: 0.9 },
+  star: { x: 0.72, z: 0.8 },
+  shield: { x: 0.75, z: 0.82 },
+  gust: { x: 0.8, z: 0.84 },
+};
 
 const getCharacter = (id: CharacterId) => CHARACTERS.find((character) => character.id === id) ?? CHARACTERS[0];
 
@@ -36,6 +40,7 @@ export class GameWorld {
   private status: GameStatus = "menu";
   private characterId: CharacterId = "cinnamoroll";
   private player: TransformNode | null = null;
+  private playerVisual: TransformNode | null = null;
   private playerYVelocity = 0;
   private playerAirHeight = 0;
   private landingTimer = 0;
@@ -57,14 +62,20 @@ export class GameWorld {
   private missionAnnounced = false;
   private newRecord = false;
   private readonly demo = new URLSearchParams(window.location.search).has("demo");
+  private readonly demoCharacter = (() => {
+    const requested = new URLSearchParams(window.location.search).get("character") as CharacterId | null;
+    return requested && CHARACTERS.some((character) => character.id === requested) ? requested : undefined;
+  })();
   private pointerStart: { x: number; y: number } | null = null;
 
   private readonly onCommand = (event: Event) => this.handleCommand((event as CustomEvent<GameCommand>).detail);
   private readonly onKeyDown = (event: KeyboardEvent) => this.handleKey(event);
   private readonly onPointerDown = (event: PointerEvent) => {
     this.pointerStart = { x: event.clientX, y: event.clientY };
+    this.canvas.setPointerCapture?.(event.pointerId);
   };
   private readonly onPointerUp = (event: PointerEvent) => this.handleSwipe(event);
+  private readonly onPointerCancel = () => { this.pointerStart = null; };
 
   constructor(scene: Scene, canvas: HTMLCanvasElement) {
     this.scene = scene;
@@ -77,8 +88,9 @@ export class GameWorld {
     window.addEventListener("keydown", this.onKeyDown);
     canvas.addEventListener("pointerdown", this.onPointerDown);
     canvas.addEventListener("pointerup", this.onPointerUp);
+    canvas.addEventListener("pointercancel", this.onPointerCancel);
     this.emitState();
-    if (this.demo) window.setTimeout(() => this.start(), 250);
+    if (this.demo) window.setTimeout(() => this.start(this.demoCharacter), 250);
   }
 
   update(delta: number) {
@@ -125,6 +137,7 @@ export class GameWorld {
     window.removeEventListener("keydown", this.onKeyDown);
     this.canvas.removeEventListener("pointerdown", this.onPointerDown);
     this.canvas.removeEventListener("pointerup", this.onPointerUp);
+    this.canvas.removeEventListener("pointercancel", this.onPointerCancel);
     this.entities.forEach((entity) => entity.node.dispose(false, true));
     this.decorations.forEach((node) => node.dispose(false, true));
     this.player?.dispose(false, true);
@@ -153,6 +166,7 @@ export class GameWorld {
   private handleKey(event: KeyboardEvent) {
     const key = event.key.toLowerCase();
     if (["arrowleft", "arrowright", "arrowup", "arrowdown", "a", "d", "w", "s", " ", "escape"].includes(key)) event.preventDefault();
+    if (event.repeat) return;
     if (key === "arrowleft" || key === "a") this.handleCommand({ type: "lane", direction: -1 });
     if (key === "arrowright" || key === "d") this.handleCommand({ type: "lane", direction: 1 });
     if (key === "arrowup" || key === "w" || key === " ") this.handleCommand({ type: "jump" });
@@ -165,6 +179,7 @@ export class GameWorld {
     const dx = event.clientX - this.pointerStart.x;
     const dy = event.clientY - this.pointerStart.y;
     this.pointerStart = null;
+    if (this.canvas.hasPointerCapture?.(event.pointerId)) this.canvas.releasePointerCapture?.(event.pointerId);
     if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 26) this.changeLane(dx > 0 ? 1 : -1);
     if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 26) dy < 0 ? this.jump() : this.slide();
   }
@@ -214,14 +229,14 @@ export class GameWorld {
   private jump() {
     if (!this.player || this.playerAirHeight > 0.03 || this.slideTimer > 0) return;
     this.audio.play("jump");
-    this.playerYVelocity = 10.7;
+    this.playerYVelocity = getCharacter(this.characterId).jumpForce;
     this.showMessage("Nhảy thật cao!");
   }
 
   private slide() {
     if (!this.player || this.playerAirHeight > 0.08) return;
     this.audio.play("slide");
-    this.slideTimer = 0.62;
+    this.slideTimer = getCharacter(this.characterId).slideDuration;
     this.showMessage("Lướt qua nào!");
   }
 
@@ -246,40 +261,20 @@ export class GameWorld {
     const landingPulse = this.landingTimer > 0 ? this.landingTimer / 0.2 : 0;
     const runningBob = isAirborne || isSliding ? 0 : runWave * 0.065;
     this.player.position.y = this.playerAirHeight + runningBob;
-    this.player.rotation.z = isSliding ? -0.075 : isAirborne ? laneDelta * -0.025 : laneDelta * -0.035 + runWave * 0.018;
-    const baseScale = 0.9;
-    this.player.scaling.y = isSliding ? 0.62 : baseScale * (isAirborne ? (this.playerYVelocity > 0 ? 1.08 : 0.96) : 1 - landingPulse * 0.16 + runWave * 0.015);
-    this.player.scaling.x = isSliding ? 1.14 : baseScale * (isAirborne ? (this.playerYVelocity > 0 ? 0.94 : 1.06) : 1 + landingPulse * 0.13 - runWave * 0.018);
-    this.player.scaling.z = 0.9;
-
-    const parts = this.player.getChildMeshes(false);
-    const portrait = parts.find((mesh) => mesh.name === "hanaMascot");
-    const capeFlutter = parts.find((mesh) => mesh.name === "hanaCapeFlutter");
-    const leftStep = parts.find((mesh) => mesh.name === "hanaLeftStep");
-    const rightStep = parts.find((mesh) => mesh.name === "hanaRightStep");
-    const puffAura = parts.find((mesh) => mesh.name === "hanaPuffAura");
-    if (portrait) {
-      portrait.position.y = isSliding ? 0.96 : 1.38 + (isAirborne ? Math.sin(this.elapsed * 10) * 0.025 : runWave * 0.035);
-      portrait.scaling.x = isSliding ? 1.2 : 1 - landingPulse * 0.08;
-      portrait.scaling.y = isSliding ? 0.7 : 1 + landingPulse * 0.1;
-      portrait.rotation.z = isSliding ? -0.055 : isAirborne ? laneDelta * -0.01 : runWave * 0.014;
+    this.player.rotation.z = 0;
+    this.player.scaling.set(1, 1, 1);
+    if (this.playerVisual) {
+      const visual = this.playerVisual;
+      visual.position.y = isSliding ? 0.38 : 0.2 + (isAirborne ? Math.sin(this.elapsed * 10) * 0.025 : runWave * 0.028);
+      visual.rotation.z = isSliding ? -0.11 : isAirborne ? laneDelta * -0.018 : laneDelta * -0.026 + runWave * 0.012;
+      visual.scaling.x = isSliding ? 1.18 : isAirborne ? (this.playerYVelocity > 0 ? 0.93 : 1.05) : 1 + landingPulse * 0.11;
+      visual.scaling.y = isSliding ? 0.58 : isAirborne ? (this.playerYVelocity > 0 ? 1.08 : 0.97) : 1 - landingPulse * 0.13 + runWave * 0.012;
+      visual.scaling.z = 1;
+      const ears = visual.getChildMeshes().filter((mesh) => mesh.name.startsWith("avatarEar") || mesh.name.startsWith("kittyEar"));
+      ears.forEach((ear, index) => { ear.rotation.z = (index % 2 === 0 ? -1 : 1) * (0.08 + runWave * 0.1 + (isAirborne ? 0.15 : 0)); });
+      const badge = visual.getChildMeshes().find((mesh) => mesh.name === "runnerBadge");
+      if (badge) badge.rotation.z = isSliding ? -0.3 : runWave * 0.25;
     }
-    if (capeFlutter) {
-      capeFlutter.position.x = isSliding ? -0.86 : -0.68 - runWave * 0.07;
-      capeFlutter.position.y = isSliding ? 0.98 : 1.2 + runWave * 0.055;
-      capeFlutter.scaling.x = isSliding ? 1.65 : isAirborne ? 1.42 : 1.12 + Math.max(0, runWave) * 0.25;
-      capeFlutter.scaling.y = isSliding ? 0.42 : 0.58 + Math.abs(runWave) * 0.12;
-      capeFlutter.rotation.z = isSliding ? -0.18 : -0.08 - runWave * 0.08;
-    }
-    if (leftStep && rightStep) {
-      const leftPulse = Math.max(0.3, 0.5 + 0.5 * Math.sin(runPhase));
-      const rightPulse = Math.max(0.3, 0.5 + 0.5 * Math.sin(runPhase + Math.PI));
-      leftStep.scaling.set(leftPulse, leftPulse, 1);
-      rightStep.scaling.set(rightPulse, rightPulse, 1);
-      leftStep.isVisible = !isAirborne && !isSliding;
-      rightStep.isVisible = !isAirborne && !isSliding;
-    }
-    if (puffAura) puffAura.scaling.set(0.9 + Math.abs(runWave) * 0.08, 1.12 + Math.abs(runWave) * 0.04, 0.18);
     const shieldRing = this.player.getChildMeshes().find((mesh) => mesh.name === "shieldRing");
     if (shieldRing) shieldRing.isVisible = this.shieldTimer > 0;
   }
@@ -295,11 +290,14 @@ export class GameWorld {
         this.entities.splice(index, 1);
         continue;
       }
-      if (Math.abs(entity.node.position.z - PLAYER_Z) < 1.2 && Math.abs(entity.node.position.x - (this.player?.position.x ?? 0)) < 1.08) {
+      const hitbox = ENTITY_HITBOX[entity.kind];
+      const horizontalHit = Math.abs(entity.node.position.x - (this.player?.position.x ?? 0)) < hitbox.x;
+      const depthHit = Math.abs(entity.node.position.z - PLAYER_Z) < hitbox.z;
+      if (horizontalHit && depthHit) {
         if (entity.kind === "star") {
           this.audio.play("star");
           this.stars += 1;
-          this.score += 30 * this.multiplier;
+          this.score += 30 * this.multiplier * getCharacter(this.characterId).starBonus;
           this.multiplier = Math.min(5, this.multiplier + 0.2);
           this.showMessage("+1 sao điều ước");
           this.removeEntity(index);
@@ -307,8 +305,8 @@ export class GameWorld {
         }
         if (entity.kind === "shield") {
           this.audio.play("shield");
-          this.shieldTimer = 5;
-          this.showMessage("Khiên cầu vồng: 5 giây!");
+          this.shieldTimer = getCharacter(this.characterId).shieldSeconds;
+          this.showMessage(`Khiên cầu vồng: ${this.shieldTimer.toFixed(1)} giây!`);
           this.removeEntity(index);
           continue;
         }
@@ -319,7 +317,7 @@ export class GameWorld {
           this.removeEntity(index);
           continue;
         }
-        const safeFromMacaron = entity.kind === "macaron" && (this.player?.position.y ?? 0) > 1.05;
+        const safeFromMacaron = entity.kind === "macaron" && this.playerAirHeight > 1.05;
         const safeFromStorm = entity.kind === "storm" && this.slideTimer > 0.08;
         if (safeFromMacaron || safeFromStorm) {
           this.score += 18 * this.multiplier;
@@ -453,60 +451,118 @@ export class GameWorld {
   private buildPlayer() {
     this.player?.dispose(false, true);
     const character = getCharacter(this.characterId);
+    const body = this.material(`body-${character.id}`, character.body, 0.06);
+    const accent = this.material(`accent-${character.id}`, character.accent, 0.18);
+    const softAccent = this.material(`soft-${character.id}`, character.accentSoft, 0.08);
+    const ink = this.material(`ink-${character.id}`, "#233C62", 0.04);
     const root = new TransformNode("runner", this.scene);
     root.position = new Vector3(LANES[this.playerLane], 0, PLAYER_Z);
-    const accent = this.material(`accent-${character.id}`, character.accent, 0.11);
-    const softAccent = this.material(`soft-${character.id}`, character.accentSoft, 0.05);
-    const avatarShadow = MeshBuilder.CreateSphere("hanaPuffAura", { diameter: 2.2, segments: 20 }, this.scene);
-    avatarShadow.parent = root;
-    avatarShadow.position = new Vector3(0, 1.35, 0.18);
-    avatarShadow.scaling = new Vector3(0.9, 1.12, 0.18);
-    avatarShadow.material = softAccent;
-    const capeMaterial = this.material(`hanaCapeFlutter-${character.id}`, "#F06E82", 0.26);
-    capeMaterial.alpha = 1;
-    capeMaterial.disableLighting = true;
-    capeMaterial.backFaceCulling = false;
-    capeMaterial.emissiveColor = Color3.FromHexString("#F06E82").scale(0.42);
-    const capeFlutter = MeshBuilder.CreatePlane("hanaCapeFlutter", { width: 1.5, height: 0.62, sideOrientation: Mesh.DOUBLESIDE }, this.scene);
-    capeFlutter.parent = root;
-    capeFlutter.position = new Vector3(-0.68, 1.2, 0.12);
-    capeFlutter.scaling = new Vector3(1.12, 0.58, 1);
-    capeFlutter.material = capeMaterial;
-    capeFlutter.isVisible = false;
-    const portraitTexture = new Texture(HANA_RUNNER_URL, this.scene, true, false);
-    portraitTexture.hasAlpha = true;
-    const portraitMaterial = new StandardMaterial(`hanaPortrait-${character.id}`, this.scene);
-    portraitMaterial.diffuseTexture = portraitTexture;
-    portraitMaterial.opacityTexture = portraitTexture;
-    portraitMaterial.emissiveTexture = portraitTexture;
-    portraitMaterial.useAlphaFromDiffuseTexture = true;
-    portraitMaterial.disableLighting = true;
-    const portrait = MeshBuilder.CreatePlane("hanaMascot", { width: 2.5, height: 3.1, sideOrientation: Mesh.DOUBLESIDE }, this.scene);
-    portrait.parent = root;
-    portrait.position = new Vector3(0, 1.38, -0.2);
-    portrait.material = portraitMaterial;
-    const capeAccent = MeshBuilder.CreateTorus("hanaStarClasp", { diameter: 0.34, thickness: 0.08, tessellation: 18 }, this.scene);
-    capeAccent.parent = root;
-    capeAccent.position = new Vector3(0, 0.93, -0.26);
-    capeAccent.rotation.x = Math.PI / 2;
-    capeAccent.material = accent;
-    const stepMaterial = this.material(`hanaStepMint-${character.id}`, "#7FDDCE", 0.32);
-    stepMaterial.alpha = 0.78;
-    stepMaterial.disableLighting = true;
-    for (const x of [-0.38, 0.38]) {
-      const step = MeshBuilder.CreateTorus(x < 0 ? "hanaLeftStep" : "hanaRightStep", { diameter: 0.46, thickness: 0.045, tessellation: 18 }, this.scene);
-      step.parent = root;
-      step.position = new Vector3(x, 0.1, 0.08);
-      step.rotation.x = Math.PI / 2;
-      step.material = stepMaterial;
+    const visual = new TransformNode("playerVisual", this.scene);
+    visual.parent = root;
+    visual.position = new Vector3(0, 0.2, -0.12);
+
+    const bodyMesh = MeshBuilder.CreateSphere("avatarBody", { diameter: 1.18, segments: 20 }, this.scene);
+    bodyMesh.parent = visual;
+    bodyMesh.position.y = 0.72;
+    bodyMesh.scaling = new Vector3(0.82, 1.05, 0.72);
+    bodyMesh.material = body;
+    const head = MeshBuilder.CreateSphere("avatarHead", { diameter: 1.32, segments: 20 }, this.scene);
+    head.parent = visual;
+    head.position.y = 1.55;
+    head.scaling = new Vector3(1, 0.94, 0.82);
+    head.material = body;
+    for (const x of [-0.24, 0.24]) {
+      const eye = MeshBuilder.CreateSphere(`avatarEye${x}`, { diameter: 0.12, segments: 12 }, this.scene);
+      eye.parent = visual;
+      eye.position = new Vector3(x, 1.61, -0.55);
+      eye.material = ink;
+      const cheek = MeshBuilder.CreateSphere(`avatarCheek${x}`, { diameter: 0.17, segments: 12 }, this.scene);
+      cheek.parent = visual;
+      cheek.position = new Vector3(x * 1.75, 1.43, -0.54);
+      cheek.scaling.x = 1.3;
+      cheek.material = softAccent;
     }
-    const shieldRing = MeshBuilder.CreateTorus("shieldRing", { diameter: 2.5, thickness: 0.09, tessellation: 32 }, this.scene);
+
+    if (character.silhouette === "cloud" || character.silhouette === "bunny") {
+      for (const x of [-0.37, 0.37]) {
+        const ear = MeshBuilder.CreateSphere(`avatarEar${x}`, { diameter: 0.48, segments: 18 }, this.scene);
+        ear.parent = visual;
+        ear.position = new Vector3(x, 2.18, 0);
+        ear.scaling = new Vector3(0.72, 1.7, 0.58);
+        ear.rotation.z = x * -0.4;
+        ear.material = character.silhouette === "bunny" ? accent : body;
+      }
+    }
+    if (character.silhouette === "pudding") {
+      const beret = MeshBuilder.CreateSphere("puddingBeret", { diameter: 0.75, segments: 16 }, this.scene);
+      beret.parent = visual;
+      beret.position = new Vector3(0.13, 2.08, -0.03);
+      beret.scaling.y = 0.32;
+      beret.material = accent;
+    }
+    if (character.silhouette === "imp") {
+      for (const x of [-0.4, 0, 0.4]) {
+        const spike = MeshBuilder.CreatePolyhedron(`impSpike${x}`, { type: 1, size: 0.4 }, this.scene);
+        spike.parent = visual;
+        spike.position = new Vector3(x, 2.2 - Math.abs(x) * 0.35, 0);
+        spike.scaling.y = 1.25;
+        spike.material = accent;
+      }
+    }
+    if (character.silhouette === "penguin") {
+      const belly = MeshBuilder.CreateSphere("penguinBelly", { diameter: 0.9, segments: 18 }, this.scene);
+      belly.parent = visual;
+      belly.position = new Vector3(0, 0.78, -0.51);
+      belly.scaling = new Vector3(0.72, 0.92, 0.2);
+      belly.material = softAccent;
+      const beak = MeshBuilder.CreatePolyhedron("penguinBeak", { type: 1, size: 0.24 }, this.scene);
+      beak.parent = visual;
+      beak.position = new Vector3(0, 1.45, -0.7);
+      beak.material = accent;
+    }
+    if (character.silhouette === "frog") {
+      for (const x of [-0.34, 0.34]) {
+        const eyeBulge = MeshBuilder.CreateSphere(`frogEye${x}`, { diameter: 0.38, segments: 16 }, this.scene);
+        eyeBulge.parent = visual;
+        eyeBulge.position = new Vector3(x, 1.98, -0.25);
+        eyeBulge.material = body;
+      }
+    }
+    if (character.silhouette === "egg") {
+      bodyMesh.scaling = new Vector3(0.75, 1.28, 0.72);
+      head.isVisible = false;
+      for (const mesh of visual.getChildMeshes()) {
+        if (mesh.name.startsWith("avatarEye") || mesh.name.startsWith("avatarCheek")) mesh.position.y -= 0.38;
+      }
+    }
+    if (character.silhouette === "kitty") {
+      for (const x of [-0.44, 0.44]) {
+        const ear = MeshBuilder.CreatePolyhedron(`kittyEar${x}`, { type: 1, size: 0.38 }, this.scene);
+        ear.parent = visual;
+        ear.position = new Vector3(x, 2.14, 0);
+        ear.scaling.y = 1.25;
+        ear.material = body;
+      }
+      const bow = MeshBuilder.CreateSphere("kittyBow", { diameter: 0.42, segments: 14 }, this.scene);
+      bow.parent = visual;
+      bow.position = new Vector3(0.56, 1.92, -0.42);
+      bow.scaling.x = 1.45;
+      bow.material = accent;
+    }
+
+    const runnerBadge = MeshBuilder.CreateTorus("runnerBadge", { diameter: 0.38, thickness: 0.07, tessellation: 18 }, this.scene);
+    runnerBadge.parent = visual;
+    runnerBadge.position = new Vector3(0, 0.96, -0.58);
+    runnerBadge.rotation.x = Math.PI / 2;
+    runnerBadge.material = accent;
+    const shieldRing = MeshBuilder.CreateTorus("shieldRing", { diameter: 2.25, thickness: 0.075, tessellation: 32 }, this.scene);
     shieldRing.parent = root;
-    shieldRing.position.y = 1.25;
+    shieldRing.position.y = 1.1;
     shieldRing.rotation.x = Math.PI / 2;
     shieldRing.material = softAccent;
     shieldRing.isVisible = false;
     this.player = root;
+    this.playerVisual = visual;
   }
 
   private createCloud(root: TransformNode, material: StandardMaterial, scale: number) {
