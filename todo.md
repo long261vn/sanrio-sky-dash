@@ -1,5 +1,10 @@
 # Hạng mục cập nhật — Chạy Đua Cùng Hana
 
+- [x] Xác định và sửa phép biến đổi texture làm lật hướng đệm dâu hoặc cổng mây trong canvas.
+- [x] Làm lại bảng hướng dẫn thành ba thẻ hành động lớn: LẤY, NHẢY, TRƯỢT.
+- [x] Dùng cùng hình asset, màu, chiều cao và mô tả ngắn với gameplay runtime.
+- [x] Kiểm thử trực quan chướng ngại low/high và bảng hướng dẫn trên desktop/mobile.
+
 - [x] Viết đặc tả một luật–một tín hiệu: vật thấp nhảy qua, vật cao trượt dưới, vật phẩm lấy bằng đổi làn.
 - [x] Thay macaron hiện tại bằng vật cản thấp có vòm nhảy rõ; thay mây giông bằng cổng mây cao có khoảng trống trượt phía dưới.
 - [x] Thiết kế lại biển báo, màu cảnh báo và thẻ hướng dẫn dùng cùng silhouette với gameplay.

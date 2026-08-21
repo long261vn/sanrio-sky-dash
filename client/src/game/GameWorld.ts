@@ -647,7 +647,7 @@ export class GameWorld {
   }
 
   private createStickerProp(root: TransformNode, name: string, url: string, width: number, height: number, y: number) {
-    const texture = new Texture(url, this.scene, true, false);
+    const texture = new Texture(url, this.scene, true, true);
     texture.hasAlpha = true;
     const material = new StandardMaterial(`${name}Material-${this.elapsed}`, this.scene);
     material.diffuseTexture = texture;

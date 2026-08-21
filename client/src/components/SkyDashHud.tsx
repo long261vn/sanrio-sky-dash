@@ -3,7 +3,7 @@
  * Các nút phản hồi tức thì; lớp UI chỉ giao tiếp với gameplay bằng CustomEvent.
  */
 import { useEffect, useMemo, useState } from "react";
-import { ChevronRight, CircleHelp, Gauge, Pause, Play, RotateCcw, Sparkles, Trophy, TriangleAlert, Volume2, VolumeX, Zap } from "lucide-react";
+import { ChevronRight, CircleHelp, Gauge, Pause, Play, RotateCcw, Trophy, Volume2, VolumeX, Zap } from "lucide-react";
 import { CHARACTERS, type CharacterId, type GameCommand, type GameSnapshot } from "@/game/types";
 
 const LOGO_URL = "/manus-storage/sky-dash-logo-retry_53835e27.png";
@@ -110,24 +110,18 @@ export default function SkyDashHud() {
 
       {tutorialOpen && snapshot.status === "menu" && (
         <div className="tutorial-scrim">
-          <section className="tutorial-panel" aria-label="Hướng dẫn chơi">
-            <div className="tutorial-copy">
-              <p className="eyebrow">HƯỚNG DẪN TRÊN ĐƯỜNG CHẠY</p>
-              <h2>Nhìn đúng vật,<br />làm đúng bước.</h2>
-              <p>Ba ví dụ bên phải dùng <strong>chính màu sắc và hình dáng</strong> đang xuất hiện trong lượt chạy. Chỉ cần nhớ một luật: sao thì lấy, macaron thì nhảy, mây giông thì trượt.</p>
-              <div className="lesson-list">
-                <div className="lesson reward"><Sparkles size={20} /><span><b>LẤY SAO</b> · Đổi làn ← → để chạm sao vàng có vòng mint. Sao tăng combo.</span></div>
-                <div className="lesson hazard"><TriangleAlert size={20} /><span><b>NHẢY ĐỆM THẤP</b> · Đệm dâu hồng thấp: nhấn SPACE hoặc ↑ để nhảy qua.</span></div>
-                <div className="lesson move"><Gauge size={20} /><span><b>TRƯỢT DƯỚI CỔNG MÂY</b> · Cổng mây treo cao: nhấn ↓ để trượt dưới, hoặc đổi làn để né.</span></div>
-              </div>
-              <button className="play-button" onClick={() => setTutorialOpen(false)}>Rõ rồi, quay lại bộ sưu tập <ChevronRight size={19} /></button>
-              <button className="quiet-button" onClick={() => setTutorialOpen(false)}>Bỏ qua lần này</button>
+          <section className="tutorial-panel guide-v2" aria-label="Hướng dẫn chơi">
+            <header className="guide-v2-head">
+              <div><p>ĐƯỜNG CHẠY MÂY · HƯỚNG DẪN NHANH</p><h2>Nhìn hình, làm đúng.</h2></div>
+              <div className="guide-rule-pill">★ Một vật · Một hành động</div>
+            </header>
+            <p className="guide-v2-intro">Ba thẻ dưới đây là <strong>đúng những vật</strong> đang xuất hiện trong đường chạy. Không cần đoán: màu sắc, chiều cao và phím bấm luôn giống nhau.</p>
+            <div className="guide-action-grid">
+              <article className="guide-action-card collect-card"><div className="guide-prop-frame"><img src="/manus-storage/hana-star-reward_f0db88ad.png" alt="Sao điều ước có vòng mint" /></div><div className="guide-action-copy"><span>01 · LẤY</span><h3>Sao điều ước</h3><p>Đổi làn để chạm vào sao. Sao tăng combo.</p><div className="key-caps"><kbd>←</kbd><kbd>→</kbd><b>Đổi làn</b></div></div></article>
+              <article className="guide-action-card jump-card"><div className="guide-prop-frame"><img src="/manus-storage/hana-low-jump-cushion_8c9af18d.png" alt="Đệm dâu hồng thấp" /></div><div className="guide-action-copy"><span>02 · NHẢY</span><h3>Đệm dâu thấp</h3><p>Vật thấp ở mặt đường: chỉ việc nhảy qua.</p><div className="key-caps"><kbd>SPACE</kbd><kbd>↑</kbd><b>Nhảy qua</b></div></div></article>
+              <article className="guide-action-card slide-card"><div className="guide-prop-frame"><img src="/manus-storage/hana-high-slide-gate_b3d23f2c.png" alt="Cổng mây cao có khoảng hở bên dưới" /></div><div className="guide-action-copy"><span>03 · TRƯỢT</span><h3>Cổng mây cao</h3><p>Mây treo cao có khoảng hở: trượt dưới cổng.</p><div className="key-caps"><kbd>↓</kbd><b>Trượt dưới</b></div></div></article>
             </div>
-            <div className="tutorial-live-board" aria-label="Mô hình vật thể thật trong game">
-              <article className="live-lesson-card live-reward"><div className="live-object"><img className="live-prop" src="/manus-storage/hana-star-reward_f0db88ad.png" alt="Sao điều ước có vòng mint" /></div><div><span>LẤY</span><h3>Sao điều ước</h3><p>← → đổi làn để lấy</p></div></article>
-              <article className="live-lesson-card live-macaron"><div className="live-object"><img className="live-prop" src="/manus-storage/hana-low-jump-cushion_8c9af18d.png" alt="Đệm dâu thấp cần nhảy qua" /></div><div><span>NHẢY</span><h3>Đệm dâu thấp</h3><p>SPACE hoặc ↑ để nhảy qua</p></div></article>
-              <article className="live-lesson-card live-storm"><div className="live-object"><img className="live-prop" src="/manus-storage/hana-high-slide-gate_b3d23f2c.png" alt="Cổng mây cao cần trượt dưới" /></div><div><span>TRƯỢT</span><h3>Cổng mây cao</h3><p>↓ để trượt dưới cổng</p></div></article>
-            </div>
+            <footer className="guide-v2-footer"><span>Luật nhớ nhanh: <b>vật thấp nhảy · vật cao trượt · sao thì lấy</b></span><button className="play-button" onClick={() => setTutorialOpen(false)}>Đã rõ, chọn người chạy <ChevronRight size={19} /></button></footer>
           </section>
         </div>
       )}
