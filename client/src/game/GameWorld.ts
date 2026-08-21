@@ -3,25 +3,33 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { GameCommand, GameSnapshot, GameStatus, CharacterId, CHARACTERS } from "@/game/types";
 import { AudioManager } from "@/game/AudioManager";
 
-type EntityKind = "macaron" | "storm" | "star" | "shield" | "gust";
+type EntityKind = "lowHurdle" | "cloudGate" | "star" | "shield" | "gust";
 
 interface WorldEntity {
   node: TransformNode;
   kind: EntityKind;
   lane: number;
   spin: number;
+  prompted?: boolean;
 }
 
 const LANES = [-2.6, 0, 2.6];
 const PLAYER_Z = 0;
 const STAR_GOAL = 10;
+const PROP_TEXTURES = {
+  lowHurdle: "/manus-storage/hana-low-jump-cushion_8c9af18d.png",
+  cloudGate: "/manus-storage/hana-high-slide-gate_b3d23f2c.png",
+  star: "/manus-storage/hana-star-reward_f0db88ad.png",
+} as const;
 const ENTITY_HITBOX: Record<EntityKind, { x: number; z: number }> = {
-  macaron: { x: 0.9, z: 1.05 },
-  storm: { x: 0.95, z: 0.9 },
+  lowHurdle: { x: 0.86, z: 0.92 },
+  cloudGate: { x: 0.98, z: 0.96 },
   star: { x: 0.72, z: 0.8 },
   shield: { x: 0.75, z: 0.82 },
   gust: { x: 0.8, z: 0.84 },
@@ -54,7 +62,7 @@ export class GameWorld {
   private distance = 0;
   private multiplier = 1;
   private spawnTimer = 0.7;
-  private message = "Hana đã sẵn sàng chạy vào điều ước.";
+  private message = "Chọn một người bạn để bắt đầu đường chạy mây.";
   private messageTimer = 0;
   private stateTimer = 0;
   private elapsed = 0;
@@ -66,6 +74,7 @@ export class GameWorld {
     const requested = new URLSearchParams(window.location.search).get("character") as CharacterId | null;
     return requested && CHARACTERS.some((character) => character.id === requested) ? requested : undefined;
   })();
+  private readonly demoLesson = new URLSearchParams(window.location.search).get("lesson");
   private pointerStart: { x: number; y: number } | null = null;
 
   private readonly onCommand = (event: Event) => this.handleCommand((event as CustomEvent<GameCommand>).detail);
@@ -99,7 +108,7 @@ export class GameWorld {
     if (this.status !== "playing") return;
 
     const difficulty = this.getDifficulty();
-    const speed = difficulty.speed;
+    const speed = this.demoLesson ? 0 : difficulty.speed;
     if (difficulty.level > this.lastDifficultyLevel) {
       this.lastDifficultyLevel = difficulty.level;
       this.audio.play("shield");
@@ -114,11 +123,11 @@ export class GameWorld {
 
     this.updatePlayer(delta);
     this.updateEntities(delta, speed);
-    if (this.spawnTimer <= 0) {
+    if (!this.demoLesson && this.spawnTimer <= 0) {
       this.spawnBeat(difficulty.level);
       this.spawnTimer = Math.max(0.4, 1.18 - difficulty.level * 0.1 - this.distance / 2600) + this.random() * 0.28;
     }
-    if (this.demo) this.runDemoBrain();
+    if (this.demo && !this.demoLesson) this.runDemoBrain();
     if (this.stars >= STAR_GOAL && !this.missionAnnounced) {
       this.missionAnnounced = true;
       this.showMessage("Nhiệm vụ hoàn tất! Thêm 250 điểm.");
@@ -162,7 +171,7 @@ export class GameWorld {
     if (command.type === "pause" && this.status === "playing") { this.audio.play("button"); this.audio.pauseMusic(); this.setStatus("paused", "Trên mây cũng cần nghỉ một nhịp."); }
     if (command.type === "resume" && this.status === "paused") { this.audio.play("button"); void this.startMusicWithFeedback(); this.setStatus("playing", "Bay tiếp nào!"); }
     if (command.type === "restart") this.start();
-    if (command.type === "menu") { this.audio.play("button"); this.audio.stopMusic(); this.setStatus("menu", "Hana đã sẵn sàng chạy vào điều ước."); }
+    if (command.type === "menu") { this.audio.play("button"); this.audio.stopMusic(); this.setStatus("menu", "Chọn một người bạn để bắt đầu đường chạy mây."); }
   }
 
   private handleKey(event: KeyboardEvent) {
@@ -213,6 +222,8 @@ export class GameWorld {
     this.missionAnnounced = false;
     this.newRecord = false;
     this.lastDifficultyLevel = 1;
+    if (this.demoLesson === "jump") this.spawnEntity("lowHurdle", 1, 11);
+    if (this.demoLesson === "slide") this.spawnEntity("cloudGate", 1, 6);
     if (this.player) this.player.position = new Vector3(0, 0, PLAYER_Z);
     this.setStatus("playing", "Lướt qua mây, gom điều ước!");
   }
@@ -300,6 +311,10 @@ export class GameWorld {
         this.entities.splice(index, 1);
         continue;
       }
+      if (!entity.prompted && (entity.kind === "lowHurdle" || entity.kind === "cloudGate") && entity.node.position.z < 8 && entity.node.position.z > 4) {
+        entity.prompted = true;
+        this.showMessage(entity.kind === "lowHurdle" ? "Đệm thấp phía trước — NHẢY qua!" : "Cổng mây cao phía trước — TRƯỢT dưới!");
+      }
       const hitbox = ENTITY_HITBOX[entity.kind];
       const horizontalHit = Math.abs(entity.node.position.x - (this.player?.position.x ?? 0)) < hitbox.x;
       const depthHit = Math.abs(entity.node.position.z - PLAYER_Z) < hitbox.z;
@@ -327,9 +342,9 @@ export class GameWorld {
           this.removeEntity(index);
           continue;
         }
-        const safeFromMacaron = entity.kind === "macaron" && this.playerAirHeight > 1.05;
-        const safeFromStorm = entity.kind === "storm" && this.slideTimer > 0.08;
-        if (safeFromMacaron || safeFromStorm) {
+        const clearedLowHurdle = entity.kind === "lowHurdle" && this.playerAirHeight > 0.76;
+        const clearedCloudGate = entity.kind === "cloudGate" && this.slideTimer > 0.08;
+        if (clearedLowHurdle || clearedCloudGate) {
           this.score += 18 * this.multiplier;
           this.removeEntity(index);
           continue;
@@ -373,37 +388,33 @@ export class GameWorld {
   private spawnBeat(level: number) {
     const lane = Math.floor(this.random() * 3);
     const roll = this.random();
-    if (roll < 0.5 + level * 0.025) {
+    if (roll < 0.46) {
       const safeLane = Math.floor(this.random() * 3);
-      const hazardLanes = [0, 1, 2].filter((candidate) => candidate !== safeLane);
-      const firstHazardLane = hazardLanes[Math.floor(this.random() * hazardLanes.length)];
-      this.spawnEntity(this.random() < 0.58 ? "macaron" : "storm", firstHazardLane, 31);
-      if (level >= 2 && this.random() < 0.3 + level * 0.07) {
-        const secondHazardLane = hazardLanes.find((candidate) => candidate !== firstHazardLane);
-        if (secondHazardLane !== undefined) this.spawnEntity(this.random() < 0.54 ? "macaron" : "storm", secondHazardLane, 31.4);
-      }
-      if (level >= 3 && this.random() < 0.55) this.spawnEntity("star", safeLane, 33.5);
-      if (level >= 4 && this.random() < 0.36) this.spawnEntity(this.random() < 0.52 ? "macaron" : "storm", lane, 44);
+      const occupiedLanes = [0, 1, 2].filter((candidate) => candidate !== safeLane);
+      const actionKind: EntityKind = this.random() < 0.56 ? "lowHurdle" : "cloudGate";
+      this.spawnEntity(actionKind, occupiedLanes[0], 31);
+      if (level >= 3 && this.random() < 0.36 + level * 0.05) this.spawnEntity(actionKind, occupiedLanes[1], 31);
+      if (this.random() < 0.76) this.spawnEntity("star", safeLane, 34.5);
       return;
     }
-    if (roll < 0.8) {
+    if (roll < 0.83) {
       this.spawnEntity("star", lane, 30);
-      this.spawnEntity("star", lane, 35);
-      if (this.random() < 0.45) this.spawnEntity("star", lane, 40);
+      this.spawnEntity("star", lane, 34.5);
+      if (level >= 2) this.spawnEntity("star", lane, 39);
       return;
     }
-    this.spawnEntity(roll < 0.89 ? "shield" : "gust", lane, 32);
+    this.spawnEntity(roll < 0.92 ? "shield" : "gust", lane, 32);
   }
 
   private spawnEntity(kind: EntityKind, lane: number, z: number) {
     const node = new TransformNode(`${kind}-${this.elapsed.toFixed(2)}`, this.scene);
-    node.position = new Vector3(LANES[lane], kind === "storm" ? 1.2 : 0.65, z);
-    if (kind === "macaron") this.createMacaron(node);
-    if (kind === "storm") this.createStorm(node);
+    node.position = new Vector3(LANES[lane], 0, z);
+    if (kind === "lowHurdle") this.createLowHurdle(node);
+    if (kind === "cloudGate") this.createCloudGate(node);
     if (kind === "star") this.createStar(node);
     if (kind === "shield") this.createShield(node);
     if (kind === "gust") this.createGust(node);
-    this.entities.push({ node, kind, lane, spin: kind === "star" || kind === "shield" ? 2.8 : 0.35 });
+    this.entities.push({ node, kind, lane, spin: kind === "star" || kind === "shield" ? 2.8 : 0.18 });
   }
 
   private buildTrack() {
@@ -586,38 +597,16 @@ export class GameWorld {
     });
   }
 
-  private createMacaron(root: TransformNode) {
-    this.createHazardFrame(root, 0.73);
-    const pink = this.material(`macaronPink-${this.elapsed}`, "#B64D79", 0.12);
-    const cream = this.material(`macaronCream-${this.elapsed}`, "#FFF0C6", 0.05);
-    for (const [y, material] of [[0.38, pink], [0.68, cream], [0.98, pink]] as const) {
-      const layer = MeshBuilder.CreateCylinder(`macaronLayer-${y}`, { diameter: 1.55, height: y === 0.68 ? 0.17 : 0.31, tessellation: 20 }, this.scene);
-      layer.parent = root;
-      layer.position.y = y;
-      layer.material = material;
-    }
+  private createLowHurdle(root: TransformNode) {
+    this.createStickerProp(root, "lowJumpCushion", PROP_TEXTURES.lowHurdle, 1.72, 1.34, 0.72);
   }
 
-  private createStorm(root: TransformNode) {
-    this.createHazardFrame(root, 0.05);
-    const cloud = this.material(`stormCloud-${this.elapsed}`, "#68537D", 0.12);
-    const bolt = this.material(`stormBolt-${this.elapsed}`, "#FFE069", 0.54);
-    this.createCloud(root, cloud, 0.75);
-    const lightning = MeshBuilder.CreatePolyhedron("stormBolt", { type: 1, size: 0.44 }, this.scene);
-    lightning.parent = root;
-    lightning.position = new Vector3(0, -0.55, -0.1);
-    lightning.scaling.y = 1.45;
-    lightning.material = bolt;
+  private createCloudGate(root: TransformNode) {
+    this.createStickerProp(root, "highSlideGate", PROP_TEXTURES.cloudGate, 2.18, 2.22, 1.65);
   }
 
   private createStar(root: TransformNode) {
-    const star = MeshBuilder.CreatePolyhedron("wishStar", { type: 1, size: 0.53 }, this.scene);
-    star.parent = root;
-    star.material = this.material(`wishStar-${this.elapsed}`, "#FFD66B", 0.62);
-    const ring = MeshBuilder.CreateTorus("starHalo", { diameter: 1.27, thickness: 0.085, tessellation: 20 }, this.scene);
-    ring.parent = root;
-    ring.rotation.x = Math.PI / 2;
-    ring.material = this.material(`starHalo-${this.elapsed}`, "#48D6BC", 0.52);
+    this.createStickerProp(root, "wishStar", PROP_TEXTURES.star, 1.22, 1.22, 0.68);
   }
 
   private createShield(root: TransformNode) {
@@ -643,19 +632,34 @@ export class GameWorld {
     }
   }
 
-  private createHazardFrame(root: TransformNode, y: number) {
-    const warningMaterial = this.material(`hazardNavy-${this.elapsed}`, "#213E63", 0.18);
-    const warningInner = this.material(`hazardBerry-${this.elapsed}`, "#A73F65", 0.16);
-    const outer = MeshBuilder.CreateBox("hazardWarningFrame", { width: 1.6, height: 1.6, depth: 0.12 }, this.scene);
-    outer.parent = root;
-    outer.position = new Vector3(0, y, 0.3);
-    outer.rotation.z = Math.PI / 4;
-    outer.material = warningMaterial;
-    const inner = MeshBuilder.CreateBox("hazardWarningInner", { width: 1.15, height: 1.15, depth: 0.13 }, this.scene);
-    inner.parent = root;
-    inner.position = new Vector3(0, y, 0.21);
-    inner.rotation.z = Math.PI / 4;
-    inner.material = warningInner;
+  private createActionBadge(root: TransformNode, action: "jump" | "slide", y: number) {
+    const navy = this.material(`actionNavy-${action}-${this.elapsed}`, "#213E63", 0.22);
+    const skyPudding = this.material(`actionPudding-${action}-${this.elapsed}`, "#FFE069", 0.48);
+    const disc = MeshBuilder.CreateSphere(`actionBadge-${action}`, { diameter: 0.42, segments: 16 }, this.scene);
+    disc.parent = root;
+    disc.position = new Vector3(0.7, y, -0.18);
+    disc.material = navy;
+    const arrow = MeshBuilder.CreatePolyhedron(`actionArrow-${action}`, { type: 1, size: 0.18 }, this.scene);
+    arrow.parent = root;
+    arrow.position = new Vector3(0.7, y, -0.41);
+    arrow.rotation.z = action === "jump" ? Math.PI : 0;
+    arrow.material = skyPudding;
+  }
+
+  private createStickerProp(root: TransformNode, name: string, url: string, width: number, height: number, y: number) {
+    const texture = new Texture(url, this.scene, true, false);
+    texture.hasAlpha = true;
+    const material = new StandardMaterial(`${name}Material-${this.elapsed}`, this.scene);
+    material.diffuseTexture = texture;
+    material.opacityTexture = texture;
+    material.emissiveTexture = texture;
+    material.useAlphaFromDiffuseTexture = true;
+    material.disableLighting = true;
+    material.backFaceCulling = false;
+    const plane = MeshBuilder.CreatePlane(name, { width, height, sideOrientation: Mesh.DOUBLESIDE }, this.scene);
+    plane.parent = root;
+    plane.position = new Vector3(0, y, -0.3);
+    plane.material = material;
   }
 
   private material(name: string, hex: string, emissive: number) {
@@ -697,9 +701,9 @@ export class GameWorld {
   }
 
   private runDemoBrain() {
-    const imminent = this.entities.find((entity) => (entity.kind === "macaron" || entity.kind === "storm") && entity.node.position.z < 7 && entity.node.position.z > -0.4 && Math.abs(entity.node.position.x - (this.player?.position.x ?? 0)) < 1.1);
+    const imminent = this.entities.find((entity) => (entity.kind === "lowHurdle" || entity.kind === "cloudGate") && entity.node.position.z < 7 && entity.node.position.z > -0.4 && Math.abs(entity.node.position.x - (this.player?.position.x ?? 0)) < 1.1);
     if (imminent) {
-      if (imminent.kind === "macaron") this.jump();
+      if (imminent.kind === "lowHurdle") this.jump();
       else this.slide();
       return;
     }

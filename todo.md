@@ -1,5 +1,11 @@
 # Hạng mục cập nhật — Chạy Đua Cùng Hana
 
+- [x] Viết đặc tả một luật–một tín hiệu: vật thấp nhảy qua, vật cao trượt dưới, vật phẩm lấy bằng đổi làn.
+- [x] Thay macaron hiện tại bằng vật cản thấp có vòm nhảy rõ; thay mây giông bằng cổng mây cao có khoảng trống trượt phía dưới.
+- [x] Thiết kế lại biển báo, màu cảnh báo và thẻ hướng dẫn dùng cùng silhouette với gameplay.
+- [x] Xây lại spawn/va chạm để chỉ yêu cầu đúng một thao tác dễ hiểu trong từng tình huống.
+- [x] Kiểm thử lượt chơi từ đầu đến cấp khó cao để xác nhận mọi luật trực quan nhất quán.
+
 - [x] Kiểm tra và sửa tài sản/đường dẫn nhạc nền cùng cơ chế khởi phát âm thanh sau thao tác chơi.
 - [x] Thay hướng dẫn minh hoạ bằng thẻ dùng đúng vật thể thật: sao, macaron và mây giông.
 - [x] Ghi rõ hành động theo từng vật thể: lấy, nhảy qua, trượt dưới hoặc đổi làn né tránh.

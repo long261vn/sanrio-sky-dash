@@ -33,3 +33,11 @@
 | --- | --- | --- |
 | `hana-bgm` | Nhạc nền game-pop vui nhộn, 90 giây, lặp sau thao tác chơi đầu tiên. | `/manus-storage/hana-sky-dash-bgm_c55c1f2d.mp3` |
 | `hana-sfx` | Button, nhặt sao, nhảy, lướt, khiên và game over. | `/manus-storage/button_7261cff8.mp3`, `/manus-storage/star_42549186.mp3`, `/manus-storage/jump_ae7164a5.mp3`, `/manus-storage/slide_52cc7eb5.mp3`, `/manus-storage/shield_492fe0ae.mp3`, `/manus-storage/gameover_34b8453a.mp3` |
+
+## Bản tái thiết kế vật thể gameplay
+
+| Vật thể | Quy tắc | URL |
+| --- | --- | --- |
+| Đệm dâu thấp | Vật cản thấp; chỉ yêu cầu nhảy qua. | `/manus-storage/hana-low-jump-cushion_8c9af18d.png` |
+| Cổng mây cao | Vật cản treo cao; chỉ yêu cầu trượt dưới. | `/manus-storage/hana-high-slide-gate_b3d23f2c.png` |
+| Sao điều ước | Phần thưởng; đổi làn để lấy. | `/manus-storage/hana-star-reward_f0db88ad.png` |

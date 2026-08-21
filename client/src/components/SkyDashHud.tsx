@@ -19,7 +19,7 @@ const initialSnapshot: GameSnapshot = {
   multiplier: 1,
   shieldSeconds: 0,
   missionProgress: 0,
-  message: "Hana đã sẵn sàng chạy vào điều ước.",
+  message: "Chọn một người bạn để bắt đầu đường chạy mây.",
   isNewRecord: false,
   audioEnabled: true,
   difficultyLevel: 1,
@@ -117,16 +117,16 @@ export default function SkyDashHud() {
               <p>Ba ví dụ bên phải dùng <strong>chính màu sắc và hình dáng</strong> đang xuất hiện trong lượt chạy. Chỉ cần nhớ một luật: sao thì lấy, macaron thì nhảy, mây giông thì trượt.</p>
               <div className="lesson-list">
                 <div className="lesson reward"><Sparkles size={20} /><span><b>LẤY SAO</b> · Đổi làn ← → để chạm sao vàng có vòng mint. Sao tăng combo.</span></div>
-                <div className="lesson hazard"><TriangleAlert size={20} /><span><b>NHẢY MACARON</b> · Biển navy–berry + macaron hồng: nhấn SPACE hoặc ↑ để nhảy qua.</span></div>
-                <div className="lesson move"><Gauge size={20} /><span><b>TRƯỢT DƯỚI MÂY GIÔNG</b> · Biển navy–berry + tia sét: nhấn ↓ để trượt qua, hoặc đổi làn để né.</span></div>
+                <div className="lesson hazard"><TriangleAlert size={20} /><span><b>NHẢY ĐỆM THẤP</b> · Đệm dâu hồng thấp: nhấn SPACE hoặc ↑ để nhảy qua.</span></div>
+                <div className="lesson move"><Gauge size={20} /><span><b>TRƯỢT DƯỚI CỔNG MÂY</b> · Cổng mây treo cao: nhấn ↓ để trượt dưới, hoặc đổi làn để né.</span></div>
               </div>
               <button className="play-button" onClick={() => setTutorialOpen(false)}>Rõ rồi, quay lại bộ sưu tập <ChevronRight size={19} /></button>
               <button className="quiet-button" onClick={() => setTutorialOpen(false)}>Bỏ qua lần này</button>
             </div>
             <div className="tutorial-live-board" aria-label="Mô hình vật thể thật trong game">
-              <article className="live-lesson-card live-reward"><div className="live-object live-star">★</div><div><span>LẤY</span><h3>Sao điều ước</h3><p>← → đổi làn để lấy</p></div></article>
-              <article className="live-lesson-card live-macaron"><div className="live-object live-macaron-shape"><i /><i /><i /></div><div><span>NHẢY</span><h3>Macaron hồng</h3><p>SPACE hoặc ↑ để vượt</p></div></article>
-              <article className="live-lesson-card live-storm"><div className="live-object live-storm-shape"><i>ϟ</i></div><div><span>TRƯỢT / NÉ</span><h3>Mây giông</h3><p>↓ để trượt, hoặc đổi làn</p></div></article>
+              <article className="live-lesson-card live-reward"><div className="live-object"><img className="live-prop" src="/manus-storage/hana-star-reward_f0db88ad.png" alt="Sao điều ước có vòng mint" /></div><div><span>LẤY</span><h3>Sao điều ước</h3><p>← → đổi làn để lấy</p></div></article>
+              <article className="live-lesson-card live-macaron"><div className="live-object"><img className="live-prop" src="/manus-storage/hana-low-jump-cushion_8c9af18d.png" alt="Đệm dâu thấp cần nhảy qua" /></div><div><span>NHẢY</span><h3>Đệm dâu thấp</h3><p>SPACE hoặc ↑ để nhảy qua</p></div></article>
+              <article className="live-lesson-card live-storm"><div className="live-object"><img className="live-prop" src="/manus-storage/hana-high-slide-gate_b3d23f2c.png" alt="Cổng mây cao cần trượt dưới" /></div><div><span>TRƯỢT</span><h3>Cổng mây cao</h3><p>↓ để trượt dưới cổng</p></div></article>
             </div>
           </section>
         </div>
