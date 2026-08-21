@@ -40,7 +40,8 @@ export type GameCommand =
   | { type: "pause" }
   | { type: "resume" }
   | { type: "restart" }
-  | { type: "menu" };
+  | { type: "menu" }
+  | { type: "toggleAudio" };
 
 export interface GameSnapshot {
   status: GameStatus;
@@ -54,4 +55,5 @@ export interface GameSnapshot {
   missionProgress: number;
   message: string;
   isNewRecord: boolean;
+  audioEnabled: boolean;
 }

@@ -3,7 +3,7 @@
  * Các nút phản hồi tức thì; lớp UI chỉ giao tiếp với gameplay bằng CustomEvent.
  */
 import { useEffect, useMemo, useState } from "react";
-import { Pause, Play, RotateCcw, Trophy, Volume2, Zap } from "lucide-react";
+import { Pause, Play, RotateCcw, Trophy, Volume2, VolumeX, Zap } from "lucide-react";
 import { CHARACTERS, type CharacterId, type GameCommand, type GameSnapshot } from "@/game/types";
 
 const LOGO_URL = "/manus-storage/sky-dash-logo-retry_53835e27.png";
@@ -19,8 +19,9 @@ const initialSnapshot: GameSnapshot = {
   multiplier: 1,
   shieldSeconds: 0,
   missionProgress: 0,
-  message: "Chọn một người bạn để bắt đầu chuyến bay.",
+  message: "Hana đã sẵn sàng chạy vào điều ước.",
   isNewRecord: false,
+  audioEnabled: true,
 };
 
 function send(command: GameCommand) {
@@ -49,7 +50,7 @@ export default function SkyDashHud() {
       {isRunning && (
         <>
           <div className="hud-cluster hud-cluster-left">
-            <div className="hud-brand-mark" aria-label="Sanrio Sky Dash"><img src={LOGO_URL} alt="" /><span>SKY<br />DASH</span></div>
+            <div className="hud-brand-mark" aria-label="Chạy Đua Cùng Hana"><img src={LOGO_URL} alt="" /><span>HANA<br />RUN</span></div>
             <div className="hud-score-card">
               <span className="hud-label">Điểm bay</span>
               <strong>{snapshot.score.toLocaleString("vi-VN")}</strong>
@@ -62,6 +63,7 @@ export default function SkyDashHud() {
             {snapshot.shieldSeconds > 0 && <div className="shield-chip"><Zap size={14} /> Khiên cầu vồng {snapshot.shieldSeconds}s</div>}
           </div>
           <div className="hud-cluster hud-cluster-right">
+            <button className="sound-button" onClick={() => send({ type: "toggleAudio" })} aria-label={snapshot.audioEnabled ? "Tắt âm thanh" : "Bật âm thanh"}>{snapshot.audioEnabled ? <Volume2 size={17} /> : <VolumeX size={17} />}</button>
             <button className="pause-button" onClick={() => send({ type: "pause" })} aria-label="Tạm dừng"><Pause size={18} /></button>
             <div className="hud-distance-card"><span>Quãng đường</span><strong>{snapshot.distance}m</strong></div>
           </div>
@@ -80,10 +82,11 @@ export default function SkyDashHud() {
         <div className="screen-scrim menu-scrim">
           <section className="menu-panel">
             <div className="menu-copy">
-              <div className="brand-lockup"><img src={LOGO_URL} alt="Biểu tượng ngôi sao điều ước" /><span>SKY DASH</span></div>
-              <p className="eyebrow">ENDLESS RUNNER · CLOUD EDITION</p>
-              <h1>Bầu trời đang<br />gọi tên bạn.</h1>
-              <p className="menu-intro">Dẫn một người bạn thật dễ thương lướt qua đường mây, né những bất ngờ ngọt ngào và gom đầy điều ước.</p>
+              <div className="brand-lockup"><img src={LOGO_URL} alt="Biểu tượng ngôi sao điều ước" /><span>CHẠY ĐUA CÙNG HANA</span></div>
+              <button className="menu-sound-toggle" onClick={() => send({ type: "toggleAudio" })} aria-label={snapshot.audioEnabled ? "Tắt âm thanh" : "Bật âm thanh"}>{snapshot.audioEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}<span>{snapshot.audioEnabled ? "Âm thanh bật" : "Âm thanh tắt"}</span></button>
+              <p className="eyebrow">ENDLESS RUNNER · HANA'S CLOUD TRAIL</p>
+              <h1>Hana, chạy<br />vào điều ước.</h1>
+              <p className="menu-intro">Cùng Hana lướt trên ba làn mây sắc nét, né bất ngờ ngọt ngào và gom thật nhiều điều ước lấp lánh.</p>
               <div className="record-strip"><Trophy size={18} /><span>Kỷ lục bầu trời</span><strong>{snapshot.highScore.toLocaleString("vi-VN")}</strong></div>
               <div className="control-tips"><span>← → <b>đổi làn</b></span><span>SPACE <b>nhảy</b></span><span>↓ <b>trượt</b></span></div>
             </div>
@@ -97,8 +100,8 @@ export default function SkyDashHud() {
                   </button>
                 ))}
               </div>
-              <button className="play-button" onClick={() => send({ type: "start", characterId: selectedId })}><Play size={20} fill="currentColor" /> Chạy vào mây ngay</button>
-              <p className="fan-note">Fan-made concept · Không liên kết hay đại diện cho Sanrio.</p>
+              <button className="play-button" onClick={() => send({ type: "start", characterId: selectedId })}><Play size={20} fill="currentColor" /> Cùng Hana chạy ngay</button>
+              <p className="fan-note">Nhạc nền bắt đầu sau khi bạn chọn chạy.</p>
             </div>
           </section>
         </div>

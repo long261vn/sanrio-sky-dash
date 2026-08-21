@@ -1,11 +1,11 @@
 import { Scene } from "@babylonjs/core/scene";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { GameCommand, GameSnapshot, GameStatus, CharacterId, CHARACTERS } from "@/game/types";
+import { AudioManager } from "@/game/AudioManager";
 
 type EntityKind = "macaron" | "storm" | "star" | "shield" | "gust";
 
@@ -27,6 +27,7 @@ export class GameWorld {
   private readonly canvas: HTMLCanvasElement;
   private readonly entities: WorldEntity[] = [];
   private readonly decorations: TransformNode[] = [];
+  private readonly audio = new AudioManager();
   private readonly rngSeed = 9711;
   private randomState = this.rngSeed;
   private status: GameStatus = "menu";
@@ -43,7 +44,7 @@ export class GameWorld {
   private distance = 0;
   private multiplier = 1;
   private spawnTimer = 0.7;
-  private message = "Chọn một người bạn để bắt đầu chuyến bay.";
+  private message = "Hana đã sẵn sàng chạy vào điều ước.";
   private messageTimer = 0;
   private stateTimer = 0;
   private elapsed = 0;
@@ -115,19 +116,26 @@ export class GameWorld {
     this.entities.forEach((entity) => entity.node.dispose(false, true));
     this.decorations.forEach((node) => node.dispose(false, true));
     this.player?.dispose(false, true);
+    this.audio.dispose();
   }
 
   private handleCommand(command: GameCommand) {
     if (!command) return;
+    if (command.type === "toggleAudio") {
+      this.audio.toggle(this.status === "playing");
+      this.showMessage(this.audio.isEnabled ? "Âm thanh đã bật — mây đang ngân nga!" : "Âm thanh đã tắt.");
+      this.emitState();
+      return;
+    }
     if (command.type === "start") this.start(command.characterId);
-    if (command.type === "select") this.selectCharacter(command.characterId);
+    if (command.type === "select") { this.audio.play("button"); this.selectCharacter(command.characterId); }
     if (command.type === "lane" && this.status === "playing") this.changeLane(command.direction);
     if (command.type === "jump" && this.status === "playing") this.jump();
     if (command.type === "slide" && this.status === "playing") this.slide();
-    if (command.type === "pause" && this.status === "playing") this.setStatus("paused", "Trên mây cũng cần nghỉ một nhịp.");
-    if (command.type === "resume" && this.status === "paused") this.setStatus("playing", "Bay tiếp nào!");
+    if (command.type === "pause" && this.status === "playing") { this.audio.play("button"); this.audio.pauseMusic(); this.setStatus("paused", "Trên mây cũng cần nghỉ một nhịp."); }
+    if (command.type === "resume" && this.status === "paused") { this.audio.play("button"); this.audio.startMusic(); this.setStatus("playing", "Bay tiếp nào!"); }
     if (command.type === "restart") this.start();
-    if (command.type === "menu") this.setStatus("menu", "Chọn một người bạn để bắt đầu chuyến bay.");
+    if (command.type === "menu") { this.audio.play("button"); this.audio.stopMusic(); this.setStatus("menu", "Hana đã sẵn sàng chạy vào điều ước."); }
   }
 
   private handleKey(event: KeyboardEvent) {
@@ -156,6 +164,8 @@ export class GameWorld {
   }
 
   private start(characterId?: CharacterId) {
+    this.audio.play("button");
+    this.audio.startMusic();
     if (characterId) this.selectCharacter(characterId);
     this.entities.splice(0).forEach((entity) => entity.node.dispose(false, true));
     this.randomState = this.rngSeed;
@@ -188,12 +198,14 @@ export class GameWorld {
 
   private jump() {
     if (!this.player || this.player.position.y > 0.03 || this.slideTimer > 0) return;
+    this.audio.play("jump");
     this.playerYVelocity = 10.7;
     this.showMessage("Nhảy thật cao!");
   }
 
   private slide() {
     if (!this.player || this.player.position.y > 0.08) return;
+    this.audio.play("slide");
     this.slideTimer = 0.62;
     this.showMessage("Lướt qua nào!");
   }
@@ -229,6 +241,7 @@ export class GameWorld {
       }
       if (Math.abs(entity.node.position.z - PLAYER_Z) < 1.2 && Math.abs(entity.node.position.x - (this.player?.position.x ?? 0)) < 1.08) {
         if (entity.kind === "star") {
+          this.audio.play("star");
           this.stars += 1;
           this.score += 30 * this.multiplier;
           this.multiplier = Math.min(5, this.multiplier + 0.2);
@@ -237,12 +250,14 @@ export class GameWorld {
           continue;
         }
         if (entity.kind === "shield") {
+          this.audio.play("shield");
           this.shieldTimer = 5;
           this.showMessage("Khiên cầu vồng: 5 giây!");
           this.removeEntity(index);
           continue;
         }
         if (entity.kind === "gust") {
+          this.audio.play("star");
           this.score += 90;
           this.showMessage("Gió mint: +90 điểm!");
           this.removeEntity(index);
@@ -256,6 +271,7 @@ export class GameWorld {
           continue;
         }
         if (this.shieldTimer > 0) {
+          this.audio.play("shield");
           this.shieldTimer = 0;
           this.showMessage("Khiên đã che chắn bạn!");
           this.removeEntity(index);
@@ -273,6 +289,8 @@ export class GameWorld {
   }
 
   private endRun() {
+    this.audio.pauseMusic();
+    this.audio.play("gameover");
     const finalScore = Math.floor(this.score);
     this.newRecord = finalScore > this.highScore;
     if (this.newRecord) {
@@ -311,15 +329,15 @@ export class GameWorld {
   }
 
   private buildTrack() {
-    const trackMaterial = this.material("cloudRibbon", "#F4D7B7", 0.025);
-    const laneMaterial = this.material("laneSeam", "#EFA1A2", 0.03);
-    const edgeMaterial = this.material("trackEdge", "#F8C85E", 0.07);
+    const trackMaterial = this.material("cloudRibbon", "#C85A7B", 0.06);
+    const laneMaterial = this.material("laneSeam", "#1F5F93", 0.14);
+    const edgeMaterial = this.material("trackEdge", "#F7B632", 0.16);
     const track = MeshBuilder.CreateGround("cloudRibbonTrack", { width: 9.15, height: 112, subdivisions: 2 }, this.scene);
     track.position.z = 44;
     track.material = trackMaterial;
     for (const x of [-1.3, 1.3]) {
-      const seam = MeshBuilder.CreateBox(`laneSeam${x}`, { width: 0.09, height: 0.08, depth: 112 }, this.scene);
-      seam.position = new Vector3(x, 0.035, 44);
+      const seam = MeshBuilder.CreateBox(`laneSeam${x}`, { width: 0.19, height: 0.13, depth: 112 }, this.scene);
+      seam.position = new Vector3(x, 0.065, 44);
       seam.material = laneMaterial;
     }
     for (const x of [-4.62, 4.62]) {
@@ -328,8 +346,8 @@ export class GameWorld {
       rail.material = edgeMaterial;
     }
     for (let z = 4; z < 105; z += 8) {
-      const star = MeshBuilder.CreatePolyhedron(`trackStar${z}`, { type: 1, size: 0.15 }, this.scene);
-      star.position = new Vector3(0, 0.11, z);
+      const star = MeshBuilder.CreatePolyhedron(`trackStar${z}`, { type: 1, size: 0.22 }, this.scene);
+      star.position = new Vector3(0, 0.14, z);
       star.material = edgeMaterial;
       star.rotation.y = Math.PI / 4;
     }
@@ -433,8 +451,8 @@ export class GameWorld {
   }
 
   private createMacaron(root: TransformNode) {
-    const pink = this.material(`macaronPink-${this.elapsed}`, "#FF9FB3", 0.08);
-    const cream = this.material(`macaronCream-${this.elapsed}`, "#FFF4DC", 0.03);
+    const pink = this.material(`macaronPink-${this.elapsed}`, "#B64D79", 0.12);
+    const cream = this.material(`macaronCream-${this.elapsed}`, "#FFF0C6", 0.05);
     for (const [y, material] of [[0.38, pink], [0.68, cream], [0.98, pink]] as const) {
       const layer = MeshBuilder.CreateCylinder(`macaronLayer-${y}`, { diameter: 1.55, height: y === 0.68 ? 0.17 : 0.31, tessellation: 20 }, this.scene);
       layer.parent = root;
@@ -444,8 +462,8 @@ export class GameWorld {
   }
 
   private createStorm(root: TransformNode) {
-    const cloud = this.material(`stormCloud-${this.elapsed}`, "#B9A6D1", 0.04);
-    const bolt = this.material(`stormBolt-${this.elapsed}`, "#FFD66B", 0.42);
+    const cloud = this.material(`stormCloud-${this.elapsed}`, "#68537D", 0.12);
+    const bolt = this.material(`stormBolt-${this.elapsed}`, "#FFE069", 0.54);
     this.createCloud(root, cloud, 0.75);
     const lightning = MeshBuilder.CreatePolyhedron("stormBolt", { type: 1, size: 0.44 }, this.scene);
     lightning.parent = root;
@@ -513,6 +531,7 @@ export class GameWorld {
       missionProgress: Math.min(STAR_GOAL, this.stars),
       message: this.messageTimer > 0 || this.status !== "playing" ? this.message : "",
       isNewRecord: this.newRecord,
+      audioEnabled: this.audio.isEnabled,
     };
     window.dispatchEvent(new CustomEvent<GameSnapshot>("skydash:state", { detail: snapshot }));
   }

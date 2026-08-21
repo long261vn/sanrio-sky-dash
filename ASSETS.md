@@ -23,3 +23,10 @@
 - `visual-target` → artwork menu, nguồn QA bố cục cho `?demo`.
 - `wish-star-logo` → dấu nhận diện lớn trong menu và favicon.
 - `character-pack` / `obstacle-pack` → bộ tham chiếu trực quan cho mascot và props procedural trong `GameWorld`.
+
+## Audio
+
+| Name | Role | URL |
+| --- | --- | --- |
+| `hana-bgm` | Nhạc nền game-pop vui nhộn, 90 giây, lặp sau thao tác chơi đầu tiên. | `/manus-storage/hana-sky-dash-bgm_c55c1f2d.mp3` |
+| `hana-sfx` | Button, nhặt sao, nhảy, lướt, khiên và game over. | `/manus-storage/button_7261cff8.mp3`, `/manus-storage/star_42549186.mp3`, `/manus-storage/jump_ae7164a5.mp3`, `/manus-storage/slide_52cc7eb5.mp3`, `/manus-storage/shield_492fe0ae.mp3`, `/manus-storage/gameover_34b8453a.mp3` |
