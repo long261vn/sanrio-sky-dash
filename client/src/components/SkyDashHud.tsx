@@ -3,11 +3,12 @@
  * Các nút phản hồi tức thì; lớp UI chỉ giao tiếp với gameplay bằng CustomEvent.
  */
 import { useEffect, useMemo, useState } from "react";
-import { Pause, Play, RotateCcw, Trophy, Volume2, VolumeX, Zap } from "lucide-react";
+import { ChevronRight, CircleHelp, Gauge, Pause, Play, RotateCcw, Sparkles, Trophy, TriangleAlert, Volume2, VolumeX, Zap } from "lucide-react";
 import { CHARACTERS, type CharacterId, type GameCommand, type GameSnapshot } from "@/game/types";
 
 const LOGO_URL = "/manus-storage/sky-dash-logo-retry_53835e27.png";
 const TARGET_URL = "/manus-storage/sky-dash-menu-art-retry_f2351b45.png";
+const TUTORIAL_URL = "/manus-storage/hana-tutorial-card-v2_79a9bc21.png";
 
 const initialSnapshot: GameSnapshot = {
   status: "menu",
@@ -22,6 +23,8 @@ const initialSnapshot: GameSnapshot = {
   message: "Hana đã sẵn sàng chạy vào điều ước.",
   isNewRecord: false,
   audioEnabled: true,
+  difficultyLevel: 1,
+  speed: 10,
 };
 
 function send(command: GameCommand) {
@@ -31,12 +34,14 @@ function send(command: GameCommand) {
 export default function SkyDashHud() {
   const [snapshot, setSnapshot] = useState<GameSnapshot>(initialSnapshot);
   const [selectedId, setSelectedId] = useState<CharacterId>("cinnamoroll");
+  const [tutorialOpen, setTutorialOpen] = useState(true);
 
   useEffect(() => {
     const onState = (event: Event) => {
       const next = (event as CustomEvent<GameSnapshot>).detail;
       setSnapshot(next);
       setSelectedId(next.characterId);
+      if (next.status === "playing") setTutorialOpen(false);
     };
     window.addEventListener("skydash:state", onState);
     return () => window.removeEventListener("skydash:state", onState);
@@ -60,6 +65,7 @@ export default function SkyDashHud() {
           </div>
           <div className="hud-center-stack">
             <div className="mission-chip"><span>☁</span> Mục tiêu: {snapshot.missionProgress}/{10} sao</div>
+            <div className="difficulty-chip"><Gauge size={14} /> Cấp mây {snapshot.difficultyLevel} · {snapshot.speed} km/h</div>
             {snapshot.shieldSeconds > 0 && <div className="shield-chip"><Zap size={14} /> Khiên cầu vồng {snapshot.shieldSeconds}s</div>}
           </div>
           <div className="hud-cluster hud-cluster-right">
@@ -89,6 +95,7 @@ export default function SkyDashHud() {
               <p className="menu-intro">Cùng Hana lướt trên ba làn mây sắc nét, né bất ngờ ngọt ngào và gom thật nhiều điều ước lấp lánh.</p>
               <div className="record-strip"><Trophy size={18} /><span>Kỷ lục bầu trời</span><strong>{snapshot.highScore.toLocaleString("vi-VN")}</strong></div>
               <div className="control-tips"><span>← → <b>đổi làn</b></span><span>SPACE <b>nhảy</b></span><span>↓ <b>trượt</b></span></div>
+              <button className="guide-button" onClick={() => setTutorialOpen(true)}><CircleHelp size={17} /> Xem hướng dẫn của Hana</button>
             </div>
             <div className="menu-art-wrap"><img className="menu-art" src={TARGET_URL} alt="Minh hoạ đường chạy trên mây" /><div className="art-sticker">★ Nhặt sao<br />để tăng combo</div></div>
             <div className="selection-drawer">
@@ -113,6 +120,26 @@ export default function SkyDashHud() {
 
       {snapshot.status === "gameover" && (
         <div className="screen-scrim compact-scrim"><section className="results-panel"><div className="result-badge">{snapshot.isNewRecord ? "★ KỶ LỤC MỚI" : "☁ CHUYẾN BAY HOÀN TẤT"}</div><h2>{snapshot.isNewRecord ? "Bầu trời vỗ tay!" : "Mây vẫn chờ bạn."}</h2><p>{snapshot.message}</p><div className="result-stats"><div><span>Điểm bay</span><strong>{snapshot.score.toLocaleString("vi-VN")}</strong></div><div><span>Sao điều ước</span><strong>★ {snapshot.stars}</strong></div><div><span>Quãng đường</span><strong>{snapshot.distance}m</strong></div></div><button className="play-button" onClick={() => send({ type: "restart" })}><RotateCcw size={19} /> Chạy thêm một lượt</button><button className="quiet-button" onClick={() => send({ type: "menu" })}><Volume2 size={15} /> Đổi bạn đồng hành</button></section></div>
+      )}
+
+      {tutorialOpen && snapshot.status === "menu" && (
+        <div className="tutorial-scrim">
+          <section className="tutorial-panel" aria-label="Hướng dẫn chơi">
+            <div className="tutorial-copy">
+              <p className="eyebrow">HANA'S QUICK GUIDE</p>
+              <h2>Ba dấu hiệu để<br />chạy thật xa.</h2>
+              <p>Đừng chỉ nhìn màu sắc. Hana dùng <strong>vòng sáng mint</strong> cho phần thưởng và <strong>biển cảnh báo navy–berry</strong> cho mọi vật cản.</p>
+              <div className="lesson-list">
+                <div className="lesson reward"><Sparkles size={20} /><span><b>NHẶT</b> · Sao mint/gold và bubble cầu vồng là vật phẩm tốt.</span></div>
+                <div className="lesson hazard"><TriangleAlert size={20} /><span><b>NÉ</b> · Khung navy–berry là cảnh báo: nhảy qua macaron, trượt dưới mây giông.</span></div>
+                <div className="lesson move"><Gauge size={20} /><span><b>ĐỔI LÀN</b> · Dùng ← →; càng xa, tốc độ và số chướng ngại càng tăng.</span></div>
+              </div>
+              <button className="play-button" onClick={() => setTutorialOpen(false)}>Rõ rồi, cùng Hana chạy! <ChevronRight size={19} /></button>
+              <button className="quiet-button" onClick={() => setTutorialOpen(false)}>Bỏ qua lần này</button>
+            </div>
+            <div className="tutorial-art-wrap"><img src={TUTORIAL_URL} className="tutorial-art" alt="Hana đổi làn, nhảy qua vật cản và trượt dưới mây giông" /><div className="tutorial-callout mint">Vật phẩm tốt</div><div className="tutorial-callout berry">Cảnh báo nguy hiểm</div></div>
+          </section>
+        </div>
       )}
     </div>
   );

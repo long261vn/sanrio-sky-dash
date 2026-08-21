@@ -1,9 +1,11 @@
 import { Scene } from "@babylonjs/core/scene";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { GameCommand, GameSnapshot, GameStatus, CharacterId, CHARACTERS } from "@/game/types";
 import { AudioManager } from "@/game/AudioManager";
 
@@ -19,6 +21,7 @@ interface WorldEntity {
 const LANES = [-2.6, 0, 2.6];
 const PLAYER_Z = 0;
 const STAR_GOAL = 10;
+const HANA_RUNNER_URL = "/manus-storage/hana-runner-mascot-v2_672361c8.png";
 
 const getCharacter = (id: CharacterId) => CHARACTERS.find((character) => character.id === id) ?? CHARACTERS[0];
 
@@ -48,6 +51,7 @@ export class GameWorld {
   private messageTimer = 0;
   private stateTimer = 0;
   private elapsed = 0;
+  private lastDifficultyLevel = 1;
   private missionAnnounced = false;
   private newRecord = false;
   private readonly demo = new URLSearchParams(window.location.search).has("demo");
@@ -80,7 +84,13 @@ export class GameWorld {
     this.updateDecorations(delta);
     if (this.status !== "playing") return;
 
-    const speed = Math.min(21, 10 + this.distance / 130);
+    const difficulty = this.getDifficulty();
+    const speed = difficulty.speed;
+    if (difficulty.level > this.lastDifficultyLevel) {
+      this.lastDifficultyLevel = difficulty.level;
+      this.audio.play("shield");
+      this.showMessage(`Mây tăng tốc — Cấp ${difficulty.level}!`);
+    }
     this.distance += speed * delta * 0.43;
     this.score += speed * delta * 3.5 * this.multiplier;
     this.spawnTimer -= delta;
@@ -91,8 +101,8 @@ export class GameWorld {
     this.updatePlayer(delta);
     this.updateEntities(delta, speed);
     if (this.spawnTimer <= 0) {
-      this.spawnBeat();
-      this.spawnTimer = Math.max(0.56, 1.25 - this.distance / 900) + this.random() * 0.38;
+      this.spawnBeat(difficulty.level);
+      this.spawnTimer = Math.max(0.4, 1.18 - difficulty.level * 0.1 - this.distance / 2600) + this.random() * 0.28;
     }
     if (this.demo) this.runDemoBrain();
     if (this.stars >= STAR_GOAL && !this.missionAnnounced) {
@@ -181,6 +191,7 @@ export class GameWorld {
     this.spawnTimer = 0.55;
     this.missionAnnounced = false;
     this.newRecord = false;
+    this.lastDifficultyLevel = 1;
     if (this.player) this.player.position = new Vector3(0, 0, PLAYER_Z);
     this.setStatus("playing", "Lướt qua mây, gom điều ước!");
   }
@@ -218,12 +229,12 @@ export class GameWorld {
     this.player.position.y = Math.max(0, this.player.position.y + this.playerYVelocity * delta);
     if (this.player.position.y <= 0) this.playerYVelocity = 0;
     const runningBob = Math.sin(this.elapsed * 15) * 0.055;
-    this.player.rotation.z = Math.sin(this.elapsed * 11) * 0.045;
+    this.player.rotation.z = 0;
     this.player.position.y += runningBob * (this.player.position.y <= 0.001 ? 1 : 0.15);
     if (this.player.position.y < 0) this.player.position.y = 0;
-    this.player.scaling.y = this.slideTimer > 0 ? 0.76 : 1.34;
-    this.player.scaling.x = this.slideTimer > 0 ? 1.52 : 1.34;
-    this.player.scaling.z = 1.34;
+    this.player.scaling.y = this.slideTimer > 0 ? 0.56 : 0.9;
+    this.player.scaling.x = this.slideTimer > 0 ? 1.08 : 0.9;
+    this.player.scaling.z = 0.9;
     const shieldRing = this.player.getChildMeshes().find((mesh) => mesh.name === "shieldRing");
     if (shieldRing) shieldRing.isVisible = this.shieldTimer > 0;
   }
@@ -300,15 +311,29 @@ export class GameWorld {
     this.setStatus("gameover", this.newRecord ? "Kỷ lục mới! Bầu trời vỗ tay cho bạn." : "Chuyến bay kết thúc, thử thêm một lần nữa nhé.");
   }
 
-  private spawnBeat() {
+  private getDifficulty() {
+    const level = Math.min(6, 1 + Math.floor(this.distance / 150));
+    const speed = Math.min(25, 10 + (level - 1) * 1.65 + this.distance / 800);
+    return { level, speed };
+  }
+
+  private spawnBeat(level: number) {
     const lane = Math.floor(this.random() * 3);
     const roll = this.random();
-    if (roll < 0.48) {
-      this.spawnEntity(this.random() < 0.57 ? "macaron" : "storm", lane, 31);
-      if (this.random() < 0.55) this.spawnEntity("star", (lane + 1) % 3, 37);
+    if (roll < 0.5 + level * 0.025) {
+      const safeLane = Math.floor(this.random() * 3);
+      const hazardLanes = [0, 1, 2].filter((candidate) => candidate !== safeLane);
+      const firstHazardLane = hazardLanes[Math.floor(this.random() * hazardLanes.length)];
+      this.spawnEntity(this.random() < 0.58 ? "macaron" : "storm", firstHazardLane, 31);
+      if (level >= 2 && this.random() < 0.3 + level * 0.07) {
+        const secondHazardLane = hazardLanes.find((candidate) => candidate !== firstHazardLane);
+        if (secondHazardLane !== undefined) this.spawnEntity(this.random() < 0.54 ? "macaron" : "storm", secondHazardLane, 31.4);
+      }
+      if (level >= 3 && this.random() < 0.55) this.spawnEntity("star", safeLane, 33.5);
+      if (level >= 4 && this.random() < 0.36) this.spawnEntity(this.random() < 0.52 ? "macaron" : "storm", lane, 44);
       return;
     }
-    if (roll < 0.78) {
+    if (roll < 0.8) {
       this.spawnEntity("star", lane, 30);
       this.spawnEntity("star", lane, 35);
       if (this.random() < 0.45) this.spawnEntity("star", lane, 40);
@@ -385,51 +410,30 @@ export class GameWorld {
     const character = getCharacter(this.characterId);
     const root = new TransformNode("runner", this.scene);
     root.position = new Vector3(LANES[this.playerLane], 0, PLAYER_Z);
-    const body = this.material(`body-${character.id}`, character.body, 0.04);
     const accent = this.material(`accent-${character.id}`, character.accent, 0.11);
     const softAccent = this.material(`soft-${character.id}`, character.accentSoft, 0.05);
-    const ink = this.material("blueberryInk", "#31445D", 0.02);
-
-    const torso = MeshBuilder.CreateSphere("runnerBody", { diameter: 1.35, segments: 20 }, this.scene);
-    torso.parent = root;
-    torso.position = new Vector3(0, 0.74, 0);
-    torso.scaling = new Vector3(0.95, 1.05, 0.78);
-    torso.material = body;
-    const head = MeshBuilder.CreateSphere("runnerHead", { diameter: 1.45, segments: 20 }, this.scene);
-    head.parent = root;
-    head.position = new Vector3(0, 1.58, -0.03);
-    head.material = body;
-    const leftEye = MeshBuilder.CreateSphere("eyeLeft", { diameter: 0.13 }, this.scene);
-    leftEye.parent = root;
-    leftEye.position = new Vector3(-0.26, 1.66, -0.68);
-    leftEye.material = ink;
-    const rightEye = leftEye.clone("eyeRight");
-    if (rightEye) {
-      rightEye.parent = root;
-      rightEye.position.x = 0.26;
-    }
-    const blush = this.material("blush", "#F6A4B8", 0.06);
-    for (const x of [-0.43, 0.43]) {
-      const cheek = MeshBuilder.CreateSphere(`cheek${x}`, { diameter: 0.18 }, this.scene);
-      cheek.parent = root;
-      cheek.position = new Vector3(x, 1.47, -0.65);
-      cheek.scaling.x = 1.45;
-      cheek.material = blush;
-    }
-    const earScale = character.id === "cinnamoroll" || character.id === "mymelody" || character.id === "kuromi" ? 1.55 : 0.72;
-    for (const x of [-0.47, 0.47]) {
-      const ear = MeshBuilder.CreateSphere(`ear${x}`, { diameter: 0.55 }, this.scene);
-      ear.parent = root;
-      ear.position = new Vector3(x, 2.2, 0.01);
-      ear.scaling = new Vector3(0.62, earScale, 0.46);
-      ear.rotation.z = x < 0 ? 0.24 : -0.24;
-      ear.material = character.id === "kuromi" || character.id === "mymelody" ? accent : body;
-    }
-    const scarf = MeshBuilder.CreateTorus("scarf", { diameter: 1.1, thickness: 0.15, tessellation: 20 }, this.scene);
-    scarf.parent = root;
-    scarf.position = new Vector3(0, 1.03, -0.04);
-    scarf.rotation.x = Math.PI / 2;
-    scarf.material = accent;
+    const avatarShadow = MeshBuilder.CreateSphere("hanaPuffAura", { diameter: 2.2, segments: 20 }, this.scene);
+    avatarShadow.parent = root;
+    avatarShadow.position = new Vector3(0, 1.35, 0.18);
+    avatarShadow.scaling = new Vector3(0.9, 1.12, 0.18);
+    avatarShadow.material = softAccent;
+    const portraitTexture = new Texture(HANA_RUNNER_URL, this.scene, true, false);
+    portraitTexture.hasAlpha = true;
+    const portraitMaterial = new StandardMaterial(`hanaPortrait-${character.id}`, this.scene);
+    portraitMaterial.diffuseTexture = portraitTexture;
+    portraitMaterial.opacityTexture = portraitTexture;
+    portraitMaterial.emissiveTexture = portraitTexture;
+    portraitMaterial.useAlphaFromDiffuseTexture = true;
+    portraitMaterial.disableLighting = true;
+    const portrait = MeshBuilder.CreatePlane("hanaMascot", { width: 2.5, height: 3.1, sideOrientation: Mesh.DOUBLESIDE }, this.scene);
+    portrait.parent = root;
+    portrait.position = new Vector3(0, 1.38, -0.2);
+    portrait.material = portraitMaterial;
+    const capeAccent = MeshBuilder.CreateTorus("hanaStarClasp", { diameter: 0.34, thickness: 0.08, tessellation: 18 }, this.scene);
+    capeAccent.parent = root;
+    capeAccent.position = new Vector3(0, 0.93, -0.26);
+    capeAccent.rotation.x = Math.PI / 2;
+    capeAccent.material = accent;
     const shieldRing = MeshBuilder.CreateTorus("shieldRing", { diameter: 2.5, thickness: 0.09, tessellation: 32 }, this.scene);
     shieldRing.parent = root;
     shieldRing.position.y = 1.25;
@@ -451,6 +455,7 @@ export class GameWorld {
   }
 
   private createMacaron(root: TransformNode) {
+    this.createHazardFrame(root, 0.73);
     const pink = this.material(`macaronPink-${this.elapsed}`, "#B64D79", 0.12);
     const cream = this.material(`macaronCream-${this.elapsed}`, "#FFF0C6", 0.05);
     for (const [y, material] of [[0.38, pink], [0.68, cream], [0.98, pink]] as const) {
@@ -462,6 +467,7 @@ export class GameWorld {
   }
 
   private createStorm(root: TransformNode) {
+    this.createHazardFrame(root, 0.05);
     const cloud = this.material(`stormCloud-${this.elapsed}`, "#68537D", 0.12);
     const bolt = this.material(`stormBolt-${this.elapsed}`, "#FFE069", 0.54);
     this.createCloud(root, cloud, 0.75);
@@ -476,10 +482,10 @@ export class GameWorld {
     const star = MeshBuilder.CreatePolyhedron("wishStar", { type: 1, size: 0.53 }, this.scene);
     star.parent = root;
     star.material = this.material(`wishStar-${this.elapsed}`, "#FFD66B", 0.62);
-    const ring = MeshBuilder.CreateTorus("starHalo", { diameter: 1.05, thickness: 0.04, tessellation: 20 }, this.scene);
+    const ring = MeshBuilder.CreateTorus("starHalo", { diameter: 1.27, thickness: 0.085, tessellation: 20 }, this.scene);
     ring.parent = root;
     ring.rotation.x = Math.PI / 2;
-    ring.material = this.material(`starHalo-${this.elapsed}`, "#FFFFFF", 0.35);
+    ring.material = this.material(`starHalo-${this.elapsed}`, "#48D6BC", 0.52);
   }
 
   private createShield(root: TransformNode) {
@@ -503,6 +509,21 @@ export class GameWorld {
       curl.rotation.x = Math.PI / 2;
       curl.material = gustMaterial;
     }
+  }
+
+  private createHazardFrame(root: TransformNode, y: number) {
+    const warningMaterial = this.material(`hazardNavy-${this.elapsed}`, "#213E63", 0.18);
+    const warningInner = this.material(`hazardBerry-${this.elapsed}`, "#A73F65", 0.16);
+    const outer = MeshBuilder.CreateBox("hazardWarningFrame", { width: 1.6, height: 1.6, depth: 0.12 }, this.scene);
+    outer.parent = root;
+    outer.position = new Vector3(0, y, 0.3);
+    outer.rotation.z = Math.PI / 4;
+    outer.material = warningMaterial;
+    const inner = MeshBuilder.CreateBox("hazardWarningInner", { width: 1.15, height: 1.15, depth: 0.13 }, this.scene);
+    inner.parent = root;
+    inner.position = new Vector3(0, y, 0.21);
+    inner.rotation.z = Math.PI / 4;
+    inner.material = warningInner;
   }
 
   private material(name: string, hex: string, emissive: number) {
@@ -532,6 +553,8 @@ export class GameWorld {
       message: this.messageTimer > 0 || this.status !== "playing" ? this.message : "",
       isNewRecord: this.newRecord,
       audioEnabled: this.audio.isEnabled,
+      difficultyLevel: this.getDifficulty().level,
+      speed: Math.round(this.getDifficulty().speed),
     };
     window.dispatchEvent(new CustomEvent<GameSnapshot>("skydash:state", { detail: snapshot }));
   }

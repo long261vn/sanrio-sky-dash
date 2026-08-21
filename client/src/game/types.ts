@@ -56,4 +56,6 @@ export interface GameSnapshot {
   message: string;
   isNewRecord: boolean;
   audioEnabled: boolean;
+  difficultyLevel: number;
+  speed: number;
 }

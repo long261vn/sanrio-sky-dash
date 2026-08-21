@@ -16,6 +16,9 @@
 | `character-pack` | Tám mascot chibi làm neo style cho selectable runners. | 120px tham chiếu mỗi nhân vật | `/manus-storage/sanrio-sky-dash-character-pack_ad85e837.png` |
 | `obstacle-pack` | Mây mưa, macaron, vali, bubble, sao và gió mint. | 96–140px tham chiếu mỗi món | `/manus-storage/sanrio-sky-dash-obstacle-pack_423b7f6c.png` |
 | `wish-star-logo` | Ngôi sao điều ước và đường mây; sử dụng ở menu/fav icon. | 72–112px | `/manus-storage/sky-dash-logo-retry_53835e27.png` |
+| `hana-runner-v2` | Mascot Hana mới, minh hoạ chạy 3/4 với cape coral và sneaker mint. | 128×158px trong gameplay | `/manus-storage/hana-runner-mascot-v2_672361c8.png` |
+| `hana-signals-v2` | Hệ quy chiếu nhìn nhanh: phần thưởng mint/gold và cảnh báo berry/navy. | 96px mỗi đối tượng | `/manus-storage/hana-gameplay-signals-v2_02663f2c.png` |
+| `hana-tutorial-v2` | Hình minh hoạ đổi làn, nhảy và trượt trong onboarding. | 16:9, tutorial panel | `/manus-storage/hana-tutorial-card-v2_79a9bc21.png` |
 
 ## Runtime assignment
 
