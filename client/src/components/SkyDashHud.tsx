@@ -8,7 +8,6 @@ import { CHARACTERS, type CharacterId, type GameCommand, type GameSnapshot } fro
 
 const LOGO_URL = "/manus-storage/sky-dash-logo-retry_53835e27.png";
 const TARGET_URL = "/manus-storage/sky-dash-menu-art-retry_f2351b45.png";
-const TUTORIAL_URL = "/manus-storage/hana-tutorial-card-v2_79a9bc21.png";
 
 const initialSnapshot: GameSnapshot = {
   status: "menu",
@@ -34,7 +33,7 @@ function send(command: GameCommand) {
 export default function SkyDashHud() {
   const [snapshot, setSnapshot] = useState<GameSnapshot>(initialSnapshot);
   const [selectedId, setSelectedId] = useState<CharacterId>("cinnamoroll");
-  const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [tutorialOpen, setTutorialOpen] = useState(() => new URLSearchParams(window.location.search).has("guide"));
 
   useEffect(() => {
     const onState = (event: Event) => {
@@ -77,7 +76,7 @@ export default function SkyDashHud() {
           <section className="menu-panel">
             <div className="menu-copy">
               <div className="brand-lockup"><img src={LOGO_URL} alt="Biểu tượng ngôi sao điều ước" /><span>CHẠY ĐUA CÙNG HANA</span></div>
-              <button className="menu-sound-toggle" onClick={() => send({ type: "toggleAudio" })} aria-label={snapshot.audioEnabled ? "Tắt âm thanh" : "Bật âm thanh"}>{snapshot.audioEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}<span>{snapshot.audioEnabled ? "Âm thanh bật" : "Âm thanh tắt"}</span></button>
+              <button className="menu-sound-toggle" onClick={() => send({ type: "toggleAudio" })} aria-label={snapshot.audioEnabled ? "Tắt nhạc nền" : "Bật nhạc nền"}>{snapshot.audioEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}<span>{snapshot.audioEnabled ? "Nhạc nền: Bật" : "Nhạc nền: Tắt"}</span></button>
               <p className="eyebrow">ENDLESS RUNNER · CLOUD COLLECTION</p>
               <h1>Chọn người bạn<br />dẫn đường.</h1>
               <p className="menu-intro">Mỗi người chạy có dáng riêng và một thế mạnh thực sự. Chọn người bạn phù hợp, rồi lướt qua ba làn mây để săn sao điều ước.</p>
@@ -95,7 +94,7 @@ export default function SkyDashHud() {
                 ))}
               </div>
               <button className="play-button" onClick={() => send({ type: "start", characterId: selectedId })}><Play size={20} fill="currentColor" /> Chạy cùng {selected.name}</button>
-              <p className="fan-note">Nhạc nền bắt đầu sau khi bạn chọn chạy.</p>
+              <p className="fan-note">Nhạc nền sẽ bắt đầu khi bạn bấm chạy; có thể bật/tắt bằng nút loa.</p>
             </div>
           </section>
         </div>
@@ -113,18 +112,22 @@ export default function SkyDashHud() {
         <div className="tutorial-scrim">
           <section className="tutorial-panel" aria-label="Hướng dẫn chơi">
             <div className="tutorial-copy">
-              <p className="eyebrow">HƯỚNG DẪN NHANH</p>
-              <h2>Ba dấu hiệu để<br />chạy thật xa.</h2>
-              <p>Đừng chỉ nhìn màu sắc. Hana dùng <strong>vòng sáng mint</strong> cho phần thưởng và <strong>biển cảnh báo navy–berry</strong> cho mọi vật cản.</p>
+              <p className="eyebrow">HƯỚNG DẪN TRÊN ĐƯỜNG CHẠY</p>
+              <h2>Nhìn đúng vật,<br />làm đúng bước.</h2>
+              <p>Ba ví dụ bên phải dùng <strong>chính màu sắc và hình dáng</strong> đang xuất hiện trong lượt chạy. Chỉ cần nhớ một luật: sao thì lấy, macaron thì nhảy, mây giông thì trượt.</p>
               <div className="lesson-list">
-                <div className="lesson reward"><Sparkles size={20} /><span><b>NHẶT</b> · Sao mint/gold và bubble cầu vồng là vật phẩm tốt.</span></div>
-                <div className="lesson hazard"><TriangleAlert size={20} /><span><b>NÉ</b> · Khung navy–berry là cảnh báo: nhảy qua macaron, trượt dưới mây giông.</span></div>
-                <div className="lesson move"><Gauge size={20} /><span><b>ĐỔI LÀN</b> · Dùng ← →; càng xa, tốc độ và số chướng ngại càng tăng.</span></div>
+                <div className="lesson reward"><Sparkles size={20} /><span><b>LẤY SAO</b> · Đổi làn ← → để chạm sao vàng có vòng mint. Sao tăng combo.</span></div>
+                <div className="lesson hazard"><TriangleAlert size={20} /><span><b>NHẢY MACARON</b> · Biển navy–berry + macaron hồng: nhấn SPACE hoặc ↑ để nhảy qua.</span></div>
+                <div className="lesson move"><Gauge size={20} /><span><b>TRƯỢT DƯỚI MÂY GIÔNG</b> · Biển navy–berry + tia sét: nhấn ↓ để trượt qua, hoặc đổi làn để né.</span></div>
               </div>
               <button className="play-button" onClick={() => setTutorialOpen(false)}>Rõ rồi, quay lại bộ sưu tập <ChevronRight size={19} /></button>
               <button className="quiet-button" onClick={() => setTutorialOpen(false)}>Bỏ qua lần này</button>
             </div>
-            <div className="tutorial-art-wrap"><img src={TUTORIAL_URL} className="tutorial-art" alt="Hana đổi làn, nhảy qua vật cản và trượt dưới mây giông" /><div className="tutorial-callout mint">Vật phẩm tốt</div><div className="tutorial-callout berry">Cảnh báo nguy hiểm</div></div>
+            <div className="tutorial-live-board" aria-label="Mô hình vật thể thật trong game">
+              <article className="live-lesson-card live-reward"><div className="live-object live-star">★</div><div><span>LẤY</span><h3>Sao điều ước</h3><p>← → đổi làn để lấy</p></div></article>
+              <article className="live-lesson-card live-macaron"><div className="live-object live-macaron-shape"><i /><i /><i /></div><div><span>NHẢY</span><h3>Macaron hồng</h3><p>SPACE hoặc ↑ để vượt</p></div></article>
+              <article className="live-lesson-card live-storm"><div className="live-object live-storm-shape"><i>ϟ</i></div><div><span>TRƯỢT / NÉ</span><h3>Mây giông</h3><p>↓ để trượt, hoặc đổi làn</p></div></article>
+            </div>
           </section>
         </div>
       )}

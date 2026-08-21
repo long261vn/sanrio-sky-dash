@@ -15,11 +15,13 @@ export class AudioManager {
   private readonly bgm = new Audio(BGM_URL);
   private readonly effects: Record<EffectName, HTMLAudioElement>;
   private enabled = true;
+  private unlocked = false;
 
   constructor() {
     this.bgm.loop = true;
     this.bgm.preload = "auto";
-    this.bgm.volume = 0.28;
+    this.bgm.volume = 0.38;
+    this.bgm.load();
     this.effects = Object.fromEntries(
       Object.entries(EFFECT_URLS).map(([name, url]) => {
         const audio = new Audio(url);
@@ -34,18 +36,25 @@ export class AudioManager {
     return this.enabled;
   }
 
-  toggle(shouldResume: boolean) {
+  async toggle(shouldResume: boolean) {
     this.enabled = !this.enabled;
     if (!this.enabled) {
       this.bgm.pause();
-      return;
+      return false;
     }
-    if (shouldResume) this.startMusic();
+    return shouldResume ? this.startMusic() : true;
   }
 
-  startMusic() {
-    if (!this.enabled) return;
-    void this.bgm.play().catch(() => undefined);
+  async startMusic() {
+    if (!this.enabled) return false;
+    this.unlocked = true;
+    this.bgm.muted = false;
+    try {
+      await this.bgm.play();
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   pauseMusic() {
@@ -59,6 +68,7 @@ export class AudioManager {
 
   play(effect: EffectName) {
     if (!this.enabled) return;
+    this.unlocked = true;
     const sound = this.effects[effect];
     sound.currentTime = 0;
     void sound.play().catch(() => undefined);

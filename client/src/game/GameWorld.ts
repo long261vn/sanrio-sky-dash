@@ -147,8 +147,10 @@ export class GameWorld {
   private handleCommand(command: GameCommand) {
     if (!command) return;
     if (command.type === "toggleAudio") {
-      this.audio.toggle(this.status === "playing");
-      this.showMessage(this.audio.isEnabled ? "Âm thanh đã bật — mây đang ngân nga!" : "Âm thanh đã tắt.");
+      void this.audio.toggle(this.status === "playing").then((started) => {
+        this.showMessage(!this.audio.isEnabled ? "Âm thanh đã tắt." : started ? "Nhạc nền đã bật — mây đang ngân nga!" : "Không phát được nhạc. Chạm loa để thử lại.");
+        this.emitState();
+      });
       this.emitState();
       return;
     }
@@ -158,7 +160,7 @@ export class GameWorld {
     if (command.type === "jump" && this.status === "playing") this.jump();
     if (command.type === "slide" && this.status === "playing") this.slide();
     if (command.type === "pause" && this.status === "playing") { this.audio.play("button"); this.audio.pauseMusic(); this.setStatus("paused", "Trên mây cũng cần nghỉ một nhịp."); }
-    if (command.type === "resume" && this.status === "paused") { this.audio.play("button"); this.audio.startMusic(); this.setStatus("playing", "Bay tiếp nào!"); }
+    if (command.type === "resume" && this.status === "paused") { this.audio.play("button"); void this.startMusicWithFeedback(); this.setStatus("playing", "Bay tiếp nào!"); }
     if (command.type === "restart") this.start();
     if (command.type === "menu") { this.audio.play("button"); this.audio.stopMusic(); this.setStatus("menu", "Hana đã sẵn sàng chạy vào điều ước."); }
   }
@@ -192,7 +194,7 @@ export class GameWorld {
 
   private start(characterId?: CharacterId) {
     this.audio.play("button");
-    this.audio.startMusic();
+    void this.startMusicWithFeedback();
     if (characterId) this.selectCharacter(characterId);
     this.entities.splice(0).forEach((entity) => entity.node.dispose(false, true));
     this.randomState = this.rngSeed;
@@ -213,6 +215,14 @@ export class GameWorld {
     this.lastDifficultyLevel = 1;
     if (this.player) this.player.position = new Vector3(0, 0, PLAYER_Z);
     this.setStatus("playing", "Lướt qua mây, gom điều ước!");
+  }
+
+  private async startMusicWithFeedback() {
+    const started = await this.audio.startMusic();
+    if (!started && this.status === "playing") {
+      this.showMessage("Nhạc chưa phát. Chạm biểu tượng loa để thử lại.");
+      this.emitState();
+    }
   }
 
   private selectCharacter(characterId: CharacterId) {

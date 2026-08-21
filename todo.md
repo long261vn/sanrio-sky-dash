@@ -1,5 +1,11 @@
 # Hạng mục cập nhật — Chạy Đua Cùng Hana
 
+- [x] Kiểm tra và sửa tài sản/đường dẫn nhạc nền cùng cơ chế khởi phát âm thanh sau thao tác chơi.
+- [x] Thay hướng dẫn minh hoạ bằng thẻ dùng đúng vật thể thật: sao, macaron và mây giông.
+- [x] Ghi rõ hành động theo từng vật thể: lấy, nhảy qua, trượt dưới hoặc đổi làn né tránh.
+- [x] Tối ưu menu để toàn bộ chọn nhân vật và CTA vừa một viewport desktop/mobile, không phải cuộn.
+- [x] Kiểm thử âm thanh và độ rõ của onboarding trên desktop/mobile.
+
 - [x] Hoàn tất audit QA về chồng chéo giao diện, khả năng đọc và luồng gameplay.
 - [x] Loại bỏ sprite nhân vật sai tư thế; thay bằng avatar procedural đứng đúng chiều, có silhouette rõ.
 - [x] Khôi phục bộ chọn tám nhân vật hoạt động thực sự với tạo hình, màu và khả năng riêng.
