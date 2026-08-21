@@ -37,6 +37,8 @@ export class GameWorld {
   private characterId: CharacterId = "cinnamoroll";
   private player: TransformNode | null = null;
   private playerYVelocity = 0;
+  private playerAirHeight = 0;
+  private landingTimer = 0;
   private playerLane = 1;
   private targetLane = 1;
   private slideTimer = 0;
@@ -186,6 +188,8 @@ export class GameWorld {
     this.playerLane = 1;
     this.targetLane = 1;
     this.playerYVelocity = 0;
+    this.playerAirHeight = 0;
+    this.landingTimer = 0;
     this.slideTimer = 0;
     this.shieldTimer = 0;
     this.spawnTimer = 0.55;
@@ -208,14 +212,14 @@ export class GameWorld {
   }
 
   private jump() {
-    if (!this.player || this.player.position.y > 0.03 || this.slideTimer > 0) return;
+    if (!this.player || this.playerAirHeight > 0.03 || this.slideTimer > 0) return;
     this.audio.play("jump");
     this.playerYVelocity = 10.7;
     this.showMessage("Nhảy thật cao!");
   }
 
   private slide() {
-    if (!this.player || this.player.position.y > 0.08) return;
+    if (!this.player || this.playerAirHeight > 0.08) return;
     this.audio.play("slide");
     this.slideTimer = 0.62;
     this.showMessage("Lướt qua nào!");
@@ -224,17 +228,58 @@ export class GameWorld {
   private updatePlayer(delta: number) {
     if (!this.player) return;
     const targetX = LANES[this.targetLane];
-    this.player.position.x += (targetX - this.player.position.x) * Math.min(1, delta * 12);
+    const laneDelta = targetX - this.player.position.x;
+    this.player.position.x += laneDelta * Math.min(1, delta * 12);
     this.playerYVelocity -= 26 * delta;
-    this.player.position.y = Math.max(0, this.player.position.y + this.playerYVelocity * delta);
-    if (this.player.position.y <= 0) this.playerYVelocity = 0;
-    const runningBob = Math.sin(this.elapsed * 15) * 0.055;
-    this.player.rotation.z = 0;
-    this.player.position.y += runningBob * (this.player.position.y <= 0.001 ? 1 : 0.15);
-    if (this.player.position.y < 0) this.player.position.y = 0;
-    this.player.scaling.y = this.slideTimer > 0 ? 0.56 : 0.9;
-    this.player.scaling.x = this.slideTimer > 0 ? 1.08 : 0.9;
+    const wasAirborne = this.playerAirHeight > 0.01;
+    this.playerAirHeight = Math.max(0, this.playerAirHeight + this.playerYVelocity * delta);
+    if (this.playerAirHeight <= 0) {
+      if (wasAirborne && this.playerYVelocity < 0) this.landingTimer = 0.2;
+      this.playerYVelocity = 0;
+    }
+    this.landingTimer = Math.max(0, this.landingTimer - delta);
+
+    const runPhase = this.elapsed * 16;
+    const runWave = Math.sin(runPhase);
+    const isSliding = this.slideTimer > 0;
+    const isAirborne = this.playerAirHeight > 0.01;
+    const landingPulse = this.landingTimer > 0 ? this.landingTimer / 0.2 : 0;
+    const runningBob = isAirborne || isSliding ? 0 : runWave * 0.065;
+    this.player.position.y = this.playerAirHeight + runningBob;
+    this.player.rotation.z = isSliding ? -0.075 : isAirborne ? laneDelta * -0.025 : laneDelta * -0.035 + runWave * 0.018;
+    const baseScale = 0.9;
+    this.player.scaling.y = isSliding ? 0.62 : baseScale * (isAirborne ? (this.playerYVelocity > 0 ? 1.08 : 0.96) : 1 - landingPulse * 0.16 + runWave * 0.015);
+    this.player.scaling.x = isSliding ? 1.14 : baseScale * (isAirborne ? (this.playerYVelocity > 0 ? 0.94 : 1.06) : 1 + landingPulse * 0.13 - runWave * 0.018);
     this.player.scaling.z = 0.9;
+
+    const parts = this.player.getChildMeshes(false);
+    const portrait = parts.find((mesh) => mesh.name === "hanaMascot");
+    const capeFlutter = parts.find((mesh) => mesh.name === "hanaCapeFlutter");
+    const leftStep = parts.find((mesh) => mesh.name === "hanaLeftStep");
+    const rightStep = parts.find((mesh) => mesh.name === "hanaRightStep");
+    const puffAura = parts.find((mesh) => mesh.name === "hanaPuffAura");
+    if (portrait) {
+      portrait.position.y = isSliding ? 0.96 : 1.38 + (isAirborne ? Math.sin(this.elapsed * 10) * 0.025 : runWave * 0.035);
+      portrait.scaling.x = isSliding ? 1.2 : 1 - landingPulse * 0.08;
+      portrait.scaling.y = isSliding ? 0.7 : 1 + landingPulse * 0.1;
+      portrait.rotation.z = isSliding ? -0.055 : isAirborne ? laneDelta * -0.01 : runWave * 0.014;
+    }
+    if (capeFlutter) {
+      capeFlutter.position.x = isSliding ? -0.86 : -0.68 - runWave * 0.07;
+      capeFlutter.position.y = isSliding ? 0.98 : 1.2 + runWave * 0.055;
+      capeFlutter.scaling.x = isSliding ? 1.65 : isAirborne ? 1.42 : 1.12 + Math.max(0, runWave) * 0.25;
+      capeFlutter.scaling.y = isSliding ? 0.42 : 0.58 + Math.abs(runWave) * 0.12;
+      capeFlutter.rotation.z = isSliding ? -0.18 : -0.08 - runWave * 0.08;
+    }
+    if (leftStep && rightStep) {
+      const leftPulse = Math.max(0.3, 0.5 + 0.5 * Math.sin(runPhase));
+      const rightPulse = Math.max(0.3, 0.5 + 0.5 * Math.sin(runPhase + Math.PI));
+      leftStep.scaling.set(leftPulse, leftPulse, 1);
+      rightStep.scaling.set(rightPulse, rightPulse, 1);
+      leftStep.isVisible = !isAirborne && !isSliding;
+      rightStep.isVisible = !isAirborne && !isSliding;
+    }
+    if (puffAura) puffAura.scaling.set(0.9 + Math.abs(runWave) * 0.08, 1.12 + Math.abs(runWave) * 0.04, 0.18);
     const shieldRing = this.player.getChildMeshes().find((mesh) => mesh.name === "shieldRing");
     if (shieldRing) shieldRing.isVisible = this.shieldTimer > 0;
   }
@@ -417,6 +462,17 @@ export class GameWorld {
     avatarShadow.position = new Vector3(0, 1.35, 0.18);
     avatarShadow.scaling = new Vector3(0.9, 1.12, 0.18);
     avatarShadow.material = softAccent;
+    const capeMaterial = this.material(`hanaCapeFlutter-${character.id}`, "#F06E82", 0.26);
+    capeMaterial.alpha = 1;
+    capeMaterial.disableLighting = true;
+    capeMaterial.backFaceCulling = false;
+    capeMaterial.emissiveColor = Color3.FromHexString("#F06E82").scale(0.42);
+    const capeFlutter = MeshBuilder.CreatePlane("hanaCapeFlutter", { width: 1.5, height: 0.62, sideOrientation: Mesh.DOUBLESIDE }, this.scene);
+    capeFlutter.parent = root;
+    capeFlutter.position = new Vector3(-0.68, 1.2, 0.12);
+    capeFlutter.scaling = new Vector3(1.12, 0.58, 1);
+    capeFlutter.material = capeMaterial;
+    capeFlutter.isVisible = false;
     const portraitTexture = new Texture(HANA_RUNNER_URL, this.scene, true, false);
     portraitTexture.hasAlpha = true;
     const portraitMaterial = new StandardMaterial(`hanaPortrait-${character.id}`, this.scene);
@@ -434,6 +490,16 @@ export class GameWorld {
     capeAccent.position = new Vector3(0, 0.93, -0.26);
     capeAccent.rotation.x = Math.PI / 2;
     capeAccent.material = accent;
+    const stepMaterial = this.material(`hanaStepMint-${character.id}`, "#7FDDCE", 0.32);
+    stepMaterial.alpha = 0.78;
+    stepMaterial.disableLighting = true;
+    for (const x of [-0.38, 0.38]) {
+      const step = MeshBuilder.CreateTorus(x < 0 ? "hanaLeftStep" : "hanaRightStep", { diameter: 0.46, thickness: 0.045, tessellation: 18 }, this.scene);
+      step.parent = root;
+      step.position = new Vector3(x, 0.1, 0.08);
+      step.rotation.x = Math.PI / 2;
+      step.material = stepMaterial;
+    }
     const shieldRing = MeshBuilder.CreateTorus("shieldRing", { diameter: 2.5, thickness: 0.09, tessellation: 32 }, this.scene);
     shieldRing.parent = root;
     shieldRing.position.y = 1.25;
