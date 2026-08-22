@@ -7,6 +7,12 @@
 - [x] Trỏ bundle GitHub Pages đến API leaderboard Manus và giới hạn CORS đúng origin GitHub Pages.
 - [x] Kiểm thử các quy tắc thuần: hợp lý điểm–sao–quãng đường, chỉ thay kỷ lục tốt hơn, thứ tự score→stars→submittedAt và giới hạn 30 dòng.
 - [x] Viết test mock DB cho `submitScore`/`listLeaderboard` để xác nhận ghi và đọc dữ liệu theo API.
+- [x] Chẩn đoán nguyên nhân lượt chơi sau không lưu được điểm vào bảng xếp hạng.
+- [x] Tự động gửi điểm hợp lệ khi lượt chơi kết thúc, không yêu cầu bấm nút lưu.
+- [x] Hiển thị hạng đạt được trong Top 30 và mở bảng xếp hạng khi người chơi vào bảng.
+- [x] Làm mới bảng xếp hạng theo dữ liệu API sau mỗi lượt và xử lý rõ trạng thái ngoài Top 30/lỗi lưu.
+- [x] Tự trở về màn hình chọn nhân vật sau thông báo kết quả và bảng xếp hạng.
+- [ ] Kiểm thử hai lượt liên tiếp bằng cùng người chơi, phản hồi hạng và luồng quay về màn đầu.
 
 - [x] Nâng cấp game lên hạ tầng có cơ sở dữ liệu và API an toàn.
 - [x] Tạo dữ liệu mùa, điểm số, tên người chơi và chỉ mục xếp hạng Top 30.

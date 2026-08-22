@@ -5,7 +5,8 @@ import { getDb } from "./db";
 
 const VIETNAM_TIMEZONE = "Asia/Ho_Chi_Minh";
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-const SUBMIT_COOLDOWN_MS = 20_000;
+const DUPLICATE_REQUEST_WINDOW_MS = 1_200;
+const recentSubmitByPlayer = new Map<string, number>();
 
 export type ScoreSubmission = {
   playerId: string;
@@ -27,7 +28,7 @@ export type LeaderboardRepository = {
   getPlayerEntry: (seasonId: number, playerId: string) => Promise<LeaderboardEntry | null>;
   insertEntry: (entry: Omit<LeaderboardEntry, "id">) => Promise<void>;
   updateEntry: (id: number, entry: Omit<LeaderboardEntry, "id" | "seasonId" | "playerId">) => Promise<void>;
-  listEntries: (seasonId: number) => Promise<LeaderboardRow[]>;
+  listEntries: (seasonId: number) => Promise<LeaderboardEntry[]>;
 };
 
 export function isScorePlausible(input: Pick<ScoreSubmission, "score" | "stars" | "distance">) {
@@ -101,6 +102,9 @@ async function createDatabaseRepository(): Promise<LeaderboardRepository> {
     async listEntries(seasonId) {
       return db
         .select({
+          id: leaderboardEntries.id,
+          seasonId: leaderboardEntries.seasonId,
+          playerId: leaderboardEntries.playerId,
           playerName: leaderboardEntries.playerName,
           runnerId: leaderboardEntries.runnerId,
           score: leaderboardEntries.score,
@@ -120,12 +124,18 @@ async function resolveRepository(repository?: LeaderboardRepository) {
   return repository ?? createDatabaseRepository();
 }
 
+async function buildLeaderboard(repository: LeaderboardRepository) {
+  const season = await repository.getLatestSeason();
+  if (!season) return { seasonKey: getSeasonWindow().seasonKey, rankedRows: [], rows: [] as Array<LeaderboardRow & { rank: number }> };
+  const rankedRows = rankTop30(await repository.listEntries(season.id));
+  const rows = rankedRows.map(({ id: _id, seasonId: _seasonId, playerId: _playerId, ...row }) => row);
+  return { seasonKey: season.seasonKey, rankedRows, rows };
+}
+
 export async function listLeaderboard(repository?: LeaderboardRepository) {
   const repo = await resolveRepository(repository);
-  const season = await repo.getLatestSeason();
-  if (!season) return { seasonKey: getSeasonWindow().seasonKey, rows: [] };
-  const rows = await repo.listEntries(season.id);
-  return { seasonKey: season.seasonKey, rows: rankTop30(rows) };
+  const leaderboard = await buildLeaderboard(repo);
+  return { seasonKey: leaderboard.seasonKey, rows: leaderboard.rows };
 }
 
 export async function submitScore(input: ScoreSubmission, repository?: LeaderboardRepository) {
@@ -136,8 +146,12 @@ export async function submitScore(input: ScoreSubmission, repository?: Leaderboa
   const season = await repo.upsertSeason(getSeasonWindow());
   const previous = await repo.getPlayerEntry(season.id, input.playerId);
   const submittedAt = Date.now();
-  if (previous && submittedAt - previous.submittedAt < SUBMIT_COOLDOWN_MS) {
-    throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Hãy chờ một lát trước khi lưu điểm tiếp theo." });
+  if (!repository) {
+    const previousRequestAt = recentSubmitByPlayer.get(input.playerId);
+    if (previousRequestAt && submittedAt - previousRequestAt < DUPLICATE_REQUEST_WINDOW_MS) {
+      throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Đang đồng bộ kết quả chuyến bay, hãy chờ một nhịp nhé." });
+    }
+    recentSubmitByPlayer.set(input.playerId, submittedAt);
   }
 
   const improved = isBetterScore(previous, input);
@@ -154,8 +168,7 @@ export async function submitScore(input: ScoreSubmission, repository?: Leaderboa
     });
   }
 
-  const leaderboard = await listLeaderboard(repo);
-  const savedScore = improved ? input.score : previous?.score ?? input.score;
-  const rank = leaderboard.rows.find((row) => row.playerName === input.playerName && row.score === savedScore)?.rank ?? null;
-  return { ...leaderboard, rank, improved };
+  const leaderboard = await buildLeaderboard(repo);
+  const playerRank = leaderboard.rankedRows.find((row) => row.playerId === input.playerId)?.rank ?? null;
+  return { seasonKey: leaderboard.seasonKey, rows: leaderboard.rows, rank: playerRank, improved, enteredTop30: playerRank !== null };
 }

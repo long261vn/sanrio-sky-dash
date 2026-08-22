@@ -102,6 +102,12 @@ describe("submitScore through a repository", () => {
     expect(result.rows[0]).toMatchObject({ score: 180, stars: 2 });
   });
 
+  it("returns the correct rank even when another player uses the same display name", async () => {
+    const repository = createMemoryRepository([{ id: 1, seasonId: 1, ...baseScore, playerId: "other-player", score: 300, submittedAt: Date.now() - 30_000 }]);
+    const result = await submitScore({ ...baseScore, score: 180 }, repository);
+    expect(result).toMatchObject({ rank: 2, enteredTop30: true });
+  });
+
   it("returns a ranked Top 30 response from the repository", async () => {
     const seasonId = 1;
     const entries = Array.from({ length: 31 }, (_, index) => ({

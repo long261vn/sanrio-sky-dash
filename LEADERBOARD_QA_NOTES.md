@@ -10,3 +10,4 @@
 - Trên GitHub Pages, modal **Top 30 tuần** mở thành công và đọc API cross-origin: hiển thị mùa `2026-08-22`, trạng thái rỗng và nội dung reset lười. Không có lỗi CORS hay lỗi tải ảnh được quan sát.
 - Một lượt chơi trực tiếp trên GitHub Pages đã tải canvas 3D, mascot, đường chạy, sao, đệm thấp, biển nhắc **NHẢY** và điều khiển bàn phím. Lượt kết thúc hiển thị lại form lưu điểm; không nhập tên hoặc gửi entry thử vào bảng công khai.
 - Console của GitHub Pages sau lượt thử không ghi lỗi runtime hoặc tải audio. Đã bổ sung `404.html` để đường dẫn con của Pages quay lại base `/sanrio-sky-dash/`.
+- Workflow Pages của commit `e2215a59` hoàn tất thành công. Truy cập đường dẫn con `/sanrio-sky-dash/duong-dan-kiem-thu` đã tự quay về menu game, xác nhận fallback hoạt động.

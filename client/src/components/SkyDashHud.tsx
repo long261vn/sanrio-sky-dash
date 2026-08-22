@@ -2,8 +2,8 @@
  * Mây Bông & Kẹo Ngọt: HUD postcard dùng cream, blueberry ink và Sky Pudding.
  * Các nút phản hồi tức thì; lớp UI chỉ giao tiếp với gameplay bằng CustomEvent.
  */
-import { useEffect, useMemo, useState } from "react";
-import { ChevronRight, CircleHelp, Crown, Gauge, Pause, Play, RotateCcw, Trophy, Volume2, VolumeX, X, Zap } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronRight, CircleHelp, Crown, Gauge, Pause, Play, Trophy, Volume2, VolumeX, X, Zap } from "lucide-react";
 import { CHARACTERS, type CharacterId, type GameCommand, type GameSnapshot } from "@/game/types";
 import { assetUrl } from "@/lib/assets";
 import { trpc } from "@/lib/trpc";
@@ -15,6 +15,8 @@ const GUIDE_JUMP_URL = assetUrl("hana-low-jump-cushion_8c9af18d.png");
 const GUIDE_SLIDE_URL = assetUrl("hana-high-slide-gate_b3d23f2c.png");
 const PLAYER_ID_KEY = "hanaSkyDashPlayerId";
 const PLAYER_NAME_KEY = "hanaSkyDashPlayerName";
+
+type CompletedRun = GameSnapshot & { runId: number };
 
 function getPlayerId() {
   const current = window.localStorage.getItem(PLAYER_ID_KEY);
@@ -55,19 +57,49 @@ export default function SkyDashHud() {
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const [playerName, setPlayerName] = useState(() => window.localStorage.getItem(PLAYER_NAME_KEY) ?? "");
   const [nameError, setNameError] = useState("");
+  const [completedRun, setCompletedRun] = useState<CompletedRun | null>(null);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "ranked" | "outside" | "error">("idle");
+  const [recentRank, setRecentRank] = useState<number | null>(null);
+  const [lastSubmissionImproved, setLastSubmissionImproved] = useState<boolean | null>(null);
+  const snapshotRef = useRef(initialSnapshot);
+  const runIdRef = useRef(0);
+  const returnTimerRef = useRef<number | null>(null);
   const leaderboard = trpc.leaderboard.top30.useQuery(undefined, { staleTime: 20_000, refetchOnWindowFocus: false });
+  const leaderboardUtils = trpc.useUtils();
   const submitScore = trpc.leaderboard.submit.useMutation({
-    onSuccess: () => {
-      leaderboard.refetch();
-      setLeaderboardOpen(true);
+    onSuccess: (result) => {
+      leaderboardUtils.leaderboard.top30.setData(undefined, { seasonKey: result.seasonKey, rows: result.rows });
+      setRecentRank(result.rank);
+      setLastSubmissionImproved(result.improved);
+      setSaveStatus(result.enteredTop30 ? "ranked" : "outside");
       setNameError("");
+      if (result.enteredTop30) setLeaderboardOpen(true);
+      returnTimerRef.current = window.setTimeout(() => {
+        setLeaderboardOpen(false);
+        setCompletedRun(null);
+        setSaveStatus("idle");
+        send({ type: "menu" });
+      }, result.enteredTop30 ? 5_000 : 2_400);
     },
-    onError: (error) => setNameError(error.message),
+    onError: (error) => {
+      setSaveStatus("error");
+      setNameError(error.message);
+      returnTimerRef.current = window.setTimeout(() => {
+        setCompletedRun(null);
+        setSaveStatus("idle");
+        send({ type: "menu" });
+      }, 2_800);
+    },
   });
 
   useEffect(() => {
     const onState = (event: Event) => {
       const next = (event as CustomEvent<GameSnapshot>).detail;
+      if (next.status === "gameover" && snapshotRef.current.status !== "gameover" && !next.isPractice) {
+        runIdRef.current += 1;
+        setCompletedRun({ ...next, runId: runIdRef.current });
+      }
+      snapshotRef.current = next;
       setSnapshot(next);
       setSelectedId(next.characterId);
       if (next.status === "playing") setTutorialOpen(false);
@@ -76,6 +108,31 @@ export default function SkyDashHud() {
     return () => window.removeEventListener("skydash:state", onState);
   }, []);
 
+  useEffect(() => () => {
+    if (returnTimerRef.current) window.clearTimeout(returnTimerRef.current);
+  }, []);
+
+  useEffect(() => {
+    if (!completedRun) return;
+    const cleanName = playerName.trim();
+    if (cleanName.length < 2) {
+      setSaveStatus("error");
+      setNameError("Hãy nhập tên từ 2–20 ký tự ở màn hình đầu trước khi chạy.");
+      return;
+    }
+    setSaveStatus("saving");
+    submitScore.mutate({
+      playerId: getPlayerId(),
+      playerName: cleanName,
+      runnerId: completedRun.characterId,
+      score: completedRun.score,
+      stars: completedRun.stars,
+      distance: completedRun.distance,
+    });
+  // A completed run has one immutable id, so the mutation is triggered exactly once per run.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [completedRun?.runId]);
+
   const selected = useMemo(() => CHARACTERS.find((item) => item.id === selectedId) ?? CHARACTERS[0], [selectedId]);
   const isRunning = snapshot.status === "playing";
 
@@ -83,21 +140,23 @@ export default function SkyDashHud() {
     setPlayerName(value);
     window.localStorage.setItem(PLAYER_NAME_KEY, value);
   };
-  const saveScore = () => {
+  const canPlay = () => {
     const cleanName = playerName.trim();
     if (cleanName.length < 2) {
-      setNameError("Nhập tên từ 2–20 ký tự để lưu điểm nhé.");
-      return;
+      setNameError("Nhập tên từ 2–20 ký tự trước khi bắt đầu nhé.");
+      return false;
     }
     window.localStorage.setItem(PLAYER_NAME_KEY, cleanName);
-    submitScore.mutate({
-      playerId: getPlayerId(),
-      playerName: cleanName,
-      runnerId: snapshot.characterId,
-      score: snapshot.score,
-      stars: snapshot.stars,
-      distance: snapshot.distance,
-    });
+    setNameError("");
+    setRecentRank(null);
+    setLastSubmissionImproved(null);
+    setSaveStatus("idle");
+    return true;
+  };
+  const startRun = () => {
+    if (!canPlay()) return;
+    setCompletedRun(null);
+    send({ type: "start", characterId: selectedId });
   };
 
   return (
@@ -139,6 +198,7 @@ export default function SkyDashHud() {
             <div className="selection-drawer">
               <div className="drawer-heading"><div className="selected-runner"><span className="portrait-disc large" style={{ "--character": selected.body, "--accent": selected.accent } as React.CSSProperties}>{selected.icon}</span><div><p>NGƯỜI CHẠY ĐANG CHỌN</p><h2>{selected.name}</h2><span>{selected.tagline}</span></div></div><div className="runner-perks"><span>↥ Nhảy {selected.jumpForce.toFixed(1)}</span><span>★ Thưởng +{Math.round((selected.starBonus - 1) * 100)}%</span><span>◒ Trượt {selected.slideDuration.toFixed(2)}s</span></div></div>
               <div className="player-profile"><label><span>TÊN NGƯỜI CHƠI</span><input value={playerName} onChange={(event) => updatePlayerName(event.target.value.slice(0, 20))} placeholder="Ví dụ: Mây Nhỏ" maxLength={20} /></label><button className="leaderboard-button" onClick={() => setLeaderboardOpen(true)}><Trophy size={16} /> Top 30 tuần</button></div>
+              {nameError && <p className="score-error menu-name-error">{nameError}</p>}
               <div className="character-grid">
                 {CHARACTERS.map((character) => (
                   <button key={character.id} onClick={() => { setSelectedId(character.id); send({ type: "select", characterId: character.id }); }} className={`character-card ${selectedId === character.id ? "selected" : ""}`} style={{ "--character": character.body, "--accent": character.accent } as React.CSSProperties}>
@@ -147,7 +207,7 @@ export default function SkyDashHud() {
                 ))}
               </div>
               <button className="practice-button" onClick={() => send({ type: "practice", characterId: selectedId })}><Play size={15} fill="currentColor" /> Luyện tập 3 bước</button>
-              <button className="play-button" onClick={() => send({ type: "start", characterId: selectedId })}><Play size={20} fill="currentColor" /> Chạy cùng {selected.name}</button>
+              <button className="play-button" onClick={startRun}><Play size={20} fill="currentColor" /> Chạy cùng {selected.name}</button>
               <p className="fan-note">Nhạc nền sẽ bắt đầu khi bạn bấm chạy; có thể bật/tắt bằng nút loa.</p>
             </div>
           </section>
@@ -159,11 +219,11 @@ export default function SkyDashHud() {
       )}
 
       {snapshot.status === "gameover" && (
-        <div className="screen-scrim compact-scrim"><section className="results-panel"><div className="result-badge">{snapshot.isNewRecord ? "★ KỶ LỤC MỚI" : "☁ CHUYẾN BAY HOÀN TẤT"}</div><h2>{snapshot.isNewRecord ? "Bầu trời vỗ tay!" : "Mây vẫn chờ bạn."}</h2><p>{snapshot.message}</p><div className="result-stats"><div><span>Điểm bay</span><strong>{snapshot.score.toLocaleString("vi-VN")}</strong></div><div><span>Sao điều ước</span><strong>★ {snapshot.stars}</strong></div><div><span>Quãng đường</span><strong>{snapshot.distance}m</strong></div></div><div className="score-save"><label><span>LƯU ĐIỂM DƯỚI TÊN</span><input value={playerName} onChange={(event) => updatePlayerName(event.target.value.slice(0, 20))} placeholder="Tên người chơi" maxLength={20} /></label><button className="leaderboard-button" disabled={submitScore.isPending} onClick={saveScore}>{submitScore.isPending ? "Đang lưu..." : "Lưu vào Top 30"}</button></div>{nameError && <p className="score-error">{nameError}</p>}<button className="quiet-button leaderboard-link" onClick={() => setLeaderboardOpen(true)}><Trophy size={15} /> Xem bảng xếp hạng</button><button className="play-button" onClick={() => send({ type: "restart" })}><RotateCcw size={19} /> Chạy thêm một lượt</button><button className="quiet-button" onClick={() => send({ type: "menu" })}><Volume2 size={15} /> Đổi bạn đồng hành</button></section></div>
+        <div className="screen-scrim compact-scrim"><section className="results-panel auto-save-panel"><div className="result-badge">{snapshot.isNewRecord ? "★ KỶ LỤC MỚI" : "☁ CHUYẾN BAY HOÀN TẤT"}</div><h2>{snapshot.isNewRecord ? "Bầu trời vỗ tay!" : "Mây vẫn chờ bạn."}</h2><p>{snapshot.message}</p><div className="result-stats"><div><span>Điểm bay</span><strong>{snapshot.score.toLocaleString("vi-VN")}</strong></div><div><span>Sao điều ước</span><strong>★ {snapshot.stars}</strong></div><div><span>Quãng đường</span><strong>{snapshot.distance}m</strong></div></div><div className={`auto-save-status ${saveStatus}`}><Trophy size={18} /><div>{saveStatus === "saving" && <><b>Đang đồng bộ hành trình...</b><span>Điểm sẽ tự lưu dưới tên {playerName.trim()}.</span></>}{saveStatus === "ranked" && <><b>{lastSubmissionImproved ? (recentRank === 1 ? "Bạn đang dẫn đầu!" : `Bạn đạt hạng #${recentRank}!`) : `Kỷ lục của bạn đang ở hạng #${recentRank}.`}</b><span>Bảng xếp hạng đã cập nhật. Sẽ trở về bộ sưu tập sau ít giây.</span></>}{saveStatus === "outside" && <><b>Điểm đã được ghi nhận.</b><span>Chưa vào Top 30 tuần này; hãy thử thêm một chuyến bay nhé.</span></>}{saveStatus === "error" && <><b>Chưa thể đồng bộ điểm.</b><span>{nameError || "Kiểm tra kết nối rồi thử lại ở lượt sau."}</span></>}{saveStatus === "idle" && <><b>Chuẩn bị đồng bộ điểm...</b><span>Đợi một nhịp nhé.</span></>}</div></div></section></div>
       )}
 
       {leaderboardOpen && (
-        <div className="tutorial-scrim leaderboard-scrim"><section className="leaderboard-panel" aria-label="Bảng xếp hạng Top 30"><header><div><p><Crown size={15} /> BẦU TRỜI VINH DANH</p><h2>Top 30 tuần</h2><span>Mùa bắt đầu {leaderboard.data?.seasonKey ?? "thứ Bảy này"} · reset khi có điểm đầu tiên sau thứ Bảy.</span></div><button className="leaderboard-close" onClick={() => setLeaderboardOpen(false)} aria-label="Đóng bảng xếp hạng"><X size={20} /></button></header>{leaderboard.isLoading ? <div className="leaderboard-empty">Đang gọi các vì sao về bảng xếp hạng...</div> : leaderboard.data?.rows.length ? <ol className="leaderboard-list">{leaderboard.data.rows.map((row) => <li key={`${row.rank}-${row.playerName}-${row.score}`} className={row.rank <= 3 ? `rank-${row.rank}` : ""}><b>{row.rank}</b><span className="rank-runner">{CHARACTERS.find((character) => character.id === row.runnerId)?.icon ?? "★"}</span><strong>{row.playerName}</strong><em>{row.distance}m · ★ {row.stars}</em><mark>{row.score.toLocaleString("vi-VN")}</mark></li>)}</ol> : <div className="leaderboard-empty"><span>★</span><b>Chưa có chuyến bay nào.</b><p>Hãy là người đầu tiên ghi tên lên bầu trời!</p></div>}<footer><span>Chỉ giữ thành tích cao nhất của mỗi người chơi trong tuần.</span><button className="play-button" onClick={() => setLeaderboardOpen(false)}>Quay lại game</button></footer></section></div>
+        <div className="tutorial-scrim leaderboard-scrim"><section className="leaderboard-panel" aria-label="Bảng xếp hạng Top 30"><header><div><p><Crown size={15} /> BẦU TRỜI VINH DANH</p><h2>Top 30 tuần</h2><span>Mùa bắt đầu {leaderboard.data?.seasonKey ?? "thứ Bảy này"} · reset khi có điểm đầu tiên sau thứ Bảy.</span></div><button className="leaderboard-close" onClick={() => setLeaderboardOpen(false)} aria-label="Đóng bảng xếp hạng"><X size={20} /></button></header>{leaderboard.isLoading ? <div className="leaderboard-empty">Đang gọi các vì sao về bảng xếp hạng...</div> : leaderboard.data?.rows.length ? <ol className="leaderboard-list">{leaderboard.data.rows.map((row) => <li key={`${row.rank}-${row.playerName}-${row.score}`} className={`${row.rank <= 3 ? `rank-${row.rank}` : ""} ${row.rank === recentRank && row.playerName === playerName.trim() ? "just-ranked" : ""}`}><b>{row.rank}</b><span className="rank-runner">{CHARACTERS.find((character) => character.id === row.runnerId)?.icon ?? "★"}</span><strong>{row.playerName}</strong><em>{row.distance}m · ★ {row.stars}</em><mark>{row.score.toLocaleString("vi-VN")}</mark></li>)}</ol> : <div className="leaderboard-empty"><span>★</span><b>Chưa có chuyến bay nào.</b><p>Hãy là người đầu tiên ghi tên lên bầu trời!</p></div>}<footer><span>{recentRank ? `Chuyến bay của bạn đang ở hạng #${recentRank}.` : "Chỉ giữ thành tích cao nhất của mỗi người chơi trong tuần."}</span><button className="play-button" onClick={() => setLeaderboardOpen(false)}>Quay lại game</button></footer></section></div>
       )}
 
       {tutorialOpen && snapshot.status === "menu" && (
