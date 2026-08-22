@@ -138,14 +138,14 @@ export async function listLeaderboard(repository?: LeaderboardRepository) {
   return { seasonKey: leaderboard.seasonKey, rows: leaderboard.rows };
 }
 
-export async function submitScore(input: ScoreSubmission, repository?: LeaderboardRepository) {
+export async function submitScore(input: ScoreSubmission, repository?: LeaderboardRepository, now = new Date()) {
   if (!isScorePlausible(input)) {
     throw new TRPCError({ code: "BAD_REQUEST", message: "Điểm số không khớp với quãng đường và sao đã thu thập." });
   }
   const repo = await resolveRepository(repository);
-  const season = await repo.upsertSeason(getSeasonWindow());
+  const season = await repo.upsertSeason(getSeasonWindow(now));
   const previous = await repo.getPlayerEntry(season.id, input.playerId);
-  const submittedAt = Date.now();
+  const submittedAt = now.getTime();
   if (!repository) {
     const previousRequestAt = recentSubmitByPlayer.get(input.playerId);
     if (previousRequestAt && submittedAt - previousRequestAt < DUPLICATE_REQUEST_WINDOW_MS) {

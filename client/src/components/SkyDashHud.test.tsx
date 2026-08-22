@@ -107,4 +107,15 @@ describe("SkyDashHud run flow", () => {
     ]);
     window.removeEventListener("skydash:command", commandListener);
   });
+
+  it("keeps action feedback as a compact toast instead of rendering a large center callout", () => {
+    const { container } = render(<SkyDashHud />);
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent<GameSnapshot>("skydash:state", { detail: { ...gameoverSnapshot, status: "playing", message: "Nhảy qua đệm thấp!", actionHint: "jump" } }));
+    });
+
+    expect(screen.getByText("Nhảy qua đệm thấp!")).toBeTruthy();
+    expect(container.querySelector(".action-callout")).toBeNull();
+  });
 });

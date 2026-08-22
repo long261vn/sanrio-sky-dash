@@ -139,3 +139,7 @@ Top 30 trống cũng được kiểm tra ở khung 390×844 sau reset: các ô h
 GitHub Pages sau checkpoint `15d0b81f` cũng trả Top 30 trống đủ 30 hạng và dùng đúng bản menu/hướng dẫn mới: lời giới thiệu tập trung vào nhảy, trượt và đổi làn; thẻ nhân vật hiển thị nhảy, trượt, khiên thay vì thưởng sao. Không có entry cũ xuất hiện trở lại sau reset.
 
 Hướng dẫn desktop hiển thị bốn thẻ Nhảy, Trượt, Khiên và Vòng gió theo lưới 2×2; phần công thức ghi rõ “Điểm = quãng đường + vượt vật cản đúng lúc + vòng gió” và sao không còn tác động đến điểm hoặc combo.
+
+Hồi quy leaderboard hiện mô phỏng lượt chơi cuối thứ Sáu rồi lượt đầu tiên sau nửa đêm thứ Bảy trong repository bộ nhớ. Lượt sau tạo mùa `2026-08-22`, xếp hạng mới từ đầu và không làm thay đổi entry của mùa cũ; kiểm thử này không ghi dữ liệu vào Top 30 công khai.
+
+Hồi quy HUD xác nhận trạng thái hành động nhảy vẫn hiện toast “Nhảy qua đệm thấp!” nhưng không còn render `.action-callout`; bốn nút cảm ứng tiếp tục phát đúng bốn lệnh làn trái, nhảy, làn phải và trượt. Bộ test hiện có 27 case đạt cùng kiểm tra kiểu.

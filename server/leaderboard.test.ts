@@ -22,15 +22,25 @@ const baseScore: ScoreSubmission = {
 
 function createMemoryRepository(initialEntries: LeaderboardEntry[] = []): LeaderboardRepository {
   const entries = [...initialEntries];
-  const season = { id: 1, ...getSeasonWindow() };
+  const initialSeason = { id: 1, ...getSeasonWindow() };
+  const seasons = new Map([[initialSeason.seasonKey, initialSeason]]);
+  let latestSeason = initialSeason;
   let nextId = Math.max(0, ...entries.map((entry) => entry.id)) + 1;
 
   return {
-    async upsertSeason() {
-      return season;
+    async upsertSeason(window) {
+      const existing = seasons.get(window.seasonKey);
+      if (existing) {
+        latestSeason = existing;
+        return existing;
+      }
+      const next = { id: seasons.size + 1, ...window };
+      seasons.set(window.seasonKey, next);
+      latestSeason = next;
+      return next;
     },
     async getLatestSeason() {
-      return season;
+      return latestSeason;
     },
     async getPlayerEntry(seasonId, playerId) {
       return entries.find((entry) => entry.seasonId === seasonId && entry.playerId === playerId) ?? null;
@@ -86,6 +96,15 @@ describe("submitScore through a repository", () => {
     const result = await submitScore(baseScore, createMemoryRepository());
     expect(result).toMatchObject({ improved: true, rank: 1 });
     expect(result.rows).toEqual([expect.objectContaining({ playerName: "Hana", score: 180, rank: 1 })]);
+  });
+
+  it("starts a fresh leaderboard on the first run after Saturday without changing the old season", async () => {
+    const repository = createMemoryRepository();
+    await submitScore(baseScore, repository, new Date("2026-08-21T12:00:00.000Z"));
+    const result = await submitScore({ ...baseScore, score: 240, distance: 40 }, repository, new Date("2026-08-21T18:00:00.000Z"));
+
+    expect(result).toMatchObject({ seasonKey: "2026-08-22", rank: 1 });
+    expect(result.rows).toEqual([expect.objectContaining({ score: 240, playerName: "Hana", rank: 1 })]);
   });
 
   it("retains the higher score when a later run is lower", async () => {
