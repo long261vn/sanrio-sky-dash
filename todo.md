@@ -14,6 +14,11 @@
 - [x] Tự trở về màn hình chọn nhân vật sau thông báo kết quả và bảng xếp hạng.
 - [ ] Kiểm thử hai lượt liên tiếp bằng cùng người chơi, phản hồi hạng và luồng quay về màn đầu.
 - [x] Thiết lập GitHub Pages tự phát hành khi checkpoint đồng bộ lên nhánh main.
+- [x] Bỏ cơ chế tự đóng bảng điểm; chỉ trở về menu khi người chơi chủ động bấm nút.
+- [x] Xác minh API/DB xếp entry hiện có theo score, stars và thời điểm nộp.
+- [x] Làm mới dữ liệu Top 30 thật từ server sau mỗi lượt, không chỉ dựa vào cache cục bộ.
+- [x] Hiển thị thông báo rõ ràng khi điểm mới không lọt Top 30 và để người chơi tự quay lại menu.
+- [ ] Kiểm thử dữ liệu thật có nhiều tên, thay đổi điểm cao và thứ hạng cập nhật ngay trong bảng.
 
 - [x] Nâng cấp game lên hạ tầng có cơ sở dữ liệu và API an toàn.
 - [x] Tạo dữ liệu mùa, điểm số, tên người chơi và chỉ mục xếp hạng Top 30.

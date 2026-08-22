@@ -11,3 +11,5 @@
 - Một lượt chơi trực tiếp trên GitHub Pages đã tải canvas 3D, mascot, đường chạy, sao, đệm thấp, biển nhắc **NHẢY** và điều khiển bàn phím. Lượt kết thúc hiển thị lại form lưu điểm; không nhập tên hoặc gửi entry thử vào bảng công khai.
 - Console của GitHub Pages sau lượt thử không ghi lỗi runtime hoặc tải audio. Đã bổ sung `404.html` để đường dẫn con của Pages quay lại base `/sanrio-sky-dash/`.
 - Workflow Pages của commit `e2215a59` hoàn tất thành công. Truy cập đường dẫn con `/sanrio-sky-dash/duong-dan-kiem-thu` đã tự quay về menu game, xác nhận fallback hoạt động.
+- Bản Manus công khai sau checkpoint `53f776f3` tải menu có trường tên người chơi và nút Top 30. Luồng tự lưu cần được xác minh với hai lượt thật của người chơi sau bản phát hành này.
+- QA local với dữ liệu thật: Top 30 hiển thị hai entry theo đúng thứ tự `7.211` rồi `4.033`. Modal chỉ có nút đóng và nút “Về màn hình đầu”, không tự đóng.

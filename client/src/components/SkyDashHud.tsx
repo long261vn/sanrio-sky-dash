@@ -63,32 +63,21 @@ export default function SkyDashHud() {
   const [lastSubmissionImproved, setLastSubmissionImproved] = useState<boolean | null>(null);
   const snapshotRef = useRef(initialSnapshot);
   const runIdRef = useRef(0);
-  const returnTimerRef = useRef<number | null>(null);
-  const leaderboard = trpc.leaderboard.top30.useQuery(undefined, { staleTime: 20_000, refetchOnWindowFocus: false });
+  const leaderboard = trpc.leaderboard.top30.useQuery(undefined, { staleTime: 0, refetchOnWindowFocus: true });
   const leaderboardUtils = trpc.useUtils();
   const submitScore = trpc.leaderboard.submit.useMutation({
-    onSuccess: (result) => {
+    onSuccess: async (result) => {
       leaderboardUtils.leaderboard.top30.setData(undefined, { seasonKey: result.seasonKey, rows: result.rows });
+      await leaderboard.refetch();
       setRecentRank(result.rank);
       setLastSubmissionImproved(result.improved);
       setSaveStatus(result.enteredTop30 ? "ranked" : "outside");
       setNameError("");
       if (result.enteredTop30) setLeaderboardOpen(true);
-      returnTimerRef.current = window.setTimeout(() => {
-        setLeaderboardOpen(false);
-        setCompletedRun(null);
-        setSaveStatus("idle");
-        send({ type: "menu" });
-      }, result.enteredTop30 ? 5_000 : 2_400);
     },
     onError: (error) => {
       setSaveStatus("error");
       setNameError(error.message);
-      returnTimerRef.current = window.setTimeout(() => {
-        setCompletedRun(null);
-        setSaveStatus("idle");
-        send({ type: "menu" });
-      }, 2_800);
     },
   });
 
@@ -106,10 +95,6 @@ export default function SkyDashHud() {
     };
     window.addEventListener("skydash:state", onState);
     return () => window.removeEventListener("skydash:state", onState);
-  }, []);
-
-  useEffect(() => () => {
-    if (returnTimerRef.current) window.clearTimeout(returnTimerRef.current);
   }, []);
 
   useEffect(() => {
@@ -158,6 +143,18 @@ export default function SkyDashHud() {
     setCompletedRun(null);
     send({ type: "start", characterId: selectedId });
   };
+  const openLeaderboard = () => {
+    leaderboard.refetch();
+    setLeaderboardOpen(true);
+  };
+  const returnToMenu = () => {
+    setLeaderboardOpen(false);
+    setCompletedRun(null);
+    setSaveStatus("idle");
+    setRecentRank(null);
+    setLastSubmissionImproved(null);
+    send({ type: "menu" });
+  };
 
   return (
     <div className="sky-ui" aria-live="polite">
@@ -197,7 +194,7 @@ export default function SkyDashHud() {
             <div className="menu-art-wrap"><img className="menu-art" src={TARGET_URL} alt="Minh hoạ đường chạy trên mây" /><div className="art-sticker">★ Nhặt sao<br />để tăng combo</div></div>
             <div className="selection-drawer">
               <div className="drawer-heading"><div className="selected-runner"><span className="portrait-disc large" style={{ "--character": selected.body, "--accent": selected.accent } as React.CSSProperties}>{selected.icon}</span><div><p>NGƯỜI CHẠY ĐANG CHỌN</p><h2>{selected.name}</h2><span>{selected.tagline}</span></div></div><div className="runner-perks"><span>↥ Nhảy {selected.jumpForce.toFixed(1)}</span><span>★ Thưởng +{Math.round((selected.starBonus - 1) * 100)}%</span><span>◒ Trượt {selected.slideDuration.toFixed(2)}s</span></div></div>
-              <div className="player-profile"><label><span>TÊN NGƯỜI CHƠI</span><input value={playerName} onChange={(event) => updatePlayerName(event.target.value.slice(0, 20))} placeholder="Ví dụ: Mây Nhỏ" maxLength={20} /></label><button className="leaderboard-button" onClick={() => setLeaderboardOpen(true)}><Trophy size={16} /> Top 30 tuần</button></div>
+              <div className="player-profile"><label><span>TÊN NGƯỜI CHƠI</span><input value={playerName} onChange={(event) => updatePlayerName(event.target.value.slice(0, 20))} placeholder="Ví dụ: Mây Nhỏ" maxLength={20} /></label><button className="leaderboard-button" onClick={openLeaderboard}><Trophy size={16} /> Top 30 tuần</button></div>
               {nameError && <p className="score-error menu-name-error">{nameError}</p>}
               <div className="character-grid">
                 {CHARACTERS.map((character) => (
@@ -219,11 +216,11 @@ export default function SkyDashHud() {
       )}
 
       {snapshot.status === "gameover" && (
-        <div className="screen-scrim compact-scrim"><section className="results-panel auto-save-panel"><div className="result-badge">{snapshot.isNewRecord ? "★ KỶ LỤC MỚI" : "☁ CHUYẾN BAY HOÀN TẤT"}</div><h2>{snapshot.isNewRecord ? "Bầu trời vỗ tay!" : "Mây vẫn chờ bạn."}</h2><p>{snapshot.message}</p><div className="result-stats"><div><span>Điểm bay</span><strong>{snapshot.score.toLocaleString("vi-VN")}</strong></div><div><span>Sao điều ước</span><strong>★ {snapshot.stars}</strong></div><div><span>Quãng đường</span><strong>{snapshot.distance}m</strong></div></div><div className={`auto-save-status ${saveStatus}`}><Trophy size={18} /><div>{saveStatus === "saving" && <><b>Đang đồng bộ hành trình...</b><span>Điểm sẽ tự lưu dưới tên {playerName.trim()}.</span></>}{saveStatus === "ranked" && <><b>{lastSubmissionImproved ? (recentRank === 1 ? "Bạn đang dẫn đầu!" : `Bạn đạt hạng #${recentRank}!`) : `Kỷ lục của bạn đang ở hạng #${recentRank}.`}</b><span>Bảng xếp hạng đã cập nhật. Sẽ trở về bộ sưu tập sau ít giây.</span></>}{saveStatus === "outside" && <><b>Điểm đã được ghi nhận.</b><span>Chưa vào Top 30 tuần này; hãy thử thêm một chuyến bay nhé.</span></>}{saveStatus === "error" && <><b>Chưa thể đồng bộ điểm.</b><span>{nameError || "Kiểm tra kết nối rồi thử lại ở lượt sau."}</span></>}{saveStatus === "idle" && <><b>Chuẩn bị đồng bộ điểm...</b><span>Đợi một nhịp nhé.</span></>}</div></div></section></div>
+        <div className="screen-scrim compact-scrim"><section className="results-panel auto-save-panel"><div className="result-badge">{snapshot.isNewRecord ? "★ KỶ LỤC MỚI" : "☁ CHUYẾN BAY HOÀN TẤT"}</div><h2>{snapshot.isNewRecord ? "Bầu trời vỗ tay!" : "Mây vẫn chờ bạn."}</h2><p>{snapshot.message}</p><div className="result-stats"><div><span>Điểm bay</span><strong>{snapshot.score.toLocaleString("vi-VN")}</strong></div><div><span>Sao điều ước</span><strong>★ {snapshot.stars}</strong></div><div><span>Quãng đường</span><strong>{snapshot.distance}m</strong></div></div><div className={`auto-save-status ${saveStatus}`}><Trophy size={18} /><div>{saveStatus === "saving" && <><b>Đang đồng bộ hành trình...</b><span>Điểm sẽ tự lưu dưới tên {playerName.trim()}.</span></>}{saveStatus === "ranked" && <><b>{lastSubmissionImproved ? (recentRank === 1 ? "Bạn đang dẫn đầu!" : `Bạn đạt hạng #${recentRank}!`) : `Kỷ lục của bạn đang ở hạng #${recentRank}.`}</b><span>Bảng xếp hạng đã xếp lại. Bạn chọn khi nào quay về màn đầu.</span></>}{saveStatus === "outside" && <><b>Chưa vào Top 30 tuần này.</b><span>Hãy cố gắng thêm một chuyến bay nữa ở lượt sau nhé.</span></>}{saveStatus === "error" && <><b>Chưa thể đồng bộ điểm.</b><span>{nameError || "Kiểm tra kết nối rồi thử lại ở lượt sau."}</span></>}{saveStatus === "idle" && <><b>Chuẩn bị đồng bộ điểm...</b><span>Đợi một nhịp nhé.</span></>}</div></div>{saveStatus !== "saving" && <div className="result-actions">{saveStatus !== "error" && <button className="leaderboard-button" onClick={openLeaderboard}><Trophy size={16} /> {saveStatus === "ranked" ? "Mở lại Top 30" : "Xem Top 30"}</button>}<button className="play-button" onClick={returnToMenu}>Về màn hình đầu</button></div>}</section></div>
       )}
 
       {leaderboardOpen && (
-        <div className="tutorial-scrim leaderboard-scrim"><section className="leaderboard-panel" aria-label="Bảng xếp hạng Top 30"><header><div><p><Crown size={15} /> BẦU TRỜI VINH DANH</p><h2>Top 30 tuần</h2><span>Mùa bắt đầu {leaderboard.data?.seasonKey ?? "thứ Bảy này"} · reset khi có điểm đầu tiên sau thứ Bảy.</span></div><button className="leaderboard-close" onClick={() => setLeaderboardOpen(false)} aria-label="Đóng bảng xếp hạng"><X size={20} /></button></header>{leaderboard.isLoading ? <div className="leaderboard-empty">Đang gọi các vì sao về bảng xếp hạng...</div> : leaderboard.data?.rows.length ? <ol className="leaderboard-list">{leaderboard.data.rows.map((row) => <li key={`${row.rank}-${row.playerName}-${row.score}`} className={`${row.rank <= 3 ? `rank-${row.rank}` : ""} ${row.rank === recentRank && row.playerName === playerName.trim() ? "just-ranked" : ""}`}><b>{row.rank}</b><span className="rank-runner">{CHARACTERS.find((character) => character.id === row.runnerId)?.icon ?? "★"}</span><strong>{row.playerName}</strong><em>{row.distance}m · ★ {row.stars}</em><mark>{row.score.toLocaleString("vi-VN")}</mark></li>)}</ol> : <div className="leaderboard-empty"><span>★</span><b>Chưa có chuyến bay nào.</b><p>Hãy là người đầu tiên ghi tên lên bầu trời!</p></div>}<footer><span>{recentRank ? `Chuyến bay của bạn đang ở hạng #${recentRank}.` : "Chỉ giữ thành tích cao nhất của mỗi người chơi trong tuần."}</span><button className="play-button" onClick={() => setLeaderboardOpen(false)}>Quay lại game</button></footer></section></div>
+        <div className="tutorial-scrim leaderboard-scrim"><section className="leaderboard-panel" aria-label="Bảng xếp hạng Top 30"><header><div><p><Crown size={15} /> BẦU TRỜI VINH DANH</p><h2>Top 30 tuần</h2><span>Mùa bắt đầu {leaderboard.data?.seasonKey ?? "thứ Bảy này"} · reset khi có điểm đầu tiên sau thứ Bảy.</span></div><button className="leaderboard-close" onClick={() => setLeaderboardOpen(false)} aria-label="Đóng bảng xếp hạng"><X size={20} /></button></header>{leaderboard.isLoading ? <div className="leaderboard-empty">Đang gọi các vì sao về bảng xếp hạng...</div> : leaderboard.data?.rows.length ? <ol className="leaderboard-list">{leaderboard.data.rows.map((row) => <li key={`${row.rank}-${row.playerName}-${row.score}`} className={`${row.rank <= 3 ? `rank-${row.rank}` : ""} ${row.rank === recentRank && row.playerName === playerName.trim() ? "just-ranked" : ""}`}><b>{row.rank}</b><span className="rank-runner">{CHARACTERS.find((character) => character.id === row.runnerId)?.icon ?? "★"}</span><strong>{row.playerName}</strong><em>{row.distance}m · ★ {row.stars}</em><mark>{row.score.toLocaleString("vi-VN")}</mark></li>)}</ol> : <div className="leaderboard-empty"><span>★</span><b>Chưa có chuyến bay nào.</b><p>Hãy là người đầu tiên ghi tên lên bầu trời!</p></div>}<footer><span>{leaderboard.isFetching ? "Đang xếp lại bảng điểm..." : recentRank ? `Chuyến bay của bạn đang ở hạng #${recentRank}.` : "Chỉ giữ thành tích cao nhất của mỗi người chơi trong tuần."}</span><button className="play-button" onClick={returnToMenu}>Về màn hình đầu</button></footer></section></div>
       )}
 
       {tutorialOpen && snapshot.status === "menu" && (
