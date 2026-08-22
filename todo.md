@@ -13,6 +13,7 @@
 - [x] Làm mới bảng xếp hạng theo dữ liệu API sau mỗi lượt và xử lý rõ trạng thái ngoài Top 30/lỗi lưu.
 - [x] Tự trở về màn hình chọn nhân vật sau thông báo kết quả và bảng xếp hạng.
 - [ ] Kiểm thử hai lượt liên tiếp bằng cùng người chơi, phản hồi hạng và luồng quay về màn đầu.
+- [x] Thiết lập GitHub Pages tự phát hành khi checkpoint đồng bộ lên nhánh main.
 
 - [x] Nâng cấp game lên hạ tầng có cơ sở dữ liệu và API an toàn.
 - [x] Tạo dữ liệu mùa, điểm số, tên người chơi và chỉ mục xếp hạng Top 30.
