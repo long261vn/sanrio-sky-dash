@@ -1,5 +1,20 @@
 # Hạng mục cập nhật — Chạy Đua Cùng Hana
 
+- [x] Rà soát base path, route SPA và nguồn asset để tương thích subpath GitHub Pages.
+- [x] Chuẩn bị cấu hình build và workflow GitHub Pages không làm ảnh hưởng bản game đang public.
+- [x] Kiểm thử build tĩnh ở đường dẫn `/sanrio-sky-dash/`.
+- [ ] Đồng bộ cấu hình để người dùng có thể kích hoạt workflow Pages.
+- [ ] Xác nhận URL `long261vn.github.io/sanrio-sky-dash/` sau khi GitHub hoàn tất deploy.
+
+- [x] Mở domain công khai vừa phát hành và xác nhận trang game tải thành công.
+- [x] Kiểm tra menu, lượt chơi và âm thanh khởi tạo trên bản công khai.
+- [x] Đánh giá lại nhu cầu GitHub Pages sau khi bản game đã có link chơi ổn định — giữ GitHub làm nơi lưu mã nguồn, dùng domain công khai hiện tại để chơi.
+
+- [x] Xác minh GitHub Pages đã deploy và ghi nhận URL công khai thực tế.
+- [ ] Kiểm tra asset, đường dẫn base và fallback SPA khi chạy dưới đường dẫn repository.
+- [ ] Xác nhận game tải, điều khiển và âm thanh khởi tạo đúng qua URL Pages.
+- [ ] Đồng bộ mọi cấu hình cần thiết và bàn giao liên kết chơi trực tuyến.
+
 - [x] Xác minh repository công khai và trạng thái đồng bộ nhánh mặc định.
 - [x] Kiểm tra xem GitHub Pages đã được cấu hình cho repository hay chưa — hiện chưa có GitHub Pages site.
 - [x] Xác nhận bản game build thành công và sẵn sàng phục vụ tĩnh.

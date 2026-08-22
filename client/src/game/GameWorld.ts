@@ -8,6 +8,7 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { GameCommand, GameSnapshot, GameStatus, CharacterId, CHARACTERS } from "@/game/types";
 import { AudioManager } from "@/game/AudioManager";
+import { assetUrl } from "@/lib/assets";
 
 type EntityKind = "lowHurdle" | "cloudGate" | "star" | "shield" | "gust";
 
@@ -23,9 +24,9 @@ const LANES = [-2.6, 0, 2.6];
 const PLAYER_Z = 0;
 const STAR_GOAL = 10;
 const PROP_TEXTURES = {
-  lowHurdle: "/manus-storage/hana-low-jump-cushion_8c9af18d.png",
-  cloudGate: "/manus-storage/hana-high-slide-gate_b3d23f2c.png",
-  star: "/manus-storage/hana-star-reward_f0db88ad.png",
+  lowHurdle: assetUrl("hana-low-jump-cushion_8c9af18d.png"),
+  cloudGate: assetUrl("hana-high-slide-gate_b3d23f2c.png"),
+  star: assetUrl("hana-star-reward_f0db88ad.png"),
 } as const;
 const ENTITY_HITBOX: Record<EntityKind, { x: number; z: number }> = {
   lowHurdle: { x: 0.86, z: 0.92 },

@@ -1,14 +1,16 @@
 /** Chạy Đua Cùng Hana: âm thanh chỉ phát sau một thao tác thực của người chơi. */
+import { assetUrl } from "@/lib/assets";
+
 type EffectName = "button" | "star" | "jump" | "slide" | "shield" | "gameover";
 
-const BGM_URL = "/manus-storage/hana-sky-dash-bgm_c55c1f2d.mp3";
+const BGM_URL = assetUrl("hana-sky-dash-bgm_c55c1f2d.mp3");
 const EFFECT_URLS: Record<EffectName, string> = {
-  button: "/manus-storage/button_7261cff8.mp3",
-  star: "/manus-storage/star_42549186.mp3",
-  jump: "/manus-storage/jump_ae7164a5.mp3",
-  slide: "/manus-storage/slide_52cc7eb5.mp3",
-  shield: "/manus-storage/shield_492fe0ae.mp3",
-  gameover: "/manus-storage/gameover_34b8453a.mp3",
+  button: assetUrl("button_7261cff8.mp3"),
+  star: assetUrl("star_42549186.mp3"),
+  jump: assetUrl("jump_ae7164a5.mp3"),
+  slide: assetUrl("slide_52cc7eb5.mp3"),
+  shield: assetUrl("shield_492fe0ae.mp3"),
+  gameover: assetUrl("gameover_34b8453a.mp3"),
 };
 
 export class AudioManager {

@@ -6,8 +6,9 @@ import { useEffect, useRef } from "react";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { createGameScene, type GameHandle } from "@/game/scene";
 import SkyDashHud from "@/components/SkyDashHud";
+import { assetUrl } from "@/lib/assets";
 
-const SKY_BACKGROUND_URL = "/manus-storage/sky-dash-background-retry_124d904a.png";
+const SKY_BACKGROUND_URL = assetUrl("sky-dash-background-retry_124d904a.png");
 
 export default function GameCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);

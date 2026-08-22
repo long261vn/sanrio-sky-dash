@@ -5,9 +5,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { ChevronRight, CircleHelp, Gauge, Pause, Play, RotateCcw, Trophy, Volume2, VolumeX, Zap } from "lucide-react";
 import { CHARACTERS, type CharacterId, type GameCommand, type GameSnapshot } from "@/game/types";
+import { assetUrl } from "@/lib/assets";
 
-const LOGO_URL = "/manus-storage/sky-dash-logo-retry_53835e27.png";
-const TARGET_URL = "/manus-storage/sky-dash-menu-art-retry_f2351b45.png";
+const LOGO_URL = assetUrl("sky-dash-logo-retry_53835e27.png");
+const TARGET_URL = assetUrl("sky-dash-menu-art-retry_f2351b45.png");
+const GUIDE_STAR_URL = assetUrl("hana-star-reward_f0db88ad.png");
+const GUIDE_JUMP_URL = assetUrl("hana-low-jump-cushion_8c9af18d.png");
+const GUIDE_SLIDE_URL = assetUrl("hana-high-slide-gate_b3d23f2c.png");
 
 const initialSnapshot: GameSnapshot = {
   status: "menu",
@@ -122,9 +126,9 @@ export default function SkyDashHud() {
             </header>
             <p className="guide-v2-intro">Ba thẻ dưới đây là <strong>đúng những vật</strong> đang xuất hiện trong đường chạy. Không cần đoán: màu sắc, chiều cao và phím bấm luôn giống nhau.</p>
             <div className="guide-action-grid">
-              <article className="guide-action-card collect-card"><div className="guide-prop-frame"><img src="/manus-storage/hana-star-reward_f0db88ad.png" alt="Sao điều ước có vòng mint" /></div><div className="guide-action-copy"><span>01 · LẤY</span><h3>Sao điều ước</h3><p>Đổi làn để chạm vào sao. Sao tăng combo.</p><div className="key-caps"><kbd>←</kbd><kbd>→</kbd><b>Đổi làn</b></div></div></article>
-              <article className="guide-action-card jump-card"><div className="guide-prop-frame"><img src="/manus-storage/hana-low-jump-cushion_8c9af18d.png" alt="Đệm dâu hồng thấp" /></div><div className="guide-action-copy"><span>02 · NHẢY</span><h3>Đệm dâu thấp</h3><p>Vật thấp ở mặt đường: chỉ việc nhảy qua.</p><div className="key-caps"><kbd>SPACE</kbd><kbd>↑</kbd><b>Nhảy qua</b></div></div></article>
-              <article className="guide-action-card slide-card"><div className="guide-prop-frame"><img src="/manus-storage/hana-high-slide-gate_b3d23f2c.png" alt="Cổng mây cao có khoảng hở bên dưới" /></div><div className="guide-action-copy"><span>03 · TRƯỢT</span><h3>Cổng mây cao</h3><p>Mây treo cao có khoảng hở: trượt dưới cổng.</p><div className="key-caps"><kbd>↓</kbd><b>Trượt dưới</b></div></div></article>
+              <article className="guide-action-card collect-card"><div className="guide-prop-frame"><img src={GUIDE_STAR_URL} alt="Sao điều ước có vòng mint" /></div><div className="guide-action-copy"><span>01 · LẤY</span><h3>Sao điều ước</h3><p>Đổi làn để chạm vào sao. Sao tăng combo.</p><div className="key-caps"><kbd>←</kbd><kbd>→</kbd><b>Đổi làn</b></div></div></article>
+              <article className="guide-action-card jump-card"><div className="guide-prop-frame"><img src={GUIDE_JUMP_URL} alt="Đệm dâu hồng thấp" /></div><div className="guide-action-copy"><span>02 · NHẢY</span><h3>Đệm dâu thấp</h3><p>Vật thấp ở mặt đường: chỉ việc nhảy qua.</p><div className="key-caps"><kbd>SPACE</kbd><kbd>↑</kbd><b>Nhảy qua</b></div></div></article>
+              <article className="guide-action-card slide-card"><div className="guide-prop-frame"><img src={GUIDE_SLIDE_URL} alt="Cổng mây cao có khoảng hở bên dưới" /></div><div className="guide-action-copy"><span>03 · TRƯỢT</span><h3>Cổng mây cao</h3><p>Mây treo cao có khoảng hở: trượt dưới cổng.</p><div className="key-caps"><kbd>↓</kbd><b>Trượt dưới</b></div></div></article>
             </div>
             <footer className="guide-v2-footer"><span>Luật nhớ nhanh: <b>vật thấp nhảy · vật cao trượt · sao thì lấy</b></span><button className="play-button" onClick={() => setTutorialOpen(false)}>Đã rõ, chọn người chạy <ChevronRight size={19} /></button></footer>
           </section>
