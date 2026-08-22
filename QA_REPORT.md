@@ -143,3 +143,5 @@ Hướng dẫn desktop hiển thị bốn thẻ Nhảy, Trượt, Khiên và Vò
 Hồi quy leaderboard hiện mô phỏng lượt chơi cuối thứ Sáu rồi lượt đầu tiên sau nửa đêm thứ Bảy trong repository bộ nhớ. Lượt sau tạo mùa `2026-08-22`, xếp hạng mới từ đầu và không làm thay đổi entry của mùa cũ; kiểm thử này không ghi dữ liệu vào Top 30 công khai.
 
 Hồi quy HUD xác nhận trạng thái hành động nhảy vẫn hiện toast “Nhảy qua đệm thấp!” nhưng không còn render `.action-callout`; bốn nút cảm ứng tiếp tục phát đúng bốn lệnh làn trái, nhảy, làn phải và trượt. Bộ test hiện có 27 case đạt cùng kiểm tra kiểu.
+
+Manus public sau checkpoint `fa565694` và GitHub Pages đều trả cùng mùa `2026-08-22` với đủ 30 placeholder “Đang chờ chuyến bay”; không có entry cũ, sao hoặc combo nào xuất hiện trong bảng hạng đã reset.
