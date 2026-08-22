@@ -20,15 +20,17 @@
 - [x] Hiển thị thông báo rõ ràng khi điểm mới không lọt Top 30 và để người chơi tự quay lại menu.
 - [ ] Kiểm thử dữ liệu thật có nhiều tên, thay đổi điểm cao và thứ hạng cập nhật ngay trong bảng.
 - [ ] Tái hiện lỗi không bắt đầu được lượt chơi trên Manus và GitHub Pages.
-- [ ] Kiểm tra console, network và sự kiện command/state của luồng menu đến gameplay.
+- [x] Kiểm tra console, network và sự kiện command/state của luồng menu đến gameplay.
 - [x] Viết báo cáo QA phân loại lỗi chặn chơi, lỗi logic, lỗi UX và hạng mục không cần sửa.
-- [ ] Sửa nguyên nhân chặn bắt đầu lượt chơi và thêm kiểm thử hồi quy tương ứng.
+- [x] Sửa nguyên nhân chặn bắt đầu lượt chơi và thêm kiểm thử hồi quy tương ứng.
 - [ ] Kiểm tra lại gameplay, game-over, lưu điểm và Top 30 theo một checklist phát hành thống nhất.
 - [x] Sửa chồng lấn chữ thương hiệu với nút hướng dẫn ở menu màn hình nhỏ.
 - [x] Tái hiện lỗi chặn bắt đầu trên Manus khi tên trống và xác nhận bản sửa start được trên preview cục bộ.
-- [ ] Kiểm thử trực tiếp GitHub Pages: tên trống vẫn bấm Chạy vào gameplay.
-- [ ] Ghi nhận network cùng transition command/state từ menu sang playing, bảo đảm không có request API chặn start.
-- [ ] Thêm kiểm thử hồi quy cho UI: tên trống vẫn start được và game-over hiện form đặt tên để lưu hạng.
+- [x] Kiểm thử trực tiếp GitHub Pages: tên trống vẫn bấm Chạy vào gameplay.
+- [x] Ghi nhận network cùng transition command/state từ menu sang playing, bảo đảm không có request API chặn start.
+- [x] Thêm kiểm thử hồi quy cho UI: tên trống vẫn start được và game-over hiện form đặt tên để lưu hạng.
+- [x] Viết kiểm thử component SkyDashHud: tên trống gửi lệnh Start và snapshot game-over hiển thị form tên.
+- [ ] Quan sát hoặc kiểm thử rõ chuỗi `skydash:command` tới `skydash:state(status=playing)` không phát sinh request leaderboard.
 
 - [x] Nâng cấp game lên hạ tầng có cơ sở dữ liệu và API an toàn.
 - [x] Tạo dữ liệu mùa, điểm số, tên người chơi và chỉ mục xếp hạng Top 30.
