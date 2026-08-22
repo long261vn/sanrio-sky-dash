@@ -161,3 +161,5 @@ Màn menu nay ghi rõ: mỗi thiết bị giữ **một kỷ lục cao nhất m�
 Sao xu đã trở lại trong nhịp spawn thường, nhận **+4 điểm cố định** mỗi lần nhặt; không tạo combo và không có thưởng 10 sao. Nhịp spawn đầu lượt giảm từ 2,50 giây xuống 2,05 giây trước độ lệch ngẫu nhiên, giảm dần theo cấp nhưng vẫn chặn ở sàn an toàn 0,92 giây. Demo desktop cho thấy cổng mây được cảnh báo sớm và sao xu xuất hiện lại; hướng dẫn mobile hiển thị năm thẻ Sao xu, Nhảy, Trượt, Khiên và Vòng gió. Toàn bộ 28 test, TypeScript và build production đạt.
 
 Sau batch này, Top 30 thật hiển thị cùng một dòng **Long** ở hạng 1 trên cả desktop và 390×844, với 553m / 3.611 điểm và không có số sao; các hạng còn lại là placeholder. Cảnh QA mobile ở cấp 3 / 12 km/h hiển thị đồng thời đệm thấp ở làn trái, cổng mây ở làn phải và sao xu ở làn giữa, để xác nhận nhịp dày hơn vẫn giữ một lựa chọn làn rõ ràng. Build production tiếp tục đạt.
+
+GitHub Pages sau khi đồng bộ checkpoint `0ccbdd42` đã hiển thị lượt nhặt sao xu theo bundle mới: điểm tăng từ quãng đường cộng phần thưởng nhỏ, không có combo hay mốc 10 sao; HUD/canvas và asset Manus tiếp tục tải đúng.
