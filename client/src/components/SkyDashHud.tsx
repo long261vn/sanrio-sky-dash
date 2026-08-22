@@ -122,12 +122,6 @@ export default function SkyDashHud() {
     setPlayerName(value);
     window.localStorage.setItem(PLAYER_NAME_KEY, value);
   };
-  const createNewProfile = () => {
-    window.localStorage.setItem(PLAYER_ID_KEY, crypto.randomUUID());
-    window.localStorage.removeItem(PLAYER_NAME_KEY);
-    setPlayerName("");
-    setNameError("Đã tạo hồ sơ mới. Nhập tên mới để có một kỷ lục riêng nhé.");
-  };
   const submitCompletedRun = (run = completedRun) => {
     if (!run) return;
     const cleanName = playerName.trim();
@@ -203,12 +197,12 @@ export default function SkyDashHud() {
               <h1>Chọn người bạn<br />dẫn đường.</h1>
               <p className="menu-intro">Mỗi người chạy có dáng riêng và một thế mạnh thực sự. Chọn người bạn phù hợp, rồi lướt qua ba làn mây để săn sao điều ước.</p>
               <div className="record-strip"><Trophy size={18} /><span>Kỷ lục bầu trời</span><strong>{snapshot.highScore.toLocaleString("vi-VN")}</strong></div>
-              <button className="guide-button" onClick={() => setTutorialOpen(true)}><CircleHelp size={17} /> Xem hướng dẫn đường chạy</button>
+              <button className="guide-button" onClick={() => setTutorialOpen(true)}><CircleHelp size={17} /> Hướng dẫn chơi</button>
             </div>
             <div className="menu-art-wrap"><img className="menu-art" src={TARGET_URL} alt="Minh hoạ đường chạy trên mây" /><div className="art-sticker">★ Nhặt sao<br />để tăng combo</div></div>
             <div className="selection-drawer">
               <div className="drawer-heading"><div className="selected-runner"><span className="portrait-disc large" style={{ "--character": selected.body, "--accent": selected.accent } as React.CSSProperties}>{selected.icon}</span><div><p>NGƯỜI CHẠY ĐANG CHỌN</p><h2>{selected.name}</h2><span>{selected.tagline}</span></div></div><div className="runner-perks"><span>↥ Nhảy {selected.jumpForce.toFixed(1)}</span><span>★ Thưởng +{Math.round((selected.starBonus - 1) * 100)}%</span><span>◒ Trượt {selected.slideDuration.toFixed(2)}s</span></div></div>
-              <div className="player-profile"><label><span>TÊN NGƯỜI CHƠI · ĐỂ LƯU HẠNG</span><input value={playerName} onChange={(event) => updatePlayerName(event.target.value.slice(0, 20))} placeholder="Có thể nhập sau khi chơi" maxLength={20} /></label><div className="profile-actions"><button className="new-profile-button" onClick={createNewProfile}>Hồ sơ mới</button><button className="leaderboard-button" onClick={openLeaderboard}><Trophy size={16} /> Top 30 tuần</button></div><small className="profile-note">Một hồ sơ giữ một kỷ lục tuần; đổi tên cập nhật dòng hiện tại, còn “Hồ sơ mới” tạo kỷ lục riêng.</small></div>
+              <div className="player-profile"><label><span>TÊN NGƯỜI CHƠI · ĐỂ LƯU HẠNG</span><input value={playerName} onChange={(event) => updatePlayerName(event.target.value.slice(0, 20))} placeholder="Có thể nhập sau khi chơi" maxLength={20} /></label><div className="profile-actions"><button className="leaderboard-button" onClick={openLeaderboard}><Trophy size={16} /> Top 30 tuần</button></div><small className="profile-note">Tên này cập nhật kỷ lục của bạn trên thiết bị hiện tại.</small></div>
               {nameError && <p className="score-error menu-name-error">{nameError}</p>}
               <div className="character-grid">
                 {CHARACTERS.map((character) => (

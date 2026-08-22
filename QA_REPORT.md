@@ -85,3 +85,19 @@ Phiên kiểm thử trượt liên tục bị chuyển sang trang trống sau kh
 Hướng dẫn desktop sau sửa hiển thị khiên cầu vồng và vòng gió mint bằng asset đầy đủ, căn giữa trong hai thẻ riêng, không bị cắt hoặc dùng nền sai. Panel có thể cuộn để xem phần “Điểm tính thế nào?”, bao gồm điểm chạy, sao, combo, mốc 10 sao, nhảy/trượt, vòng gió và vai trò bảo vệ của khiên.
 
 Lượt demo với spawn mới bắt đầu không có vật thể nằm sẵn giữa đường. Sau đó sao tiến dần từ xa và khi được lấy, HUD đổi từ 0 lên 1 sao, combo tăng từ ×1.0 lên ×1.2, đồng thời toast hiển thị chính xác `Sao điều ước: +32 · combo +0.2`. Điều này khớp công thức hiển thị và quy tắc spawn đã kiểm thử đơn vị.
+
+Xác minh bản Manus sau checkpoint `2514d6ce` cho thấy hướng dẫn công khai đã nhận đủ năm thẻ: sao, đệm thấp, cổng mây, khiên cầu vồng và vòng gió mint. Tóm tắt “Điểm = chạy 8 điểm/m × combo + sao/vật phẩm + thưởng mốc” xuất hiện trước các thẻ; bảng chi tiết bên dưới liệt kê toàn bộ công thức.
+
+Menu đã được làm gọn: nút “Hướng dẫn chơi” hiển thị chữ rõ ràng trong vùng trống bên phải tiêu đề trên desktop và trong hàng đầu trên mobile; nút “Hồ sơ mới” đã được loại bỏ. Trường tên hiện chỉ nhắc tên sẽ cập nhật kỷ lục trên thiết bị hiện tại, giảm một thao tác không cần thiết.
+
+### QA cận cảnh vật thể — 22/08/2026
+
+| Nhóm vật thể | Desktop 1280×720 | Mobile 390×844 | Kết luận quan sát |
+| --- | --- | --- | --- |
+| Đệm thấp | Đệm dâu đỏ giữ cạnh trên, lỗ nhảy và chiều cao thấp; không dẹt thành một dải ngang. | Hình đệm đầy đủ nằm ở làn trái, không bị nút cảm ứng che. | Đạt. |
+| Cổng mây | Cổng tím giữ vòm, khoảng trống phía dưới và biển cảnh báo rõ ràng. | Cổng giữ vòm trọn vẹn phía trước nhân vật; HUD và dãy nút không che cổng. | Đạt. |
+| Sao điều ước | Sao tròn viền mint, các tia sao và nền trong suốt đầy đủ. | Sao còn nguyên silhouette, tách biệt rõ với nền đường. | Đạt. |
+| Khiên cầu vồng | Biểu tượng khiên tròn, viền sắc nét và không có nền hình chữ nhật. | Khiên giữ hình tròn đầy đủ tại làn trái, không bị HUD che. | Đạt. |
+| Vòng gió mint | Vòng gió xoáy, ngôi sao giữa và các xoắn mây đều nguyên hình. | Vòng gió giữ đủ xoắn và ngôi sao giữa, không méo/cắt. | Đạt. |
+
+Nguyên nhân là plane texture trước đây quay theo trục Y của node cha nên có lúc quay cạnh với camera. Bản sửa để mọi sticker luôn đối diện camera và chỉ xoay Z để tạo chuyển động nhẹ. Các ảnh cận cảnh trên xác nhận cả năm nhóm vật thể giữ tỷ lệ, alpha và silhouette ở cả hai breakpoint.

@@ -93,6 +93,7 @@ export class GameWorld {
     const pickup = new URLSearchParams(window.location.search).get("pickup");
     return pickup === "shield" || pickup === "gust" ? pickup : null;
   })();
+  private readonly demoInspect = new URLSearchParams(window.location.search).has("inspect");
   private pointerStart: { x: number; y: number } | null = null;
 
   private readonly onCommand = (event: Event) => this.handleCommand((event as CustomEvent<GameCommand>).detail);
@@ -253,8 +254,11 @@ export class GameWorld {
     this.practiceStep = 0;
     this.actionHint = null;
     this.actionHintTimer = 0;
-    if (this.demoLesson === "jump") this.spawnEntity("lowHurdle", 1, 6);
-    if (this.demoLesson === "slide") this.spawnEntity("cloudGate", 1, 6);
+    const inspectionLane = this.demoInspect ? 0 : 1;
+    const inspectionZ = this.demoInspect ? 4.2 : 6;
+    if (this.demoLesson === "jump") this.spawnEntity("lowHurdle", inspectionLane, inspectionZ);
+    if (this.demoLesson === "slide") this.spawnEntity("cloudGate", inspectionLane, inspectionZ);
+    if (this.demoLesson === "star") this.spawnEntity("star", inspectionLane, inspectionZ);
     if (this.demoAction === "jump") {
       this.entities.splice(0).forEach((entity) => entity.node.dispose(false, true));
       this.spawnEntity("lowHurdle", 1, 6);
@@ -266,7 +270,7 @@ export class GameWorld {
       this.spawnTimer = 99;
     }
     if (this.demoPickup) {
-      this.spawnEntity(this.demoPickup, 1, 9);
+      this.spawnEntity(this.demoPickup, inspectionLane, this.demoInspect ? 4.2 : 9);
       this.spawnTimer = 99;
     }
     if (this.player) this.player.position = new Vector3(0, 0, PLAYER_Z);
@@ -354,7 +358,7 @@ export class GameWorld {
     for (let index = this.entities.length - 1; index >= 0; index -= 1) {
       const entity = this.entities[index];
       entity.node.position.z -= speed * delta;
-      entity.node.rotation.y += entity.spin * delta;
+      entity.node.rotation.z += entity.spin * delta;
       entity.node.position.y += Math.sin(this.elapsed * 5 + index) * delta * 0.1;
       if (entity.node.position.z < -9) {
         const missedPracticeStar = this.isPractice && this.practiceStep === 0 && entity.kind === "star";
@@ -510,7 +514,7 @@ export class GameWorld {
     if (kind === "star") this.createStar(node);
     if (kind === "shield") this.createShield(node);
     if (kind === "gust") this.createGust(node);
-    this.entities.push({ node, kind, lane, spin: kind === "star" || kind === "shield" ? 2.8 : 0.18 });
+    this.entities.push({ node, kind, lane, spin: kind === "star" ? 1.8 : kind === "gust" ? 0.42 : 0 });
   }
 
   private buildTrack() {
@@ -734,6 +738,7 @@ export class GameWorld {
     const plane = MeshBuilder.CreatePlane(name, { width, height, sideOrientation: Mesh.DOUBLESIDE }, this.scene);
     plane.parent = root;
     plane.position = new Vector3(0, y, -0.3);
+    plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
     plane.material = material;
   }
 

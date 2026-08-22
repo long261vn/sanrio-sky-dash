@@ -52,6 +52,11 @@
 - [x] Viết công thức điểm dễ hiểu, hiển thị trong hướng dẫn và HUD mà không gây rối trong lúc chạy.
 - [x] Bổ sung test cho công thức điểm, mốc sao và quy tắc spawn cảnh báo.
 - [ ] Kiểm thử trực quan power-up/tutorial và nhịp phản ứng sau khi sửa trên desktop/mobile.
+- [x] Đổi nút hướng dẫn trên menu thành nhãn trực tiếp, dễ nhận biết nội dung bên trong.
+- [x] Bỏ nút “Hồ sơ mới” khỏi menu chính và giữ mô hình một hồ sơ/thiết bị không làm rối người chơi.
+- [x] Tái hiện chướng ngại/vật phẩm ở cự ly gần để xác định nguyên nhân méo hình.
+- [x] Sửa tỷ lệ/texture/camera-facing của chướng ngại và power-up khi đến gần người chơi.
+- [x] Kiểm thử cận cảnh các vật thấp, cổng mây, sao, khiên và vòng gió trên desktop/mobile.
 
 - [x] Nâng cấp game lên hạ tầng có cơ sở dữ liệu và API an toàn.
 - [x] Tạo dữ liệu mùa, điểm số, tên người chơi và chỉ mục xếp hạng Top 30.
