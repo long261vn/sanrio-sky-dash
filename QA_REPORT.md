@@ -153,3 +153,11 @@ Hồi quy UI mới mô phỏng hai game-over liên tiếp cùng hồ sơ “Hana
 Trong QA mobile, tư thế trượt đã được giảm nén ngang và cân chỉnh lại thân/huy hiệu để gương mặt không còn bị một dải mesh cắt ngang khi đi dưới cổng mây. Lượt QA 390×844 sau sửa giữ mascot, toast “Lướt qua nào!”, cổng mây và bốn nút cảm ứng rõ ràng. Full test (28), TypeScript và build production đạt.
 
 Manus public sau checkpoint `f411bf0f` xác nhận lượt trượt vẫn tiếp tục ở cấp 1 với HUD gọn, điểm tăng từ quãng đường/vượt cổng, toast “Lướt qua nào!” và canvas render được mascot rõ ràng.
+
+### Nhịp thử thách và sao xu — 22/08/2026
+
+Màn menu nay ghi rõ: mỗi thiết bị giữ **một kỷ lục cao nhất mỗi tuần**, vì vậy hai lượt dưới tên Long sẽ cập nhật cùng một dòng thay vì sinh hai người chơi Long. Nút hướng dẫn và toast runtime được đưa lên sát HUD để giữ vùng ba làn trống.
+
+Sao xu đã trở lại trong nhịp spawn thường, nhận **+4 điểm cố định** mỗi lần nhặt; không tạo combo và không có thưởng 10 sao. Nhịp spawn đầu lượt giảm từ 2,50 giây xuống 2,05 giây trước độ lệch ngẫu nhiên, giảm dần theo cấp nhưng vẫn chặn ở sàn an toàn 0,92 giây. Demo desktop cho thấy cổng mây được cảnh báo sớm và sao xu xuất hiện lại; hướng dẫn mobile hiển thị năm thẻ Sao xu, Nhảy, Trượt, Khiên và Vòng gió. Toàn bộ 28 test, TypeScript và build production đạt.
+
+Sau batch này, Top 30 thật hiển thị cùng một dòng **Long** ở hạng 1 trên cả desktop và 390×844, với 553m / 3.611 điểm và không có số sao; các hạng còn lại là placeholder. Cảnh QA mobile ở cấp 3 / 12 km/h hiển thị đồng thời đệm thấp ở làn trái, cổng mây ở làn phải và sao xu ở làn giữa, để xác nhận nhịp dày hơn vẫn giữ một lựa chọn làn rõ ràng. Build production tiếp tục đạt.

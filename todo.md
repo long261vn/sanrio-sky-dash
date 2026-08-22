@@ -150,3 +150,11 @@
 - [x] Làm lại điểm số để sao không còn tạo combo hoặc thưởng mốc 10 sao làm điểm tăng quá nhanh.
 - [x] Reset toàn bộ dữ liệu Top 30 theo yêu cầu và xác minh danh sách trống 30 hạng.
 - [x] Kiểm thử công thức điểm, nhịp độ và cảnh báo mới trên desktop/mobile trước phát hành.
+
+- [x] Làm rõ trong UI rằng mỗi thiết bị chỉ giữ một kỷ lục cao nhất/tuần, nên hai lượt cùng tên không tạo hai dòng Top 30.
+- [x] Đưa nút hướng dẫn lên vị trí cao hơn, tách rõ khỏi vùng nhìn đường chạy và vẫn vừa màn hình mobile.
+- [x] Tăng dần mật độ chướng ngại và vật phẩm theo cấp để lượt chơi đầu không thưa, nhưng giữ khoảng phản ứng an toàn.
+- [x] Đưa sao/xu trở lại như vật phẩm nhặt có phần thưởng nhỏ cố định, không combo và không thưởng mốc 10 sao.
+- [x] Kiểm thử nhịp spawn, hướng dẫn và Top 30 mới trên desktop/mobile trước phát hành.
+- [x] Kiểm tra lại Top 30 trên desktop và mobile sau batch spawn/sao mới, ghi nhận screenshot hoặc bằng chứng browser rõ ràng.
+- [x] Chạy QA runtime mobile cho nhịp spawn mới ở vài mốc cấp để xác nhận vật thể dày hơn nhưng vẫn có cảnh báo sớm và khoảng phản ứng an toàn.

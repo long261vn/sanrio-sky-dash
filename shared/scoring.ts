@@ -1,6 +1,6 @@
 export const SCORE_RULES = {
   basePointsPerMeter: 6,
-  starBasePoints: 0,
+  starBasePoints: 4,
   starComboGain: 0,
   starGoal: 0,
   starGoalBonus: 0,

@@ -50,7 +50,7 @@ describe("GameWorld keyboard input", () => {
     const star = collisionWorld("star");
     (star.world as unknown as { updateEntities: (delta: number, speed: number) => void }).updateEntities(0, 0);
     expect(star.world.stars).toBe(1);
-    expect(star.world.score).toBe(0);
+    expect(star.world.score).toBe(4);
     expect(star.world.multiplier).toBe(1);
     expect(star.removeEntity).toHaveBeenCalledWith(0);
 

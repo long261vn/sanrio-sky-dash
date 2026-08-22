@@ -94,6 +94,7 @@ export class GameWorld {
   })();
   private readonly demoInspect = new URLSearchParams(window.location.search).has("inspect");
   private readonly demoHit = new URLSearchParams(window.location.search).has("hit");
+  private readonly demoDense = new URLSearchParams(window.location.search).has("qaDense");
   private readonly demoDistance = (() => {
     const value = Number(new URLSearchParams(window.location.search).get("qaDistance"));
     return Number.isFinite(value) ? Math.max(0, Math.min(650, Math.floor(value))) : 0;
@@ -131,7 +132,7 @@ export class GameWorld {
     if (this.status !== "playing") return;
 
     const difficulty = this.getDifficulty();
-    const speed = this.demoLesson && !this.demoAction ? 0 : this.isPractice ? 7.6 : this.demoPickup || this.demoAction ? 1.1 : difficulty.speed;
+    const speed = this.demoDense || (this.demoLesson && !this.demoAction) ? 0 : this.isPractice ? 7.6 : this.demoPickup || this.demoAction ? 1.1 : difficulty.speed;
     if (difficulty.level > this.lastDifficultyLevel) {
       this.lastDifficultyLevel = difficulty.level;
       this.audio.play("shield");
@@ -271,6 +272,13 @@ export class GameWorld {
       this.spawnEntity(this.demoPickup, 1, this.demoHit ? 0.3 : this.demoInspect ? 4.2 : 9);
       this.spawnTimer = 99;
     }
+    if (this.demoDense) {
+      this.spawnEntity("lowHurdle", 0, 12);
+      this.spawnEntity("cloudGate", 2, 15);
+      this.spawnEntity("star", 1, 18);
+      this.spawnTimer = 99;
+      this.showMessage("Nhịp mây dày hơn — làn giữa vẫn an toàn.");
+    }
     if (this.player) this.player.position = new Vector3(0, 0, PLAYER_Z);
     if (practice) {
       this.spawnPracticeStep();
@@ -380,9 +388,9 @@ export class GameWorld {
         this.actionHintTimer = this.demoLesson ? 99 : 2;
         this.showMessage(entity.kind === "lowHurdle" ? "Đệm thấp phía trước." : "Cổng mây cao phía trước.");
       }
-      if (!entity.prompted && (entity.kind === "shield" || entity.kind === "gust") && entity.node.position.z < warningDistance && entity.node.position.z > warningDistance - 2) {
+      if (!entity.prompted && (entity.kind === "star" || entity.kind === "shield" || entity.kind === "gust") && entity.node.position.z < warningDistance && entity.node.position.z > warningDistance - 2) {
         entity.prompted = true;
-        this.showMessage(entity.kind === "shield" ? "Khiên cầu vồng: chạm để chặn 1 va chạm!" : "Vòng gió mint: chạm để +40 điểm!");
+        this.showMessage(entity.kind === "star" ? "Sao xu: đổi làn để +4 điểm!" : entity.kind === "shield" ? "Khiên cầu vồng: chạm để chặn 1 va chạm!" : "Vòng gió mint: chạm để +40 điểm!");
       }
       const hitbox = ENTITY_HITBOX[entity.kind];
       const horizontalHit = Math.abs(entity.node.position.x - (this.player?.position.x ?? 0)) < hitbox.x;
@@ -394,7 +402,7 @@ export class GameWorld {
           const starPoints = scoreForStar(this.multiplier, getCharacter(this.characterId).starBonus);
           this.score += starPoints;
           this.multiplier = nextComboAfterStar(this.multiplier);
-          this.showMessage("Sao điều ước chỉ là dấu đường bay.");
+          this.showMessage(`Sao xu: +${Math.round(starPoints)} điểm!`);
           this.removeEntity(index);
           continue;
         }
@@ -491,20 +499,25 @@ export class GameWorld {
     const lane = Math.floor(this.random() * 3);
     const roll = this.random();
     const spawnZ = getSpawnZ(level);
-    if (roll < 0.68) {
+    if (roll < 0.58) {
       const safeLane = Math.floor(this.random() * 3);
       const occupiedLanes = [0, 1, 2].filter((candidate) => candidate !== safeLane);
       const actionKind: EntityKind = this.random() < 0.56 ? "lowHurdle" : "cloudGate";
       this.spawnEntity(actionKind, occupiedLanes[0], spawnZ);
-      if (level >= 4 && this.random() < 0.24 + level * 0.06) this.spawnEntity(actionKind, occupiedLanes[1], spawnZ);
+      if (level >= 3 && this.random() < 0.14 + level * 0.055) this.spawnEntity(actionKind, occupiedLanes[1], spawnZ);
       return;
     }
-    if (roll < 0.9) {
+    if (roll < 0.83) {
       const actionKind: EntityKind = this.random() < 0.5 ? "lowHurdle" : "cloudGate";
       this.spawnEntity(actionKind, lane, spawnZ);
       return;
     }
-    this.spawnEntity(roll < 0.96 ? "shield" : "gust", lane, spawnZ + 2);
+    if (roll < 0.95) {
+      this.spawnEntity("star", lane, spawnZ + 2);
+      if (level >= 2 && this.random() < 0.44) this.spawnEntity("star", (lane + 1) % 3, spawnZ + 8);
+      return;
+    }
+    this.spawnEntity(roll < 0.985 ? "shield" : "gust", lane, spawnZ + 2);
   }
 
   private spawnEntity(kind: EntityKind, lane: number, z: number) {

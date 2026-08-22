@@ -3,7 +3,7 @@ export const SPAWN_RULES = {
   hazardSpawnZPerLevel: 4,
   hazardSpawnZMax: 78,
   approachGuardZ: 42,
-  minSpawnDelay: 1.05,
+  minSpawnDelay: 0.92,
   warningSeconds: 2.1,
   minWarningZ: 19,
 } as const;
@@ -17,5 +17,5 @@ export function getWarningZ(speed: number) {
 }
 
 export function getNextSpawnDelay(level: number, distance: number, randomOffset: number) {
-  return Math.max(SPAWN_RULES.minSpawnDelay, 2.5 - level * 0.19 - distance / 2_600) + randomOffset;
+  return Math.max(SPAWN_RULES.minSpawnDelay, 2.05 - level * 0.17 - distance / 3_200) + randomOffset;
 }
