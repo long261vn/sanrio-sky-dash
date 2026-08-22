@@ -69,7 +69,12 @@ export class GameWorld {
   private lastDifficultyLevel = 1;
   private missionAnnounced = false;
   private newRecord = false;
+  private isPractice = false;
+  private practiceStep = 0;
+  private actionHint: "jump" | "slide" | null = null;
+  private actionHintTimer = 0;
   private readonly demo = new URLSearchParams(window.location.search).has("demo");
+  private readonly demoPractice = new URLSearchParams(window.location.search).has("practice");
   private readonly demoCharacter = (() => {
     const requested = new URLSearchParams(window.location.search).get("character") as CharacterId | null;
     return requested && CHARACTERS.some((character) => character.id === requested) ? requested : undefined;
@@ -99,7 +104,7 @@ export class GameWorld {
     canvas.addEventListener("pointerup", this.onPointerUp);
     canvas.addEventListener("pointercancel", this.onPointerCancel);
     this.emitState();
-    if (this.demo) window.setTimeout(() => this.start(this.demoCharacter), 250);
+    if (this.demo || this.demoPractice) window.setTimeout(() => this.start(this.demoCharacter, this.demoPractice), 250);
   }
 
   update(delta: number) {
@@ -108,7 +113,7 @@ export class GameWorld {
     if (this.status !== "playing") return;
 
     const difficulty = this.getDifficulty();
-    const speed = this.demoLesson ? 0 : difficulty.speed;
+    const speed = this.demoLesson ? 0 : this.isPractice ? 7.6 : difficulty.speed;
     if (difficulty.level > this.lastDifficultyLevel) {
       this.lastDifficultyLevel = difficulty.level;
       this.audio.play("shield");
@@ -120,10 +125,12 @@ export class GameWorld {
     this.slideTimer = Math.max(0, this.slideTimer - delta);
     this.shieldTimer = Math.max(0, this.shieldTimer - delta);
     this.messageTimer = Math.max(0, this.messageTimer - delta);
+    this.actionHintTimer = Math.max(0, this.actionHintTimer - delta);
+    if (this.actionHintTimer === 0) this.actionHint = null;
 
     this.updatePlayer(delta);
     this.updateEntities(delta, speed);
-    if (!this.demoLesson && this.spawnTimer <= 0) {
+    if (!this.demoLesson && !this.isPractice && this.spawnTimer <= 0) {
       this.spawnBeat(difficulty.level);
       this.spawnTimer = Math.max(0.4, 1.18 - difficulty.level * 0.1 - this.distance / 2600) + this.random() * 0.28;
     }
@@ -164,6 +171,7 @@ export class GameWorld {
       return;
     }
     if (command.type === "start") this.start(command.characterId);
+    if (command.type === "practice") this.start(command.characterId, true);
     if (command.type === "select") { this.audio.play("button"); this.selectCharacter(command.characterId); }
     if (command.type === "lane" && this.status === "playing") this.changeLane(command.direction);
     if (command.type === "jump" && this.status === "playing") this.jump();
@@ -201,7 +209,7 @@ export class GameWorld {
     this.emitState();
   }
 
-  private start(characterId?: CharacterId) {
+  private start(characterId?: CharacterId, practice = false) {
     this.audio.play("button");
     void this.startMusicWithFeedback();
     if (characterId) this.selectCharacter(characterId);
@@ -222,9 +230,18 @@ export class GameWorld {
     this.missionAnnounced = false;
     this.newRecord = false;
     this.lastDifficultyLevel = 1;
-    if (this.demoLesson === "jump") this.spawnEntity("lowHurdle", 1, 11);
+    this.isPractice = practice;
+    this.practiceStep = 0;
+    this.actionHint = null;
+    this.actionHintTimer = 0;
+    if (this.demoLesson === "jump") this.spawnEntity("lowHurdle", 1, 6);
     if (this.demoLesson === "slide") this.spawnEntity("cloudGate", 1, 6);
     if (this.player) this.player.position = new Vector3(0, 0, PLAYER_Z);
+    if (practice) {
+      this.spawnPracticeStep();
+      this.setStatus("playing", "Luyện tập 1/3: đổi làn để lấy sao.");
+      return;
+    }
     this.setStatus("playing", "Lướt qua mây, gom điều ước!");
   }
 
@@ -307,12 +324,19 @@ export class GameWorld {
       entity.node.rotation.y += entity.spin * delta;
       entity.node.position.y += Math.sin(this.elapsed * 5 + index) * delta * 0.1;
       if (entity.node.position.z < -9) {
+        const missedPracticeStar = this.isPractice && this.practiceStep === 0 && entity.kind === "star";
         entity.node.dispose(false, true);
         this.entities.splice(index, 1);
+        if (missedPracticeStar) {
+          this.showMessage("Hãy đổi làn để lấy sao — thử lại nhé!");
+          this.spawnPracticeStep();
+        }
         continue;
       }
       if (!entity.prompted && (entity.kind === "lowHurdle" || entity.kind === "cloudGate") && entity.node.position.z < 8 && entity.node.position.z > 4) {
         entity.prompted = true;
+        this.actionHint = entity.kind === "lowHurdle" ? "jump" : "slide";
+        this.actionHintTimer = this.demoLesson ? 99 : 2.4;
         this.showMessage(entity.kind === "lowHurdle" ? "Đệm thấp phía trước — NHẢY qua!" : "Cổng mây cao phía trước — TRƯỢT dưới!");
       }
       const hitbox = ENTITY_HITBOX[entity.kind];
@@ -326,6 +350,7 @@ export class GameWorld {
           this.multiplier = Math.min(5, this.multiplier + 0.2);
           this.showMessage("+1 sao điều ước");
           this.removeEntity(index);
+          if (this.isPractice && this.practiceStep === 0) this.advancePractice();
           continue;
         }
         if (entity.kind === "shield") {
@@ -347,6 +372,7 @@ export class GameWorld {
         if (clearedLowHurdle || clearedCloudGate) {
           this.score += 18 * this.multiplier;
           this.removeEntity(index);
+          if (this.isPractice) this.advancePractice();
           continue;
         }
         if (this.shieldTimer > 0) {
@@ -354,6 +380,11 @@ export class GameWorld {
           this.shieldTimer = 0;
           this.showMessage("Khiên đã che chắn bạn!");
           this.removeEntity(index);
+          continue;
+        }
+        if (this.isPractice) {
+          entity.node.position.z = 15;
+          this.showMessage(entity.kind === "lowHurdle" ? "Đệm thấp cần NHẢY qua — thử lại nhé!" : "Cổng mây cao cần TRƯỢT dưới — thử lại nhé!");
           continue;
         }
         this.endRun();
@@ -365,6 +396,29 @@ export class GameWorld {
   private removeEntity(index: number) {
     const [entity] = this.entities.splice(index, 1);
     entity.node.dispose(false, true);
+  }
+
+  private spawnPracticeStep() {
+    this.entities.splice(0).forEach((entity) => entity.node.dispose(false, true));
+    this.playerLane = 1;
+    this.targetLane = 1;
+    if (this.player) this.player.position.x = LANES[1];
+    if (this.practiceStep === 0) this.spawnEntity("star", 2, 17);
+    if (this.practiceStep === 1) this.spawnEntity("lowHurdle", 1, 17);
+    if (this.practiceStep === 2) this.spawnEntity("cloudGate", 1, 17);
+  }
+
+  private advancePractice() {
+    this.practiceStep += 1;
+    if (this.practiceStep >= 3) {
+      this.isPractice = false;
+      this.entities.splice(0).forEach((entity) => entity.node.dispose(false, true));
+      this.setStatus("menu", "Hoàn tất luyện tập! Chọn một người bạn và bắt đầu lượt chạy.");
+      return;
+    }
+    this.spawnPracticeStep();
+    const guidance = ["Luyện tập 1/3: đổi làn để lấy sao.", "Luyện tập 2/3: nhảy qua đệm thấp.", "Luyện tập 3/3: trượt dưới cổng mây."];
+    this.showMessage(guidance[this.practiceStep]);
   }
 
   private endRun() {
@@ -691,6 +745,9 @@ export class GameWorld {
       audioEnabled: this.audio.isEnabled,
       difficultyLevel: this.getDifficulty().level,
       speed: Math.round(this.getDifficulty().speed),
+      actionHint: this.actionHintTimer > 0 ? this.actionHint : null,
+      isPractice: this.isPractice,
+      practiceStep: this.practiceStep,
     };
     window.dispatchEvent(new CustomEvent<GameSnapshot>("skydash:state", { detail: snapshot }));
   }

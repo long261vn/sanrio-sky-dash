@@ -1,5 +1,12 @@
 # Hạng mục cập nhật — Chạy Đua Cùng Hana
 
+- [x] Thêm chế độ luyện tập an toàn theo ba bài: đổi làn lấy sao, nhảy qua đệm thấp và trượt dưới cổng mây.
+- [x] Thêm nhãn hành động lớn, đúng màu và có hoạt ảnh khi vật cản đến gần.
+- [x] Thêm chuyển động minh hoạ ngắn cho ba thẻ hướng dẫn Lấy–Nhảy–Trượt.
+- [x] Bổ sung lối vào chế độ luyện tập từ menu và lối thoát rõ ràng về màn hình chọn nhân vật.
+- [x] Kiểm thử luồng luyện tập, onboarding và build trước khi đồng bộ GitHub.
+- [x] Lưu checkpoint để đồng bộ thay đổi với repository GitHub đã liên kết.
+
 - [x] Xác định và sửa phép biến đổi texture làm lật hướng đệm dâu hoặc cổng mây trong canvas.
 - [x] Làm lại bảng hướng dẫn thành ba thẻ hành động lớn: LẤY, NHẢY, TRƯỢT.
 - [x] Dùng cùng hình asset, màu, chiều cao và mô tả ngắn với gameplay runtime.

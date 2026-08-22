@@ -24,6 +24,9 @@ const initialSnapshot: GameSnapshot = {
   audioEnabled: true,
   difficultyLevel: 1,
   speed: 10,
+  actionHint: null,
+  isPractice: false,
+  practiceStep: 0,
 };
 
 function send(command: GameCommand) {
@@ -59,9 +62,10 @@ export default function SkyDashHud() {
               <span><b>{selected.name}</b><small>{selected.tagline}</small></span>
             </div>
             <div className="game-score"><small>Điểm</small><strong>{snapshot.score.toLocaleString("vi-VN")}</strong><span>★ {snapshot.stars} · ×{snapshot.multiplier.toFixed(1)}</span></div>
-            <div className="game-meta"><div className="game-progress"><span>Mục tiêu {snapshot.missionProgress}/10 sao</span><b><Gauge size={14} /> Cấp {snapshot.difficultyLevel} · {snapshot.speed} km/h</b>{snapshot.shieldSeconds > 0 && <em><Zap size={13} /> Khiên {snapshot.shieldSeconds}s</em>}</div><div className="game-actions"><span>{snapshot.distance}m</span><button className="sound-button" onClick={() => send({ type: "toggleAudio" })} aria-label={snapshot.audioEnabled ? "Tắt âm thanh" : "Bật âm thanh"}>{snapshot.audioEnabled ? <Volume2 size={17} /> : <VolumeX size={17} />}</button><button className="pause-button" onClick={() => send({ type: "pause" })} aria-label="Tạm dừng"><Pause size={18} /></button></div></div>
+            <div className="game-meta"><div className="game-progress"><span>{snapshot.isPractice ? `Luyện tập ${snapshot.practiceStep + 1}/3` : `Mục tiêu ${snapshot.missionProgress}/10 sao`}</span><b><Gauge size={14} /> {snapshot.isPractice ? "Đường mây an toàn" : `Cấp ${snapshot.difficultyLevel} · ${snapshot.speed} km/h`}</b>{snapshot.shieldSeconds > 0 && <em><Zap size={13} /> Khiên {snapshot.shieldSeconds}s</em>}</div><div className="game-actions"><span>{snapshot.distance}m</span><button className="sound-button" onClick={() => send({ type: "toggleAudio" })} aria-label={snapshot.audioEnabled ? "Tắt âm thanh" : "Bật âm thanh"}>{snapshot.audioEnabled ? <Volume2 size={17} /> : <VolumeX size={17} />}</button><button className="pause-button" onClick={() => send({ type: "pause" })} aria-label="Tạm dừng"><Pause size={18} /></button></div></div>
           </div>
           {snapshot.message && <div className="sky-toast">{snapshot.message}</div>}
+          {snapshot.actionHint && <div className={`action-callout ${snapshot.actionHint}`}><small>VẬT CẢN SẮP TỚI</small><strong>{snapshot.actionHint === "jump" ? "NHẢY!" : "TRƯỢT!"}</strong><span>{snapshot.actionHint === "jump" ? "SPACE hoặc ↑" : "↓ để trượt dưới"}</span></div>}
           <div className="touch-controls" aria-label="Điều khiển cảm ứng">
             <button onClick={() => send({ type: "lane", direction: -1 })}>←</button>
             <button className="jump-control" onClick={() => send({ type: "jump" })}>↑</button>
@@ -93,6 +97,7 @@ export default function SkyDashHud() {
                   </button>
                 ))}
               </div>
+              <button className="practice-button" onClick={() => send({ type: "practice", characterId: selectedId })}><Play size={15} fill="currentColor" /> Luyện tập 3 bước</button>
               <button className="play-button" onClick={() => send({ type: "start", characterId: selectedId })}><Play size={20} fill="currentColor" /> Chạy cùng {selected.name}</button>
               <p className="fan-note">Nhạc nền sẽ bắt đầu khi bạn bấm chạy; có thể bật/tắt bằng nút loa.</p>
             </div>

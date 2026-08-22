@@ -46,7 +46,8 @@ export type GameCommand =
   | { type: "resume" }
   | { type: "restart" }
   | { type: "menu" }
-  | { type: "toggleAudio" };
+  | { type: "toggleAudio" }
+  | { type: "practice"; characterId?: CharacterId };
 
 export interface GameSnapshot {
   status: GameStatus;
@@ -63,4 +64,7 @@ export interface GameSnapshot {
   audioEnabled: boolean;
   difficultyLevel: number;
   speed: number;
+  actionHint: "jump" | "slide" | null;
+  isPractice: boolean;
+  practiceStep: number;
 }
