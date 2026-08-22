@@ -1,5 +1,10 @@
 # Hạng mục cập nhật — Chạy Đua Cùng Hana
 
+- [x] Xác minh repository công khai và trạng thái đồng bộ nhánh mặc định.
+- [x] Kiểm tra xem GitHub Pages đã được cấu hình cho repository hay chưa — hiện chưa có GitHub Pages site.
+- [x] Xác nhận bản game build thành công và sẵn sàng phục vụ tĩnh.
+- [x] Xác định liên kết chơi trực tuyến hợp lệ hoặc hướng dẫn thao tác phát hành còn lại.
+
 - [x] Thêm chế độ luyện tập an toàn theo ba bài: đổi làn lấy sao, nhảy qua đệm thấp và trượt dưới cổng mây.
 - [x] Thêm nhãn hành động lớn, đúng màu và có hoạt ảnh khi vật cản đến gần.
 - [x] Thêm chuyển động minh hoạ ngắn cho ba thẻ hướng dẫn Lấy–Nhảy–Trượt.
