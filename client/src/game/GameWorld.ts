@@ -83,6 +83,10 @@ export class GameWorld {
     return requested && CHARACTERS.some((character) => character.id === requested) ? requested : undefined;
   })();
   private readonly demoLesson = new URLSearchParams(window.location.search).get("lesson");
+  private readonly demoAction = (() => {
+    const action = new URLSearchParams(window.location.search).get("qaAction");
+    return action === "jump" || action === "slide" ? action : null;
+  })();
   private readonly demoPickup = (() => {
     const pickup = new URLSearchParams(window.location.search).get("pickup");
     return pickup === "shield" || pickup === "gust" ? pickup : null;
@@ -120,7 +124,7 @@ export class GameWorld {
     if (this.status !== "playing") return;
 
     const difficulty = this.getDifficulty();
-    const speed = this.demoLesson ? 0 : this.isPractice ? 7.6 : this.demoPickup ? 1.1 : difficulty.speed;
+    const speed = this.demoLesson && !this.demoAction ? 0 : this.isPractice ? 7.6 : this.demoPickup || this.demoAction ? 1.1 : difficulty.speed;
     if (difficulty.level > this.lastDifficultyLevel) {
       this.lastDifficultyLevel = difficulty.level;
       this.audio.play("shield");
@@ -243,6 +247,16 @@ export class GameWorld {
     this.actionHintTimer = 0;
     if (this.demoLesson === "jump") this.spawnEntity("lowHurdle", 1, 6);
     if (this.demoLesson === "slide") this.spawnEntity("cloudGate", 1, 6);
+    if (this.demoAction === "jump") {
+      this.entities.splice(0).forEach((entity) => entity.node.dispose(false, true));
+      this.spawnEntity("lowHurdle", 1, 6);
+      this.spawnTimer = 99;
+    }
+    if (this.demoAction === "slide") {
+      this.entities.splice(0).forEach((entity) => entity.node.dispose(false, true));
+      this.spawnEntity("cloudGate", 1, 6);
+      this.spawnTimer = 99;
+    }
     if (this.demoPickup) {
       this.spawnEntity(this.demoPickup, 1, 9);
       this.spawnTimer = 99;

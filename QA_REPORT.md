@@ -63,3 +63,21 @@ Kiểm tra trực tiếp preview xác nhận panel Top 30 hiển thị bốn ent
 Demo khiên ban đầu di chuyển quá nhanh để lưu ảnh trong khung kiểm tra. Đã hạ tốc độ và đưa vật phẩm gần hơn riêng cho URL QA `?demo&pickup=shield` hoặc `?demo&pickup=gust`, không ảnh hưởng nhịp game thật; mục tiêu là xác nhận trực quan chiều cao, silhouette và phản hồi nhặt vật phẩm.
 
 Kiểm tra hướng dẫn sau khi thay sprite xác nhận cả khiên cầu vồng và vòng gió mint xuất hiện với silhouette lớn, đầy đủ và tách biệt màu sắc. Hai thẻ này dùng đúng sprite runtime, nên phần mô tả và vật thể người chơi gặp không còn là hai hệ minh hoạ khác nhau.
+
+Sau checkpoint `10c2f8a9`, bản public Manus tại thời điểm kiểm tra đầu tiên vẫn đang trả bundle menu trước đó (chưa thấy nút “Hồ sơ mới”). Đây là độ trễ CDN/deploy cần chờ và xác minh lại bằng fingerprint bundle trước khi yêu cầu người chơi kiểm thử; không coi đó là lỗi UI của mã nguồn mới.
+
+Fingerprint bundle công khai sau đó đã đổi và chứa nhãn “Hồ sơ mới”. Kiểm tra trực tiếp bản Manus xác nhận menu có hướng dẫn một hồ sơ–một kỷ lục, còn panel Top 30 hiển thị đủ hạng 1–30 với bốn entry thật và các ô chờ có nhãn minh bạch, thanh cuộn nằm trong panel.
+
+QA runtime public qua demo đã nhặt thành công cả hai power-up. Khiên hiển thị timer 5 giây trên HUD và vòng năng lượng quanh người chạy; vòng gió trả message `+90 điểm · combo +0.5` và HUD chuyển multiplier từ ×1.0 sang ×1.5. Điều này xác nhận collision, tín hiệu và phần thưởng khớp tutorial mới.
+
+Ảnh mobile 390×844 xác nhận menu vẫn giữ CTA chạy, “Hồ sơ mới” và Top 30 trong vùng nhìn thấy; guide v2 cuộn dọc, hiển thị lần lượt năm thẻ mà không chồng chữ hay cắt vật thể. Đây là hành vi mong muốn cho màn hình hẹp.
+
+Panel Top 30 tại mobile giữ header/footer trong vùng nhìn thấy, nội dung danh sách cuộn bên trong và có cue “kéo để xem đủ 30 hạng”. Các ô hạng 5–30 được trình bày mờ có chủ đích để phân biệt với entry thật, không làm người chơi hiểu nhầm là điểm giả.
+
+Hồi quy runtime desktop sau batch mới: demo chạy liên tục qua low hurdle khi nhận chuỗi lệnh nhảy, sau đó vẫn đạt 220m và chuyển sang prompt trượt cho cloud gate thay vì game-over. HUD cũng xác nhận sao tăng multiplier (×3.7) và hoàn tất mốc 10/10 với thưởng 250 điểm. Đây là bằng chứng các nhóm sao–nhảy–trượt vẫn vận hành cùng khiên/vòng gió sau thay đổi UI/asset.
+
+Phiên kiểm thử trượt liên tục bị chuyển sang trang trống sau khi gửi phím, nên chưa dùng làm bằng chứng pass cho cloud gate; hạng mục trượt vẫn giữ mở trong checklist cho lượt QA kế tiếp.
+
+Đã chạy lại cổng mây trong preview cục bộ với chế độ QA chậm và chuỗi lệnh `ArrowDown`; game vẫn ở trạng thái playing sau khi vật thể đi qua, điểm tăng lên 110 và không xuất hiện game-over. Như vậy thao tác trượt–cloud gate vượt qua hồi quy runtime.
+
+Ảnh runtime mobile xác nhận HUD gọn, prompt nhảy và bốn nút điều khiển cảm ứng có vùng chạm riêng, không chồng lấn trên canvas. Demo khiên cũng hiển thị nhân vật, làn đường và nút đổi làn/nhảy/trượt đúng vị trí trên 390×844. Các lượt nhặt/tương tác trên mobile cần tiếp tục được xác nhận bằng thao tác chạm trực tiếp trước khi đóng checklist.

@@ -57,7 +57,7 @@ export default function SkyDashHud() {
   const [snapshot, setSnapshot] = useState<GameSnapshot>(initialSnapshot);
   const [selectedId, setSelectedId] = useState<CharacterId>("cinnamoroll");
   const [tutorialOpen, setTutorialOpen] = useState(() => new URLSearchParams(window.location.search).has("guide"));
-  const [leaderboardOpen, setLeaderboardOpen] = useState(false);
+  const [leaderboardOpen, setLeaderboardOpen] = useState(() => new URLSearchParams(window.location.search).has("leaderboard"));
   const [playerName, setPlayerName] = useState(() => window.localStorage.getItem(PLAYER_NAME_KEY) ?? "");
   const [nameError, setNameError] = useState("");
   const [completedRun, setCompletedRun] = useState<CompletedRun | null>(null);
