@@ -145,3 +145,5 @@ Hồi quy leaderboard hiện mô phỏng lượt chơi cuối thứ Sáu rồi l
 Hồi quy HUD xác nhận trạng thái hành động nhảy vẫn hiện toast “Nhảy qua đệm thấp!” nhưng không còn render `.action-callout`; bốn nút cảm ứng tiếp tục phát đúng bốn lệnh làn trái, nhảy, làn phải và trượt. Bộ test hiện có 27 case đạt cùng kiểm tra kiểu.
 
 Manus public sau checkpoint `fa565694` và GitHub Pages đều trả cùng mùa `2026-08-22` với đủ 30 placeholder “Đang chờ chuyến bay”; không có entry cũ, sao hoặc combo nào xuất hiện trong bảng hạng đã reset.
+
+Để khớp hoàn toàn với quyết định không tính sao, dòng có người chơi trong Top 30 nay chỉ hiển thị quãng đường và điểm; sao đã bị loại khỏi tiêu chí xếp hạng, điều kiện giữ kỷ lục và phần hiển thị từng hạng. Hồi quy HUD đạt 27 test và build production đạt sau thay đổi này.
