@@ -8,14 +8,15 @@ import { CHARACTERS, type CharacterId, type GameCommand, type GameSnapshot } fro
 import { assetUrl } from "@/lib/assets";
 import { trpc } from "@/lib/trpc";
 import { canStartSkyDashRun, needsLeaderboardName } from "@shared/runFlow";
+import { SCORE_RULES } from "@shared/scoring";
 
 const LOGO_URL = assetUrl("sky-dash-logo-retry_53835e27.png");
 const TARGET_URL = assetUrl("sky-dash-menu-art-retry_f2351b45.png");
 const GUIDE_STAR_URL = assetUrl("hana-star-reward_f0db88ad.png");
 const GUIDE_JUMP_URL = assetUrl("hana-low-jump-cushion_8c9af18d.png");
 const GUIDE_SLIDE_URL = assetUrl("hana-high-slide-gate_b3d23f2c.png");
-const GUIDE_SHIELD_URL = "/manus-storage/sky-dash-rainbow-shield-clean_d2fe8879.png";
-const GUIDE_GUST_URL = "/manus-storage/sky-dash-mint-gust-clean_688581d2.png";
+const GUIDE_SHIELD_URL = assetUrl("sky-dash-rainbow-shield-clean_d2fe8879.png");
+const GUIDE_GUST_URL = assetUrl("sky-dash-mint-gust-clean_688581d2.png");
 const PLAYER_ID_KEY = "hanaSkyDashPlayerId";
 const PLAYER_NAME_KEY = "hanaSkyDashPlayerName";
 
@@ -179,7 +180,7 @@ export default function SkyDashHud() {
               <span><b>{selected.name}</b><small>{selected.tagline}</small></span>
             </div>
             <div className="game-score"><small>Điểm</small><strong>{snapshot.score.toLocaleString("vi-VN")}</strong><span>★ {snapshot.stars} · ×{snapshot.multiplier.toFixed(1)}</span></div>
-            <div className="game-meta"><div className="game-progress"><span>{snapshot.isPractice ? `Luyện tập ${snapshot.practiceStep + 1}/3` : `Sao ${snapshot.missionProgress}/10 · thưởng 250 điểm`}</span><b><Gauge size={14} /> {snapshot.isPractice ? "Đường mây an toàn" : `Cấp ${snapshot.difficultyLevel} · ${snapshot.speed} km/h`}</b>{snapshot.shieldSeconds > 0 && <em><Zap size={13} /> Khiên {snapshot.shieldSeconds}s</em>}</div><div className="game-actions"><span>{snapshot.distance}m</span><button className="sound-button" onClick={() => send({ type: "toggleAudio" })} aria-label={snapshot.audioEnabled ? "Tắt âm thanh" : "Bật âm thanh"}>{snapshot.audioEnabled ? <Volume2 size={17} /> : <VolumeX size={17} />}</button><button className="pause-button" onClick={() => send({ type: "pause" })} aria-label="Tạm dừng"><Pause size={18} /></button></div></div>
+            <div className="game-meta"><div className="game-progress"><span>{snapshot.isPractice ? `Luyện tập ${snapshot.practiceStep + 1}/3` : `Sao ${snapshot.missionProgress}/${SCORE_RULES.starGoal} · mốc +${SCORE_RULES.starGoalBonus}`}</span><b><Gauge size={14} /> {snapshot.isPractice ? "Đường mây an toàn" : `Cấp ${snapshot.difficultyLevel} · ${snapshot.speed} km/h`}</b>{snapshot.shieldSeconds > 0 && <em><Zap size={13} /> Khiên {snapshot.shieldSeconds}s</em>}</div><div className="game-actions"><span>{snapshot.distance}m</span><button className="sound-button" onClick={() => send({ type: "toggleAudio" })} aria-label={snapshot.audioEnabled ? "Tắt âm thanh" : "Bật âm thanh"}>{snapshot.audioEnabled ? <Volume2 size={17} /> : <VolumeX size={17} />}</button><button className="pause-button" onClick={() => send({ type: "pause" })} aria-label="Tạm dừng"><Pause size={18} /></button></div></div>
           </div>
           {snapshot.message && <div className="sky-toast">{snapshot.message}</div>}
           {snapshot.actionHint && <div className={`action-callout ${snapshot.actionHint}`}><small>VẬT CẢN SẮP TỚI</small><strong>{snapshot.actionHint === "jump" ? "NHẢY!" : "TRƯỢT!"}</strong><span>{snapshot.actionHint === "jump" ? "SPACE hoặc ↑" : "↓ để trượt dưới"}</span></div>}
@@ -244,13 +245,15 @@ export default function SkyDashHud() {
               <div className="guide-rule-pill">★ Một vật · Một hành động</div>
             </header>
             <p className="guide-v2-intro">Năm thẻ dưới đây là <strong>đúng những vật</strong> đang xuất hiện trong đường chạy. Không cần đoán: màu sắc, chiều cao và cách nhận luôn giống nhau.</p>
+            <p className="score-formula-summary"><b>Điểm =</b> chạy {SCORE_RULES.basePointsPerMeter} điểm/m × combo + sao/vật phẩm + thưởng mốc. <strong>Sao vừa cho điểm ngay, vừa tăng combo cho các điểm sau.</strong></p>
             <div className="guide-action-grid">
-              <article className="guide-action-card collect-card"><div className="guide-prop-frame"><img src={GUIDE_STAR_URL} alt="Sao điều ước có vòng mint" /></div><div className="guide-action-copy"><span>01 · LẤY</span><h3>Sao điều ước</h3><p>Đổi làn để lấy: +30 × combo, combo +0.2. Đủ 10 sao nhận thêm 250 điểm.</p><div className="key-caps"><kbd>←</kbd><kbd>→</kbd><b>Đổi làn</b></div></div></article>
+              <article className="guide-action-card collect-card"><div className="guide-prop-frame"><img src={GUIDE_STAR_URL} alt="Sao điều ước có vòng mint" /></div><div className="guide-action-copy"><span>01 · LẤY</span><h3>Sao điều ước</h3><p>Đổi làn để lấy: +{SCORE_RULES.starBasePoints} × combo, combo +{SCORE_RULES.starComboGain}. Đủ {SCORE_RULES.starGoal} sao nhận thêm {SCORE_RULES.starGoalBonus} điểm.</p><div className="key-caps"><kbd>←</kbd><kbd>→</kbd><b>Đổi làn</b></div></div></article>
               <article className="guide-action-card jump-card"><div className="guide-prop-frame"><img src={GUIDE_JUMP_URL} alt="Đệm dâu hồng thấp" /></div><div className="guide-action-copy"><span>02 · NHẢY</span><h3>Đệm dâu thấp</h3><p>Vật thấp ở mặt đường: chỉ việc nhảy qua.</p><div className="key-caps"><kbd>SPACE</kbd><kbd>↑</kbd><b>Nhảy qua</b></div></div></article>
               <article className="guide-action-card slide-card"><div className="guide-prop-frame"><img src={GUIDE_SLIDE_URL} alt="Cổng mây cao có khoảng hở bên dưới" /></div><div className="guide-action-copy"><span>03 · TRƯỢT</span><h3>Cổng mây cao</h3><p>Mây treo cao có khoảng hở: trượt dưới cổng.</p><div className="key-caps"><kbd>↓</kbd><b>Trượt dưới</b></div></div></article>
               <article className="guide-action-card shield-card"><div className="guide-prop-frame"><img src={GUIDE_SHIELD_URL} alt="Khiên cầu vồng trong bong bóng xanh" /></div><div className="guide-action-copy"><span>04 · BẢO VỆ</span><h3>Khiên cầu vồng</h3><p>Đổi làn để chạm vào bong bóng. Khiên che được một va chạm trong thời gian ngắn.</p><div className="key-caps"><kbd>←</kbd><kbd>→</kbd><b>Chạm để lấy</b></div></div></article>
               <article className="guide-action-card gust-card"><div className="guide-prop-frame"><img src={GUIDE_GUST_URL} alt="Vòng gió mint với sao vàng ở giữa" /></div><div className="guide-action-copy"><span>05 · TĂNG TỐC</span><h3>Vòng gió mint</h3><p>Đổi làn để chạm vào vòng gió: +90 × combo và combo tăng thêm 0.5.</p><div className="key-caps"><kbd>←</kbd><kbd>→</kbd><b>Chạm để lấy</b></div></div></article>
             </div>
+            <aside className="score-formula-card" aria-label="Cách tính điểm"><div><span>ĐIỂM TÍNH THẾ NÀO?</span><h3>Mỗi sao làm lượt chạy đáng giá hơn.</h3></div><div className="score-formula-grid"><p><b>Chạy</b><em>+{SCORE_RULES.basePointsPerMeter} điểm/m × combo</em></p><p><b>Sao</b><em>+{SCORE_RULES.starBasePoints} × combo · combo +{SCORE_RULES.starComboGain}</em></p><p><b>{SCORE_RULES.starGoal} sao</b><em>thưởng một lần +{SCORE_RULES.starGoalBonus}</em></p><p><b>Nhảy / trượt đúng</b><em>+{SCORE_RULES.hurdleClearPoints} × combo</em></p><p><b>Vòng gió</b><em>+{SCORE_RULES.gustBasePoints} × combo · combo +{SCORE_RULES.gustComboGain}</em></p><p><b>Khiên</b><em>chặn 1 va chạm, giữ chuỗi combo</em></p></div><small>Tổng điểm = điểm chạy đã nhân combo + điểm sao/vật phẩm + thưởng mốc. Sao vừa cho điểm ngay, vừa tăng combo để các điểm sau cao hơn.</small></aside>
             <footer className="guide-v2-footer"><span>Luật nhớ nhanh: <b>vật thấp nhảy · vật cao trượt · sao/khiên/gió thì đổi làn để lấy</b></span><button className="play-button" onClick={() => setTutorialOpen(false)}>Đã rõ, chọn người chạy <ChevronRight size={19} /></button></footer>
           </section>
         </div>

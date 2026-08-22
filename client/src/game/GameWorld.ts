@@ -9,6 +9,8 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { GameCommand, GameSnapshot, GameStatus, CharacterId, CHARACTERS } from "@/game/types";
 import { AudioManager } from "@/game/AudioManager";
 import { assetUrl } from "@/lib/assets";
+import { SCORE_RULES, nextComboAfterGust, nextComboAfterStar, scoreForClear, scoreForDistance, scoreForGust, scoreForStar } from "@shared/scoring";
+import { SPAWN_RULES, getNextSpawnDelay, getSpawnZ, getWarningZ } from "@shared/spawnRules";
 
 type EntityKind = "lowHurdle" | "cloudGate" | "star" | "shield" | "gust";
 
@@ -27,8 +29,8 @@ const PROP_TEXTURES = {
   lowHurdle: assetUrl("hana-low-jump-cushion_8c9af18d.png"),
   cloudGate: assetUrl("hana-high-slide-gate_b3d23f2c.png"),
   star: assetUrl("hana-star-reward_f0db88ad.png"),
-  shield: "/manus-storage/sky-dash-rainbow-shield-clean_d2fe8879.png",
-  gust: "/manus-storage/sky-dash-mint-gust-clean_688581d2.png",
+  shield: assetUrl("sky-dash-rainbow-shield-clean_d2fe8879.png"),
+  gust: assetUrl("sky-dash-mint-gust-clean_688581d2.png"),
 } as const;
 const ENTITY_HITBOX: Record<EntityKind, { x: number; z: number }> = {
   lowHurdle: { x: 0.86, z: 0.92 },
@@ -130,8 +132,9 @@ export class GameWorld {
       this.audio.play("shield");
       this.showMessage(`Mây tăng tốc — Cấp ${difficulty.level}!`);
     }
-    this.distance += speed * delta * 0.43;
-    this.score += speed * delta * 3.5 * this.multiplier;
+    const metersTravelled = speed * delta * 0.43;
+    this.distance += metersTravelled;
+    this.score += scoreForDistance(metersTravelled, this.multiplier);
     this.spawnTimer -= delta;
     this.slideTimer = Math.max(0, this.slideTimer - delta);
     this.shieldTimer = Math.max(0, this.shieldTimer - delta);
@@ -142,14 +145,19 @@ export class GameWorld {
     this.updatePlayer(delta);
     this.updateEntities(delta, speed);
     if (!this.demoLesson && !this.isPractice && this.spawnTimer <= 0) {
-      this.spawnBeat(difficulty.level);
-      this.spawnTimer = Math.max(0.4, 1.18 - difficulty.level * 0.1 - this.distance / 2600) + this.random() * 0.28;
+      const hasApproachingHazard = this.entities.some((entity) => (entity.kind === "lowHurdle" || entity.kind === "cloudGate") && entity.node.position.z < SPAWN_RULES.approachGuardZ);
+      if (hasApproachingHazard) {
+        this.spawnTimer = 0.22;
+      } else {
+        this.spawnBeat(difficulty.level);
+        this.spawnTimer = getNextSpawnDelay(difficulty.level, this.distance, this.random() * 0.28);
+      }
     }
     if (this.demo && !this.demoLesson) this.runDemoBrain();
     if (this.stars >= STAR_GOAL && !this.missionAnnounced) {
       this.missionAnnounced = true;
       this.showMessage("Nhiệm vụ hoàn tất! Thêm 250 điểm.");
-      this.score += 250;
+      this.score += SCORE_RULES.starGoalBonus;
     }
 
     this.stateTimer -= delta;
@@ -358,13 +366,14 @@ export class GameWorld {
         }
         continue;
       }
-      if (!entity.prompted && (entity.kind === "lowHurdle" || entity.kind === "cloudGate") && entity.node.position.z < 8 && entity.node.position.z > 4) {
+      const warningDistance = getWarningZ(speed);
+      if (!entity.prompted && (entity.kind === "lowHurdle" || entity.kind === "cloudGate") && entity.node.position.z < warningDistance && entity.node.position.z > warningDistance - 2) {
         entity.prompted = true;
         this.actionHint = entity.kind === "lowHurdle" ? "jump" : "slide";
         this.actionHintTimer = this.demoLesson ? 99 : 2.4;
         this.showMessage(entity.kind === "lowHurdle" ? "Đệm thấp phía trước — NHẢY qua!" : "Cổng mây cao phía trước — TRƯỢT dưới!");
       }
-      if (!entity.prompted && (entity.kind === "shield" || entity.kind === "gust") && entity.node.position.z < 9 && entity.node.position.z > 5) {
+      if (!entity.prompted && (entity.kind === "shield" || entity.kind === "gust") && entity.node.position.z < warningDistance && entity.node.position.z > warningDistance - 2) {
         entity.prompted = true;
         this.showMessage(entity.kind === "shield" ? "Khiên cầu vồng: chạm để chặn 1 va chạm!" : "Vòng gió mint: chạm để +90 điểm và tăng combo!");
       }
@@ -375,9 +384,10 @@ export class GameWorld {
         if (entity.kind === "star") {
           this.audio.play("star");
           this.stars += 1;
-          this.score += 30 * this.multiplier * getCharacter(this.characterId).starBonus;
-          this.multiplier = Math.min(5, this.multiplier + 0.2);
-          this.showMessage("+1 sao điều ước");
+          const starPoints = scoreForStar(this.multiplier, getCharacter(this.characterId).starBonus);
+          this.score += starPoints;
+          this.multiplier = nextComboAfterStar(this.multiplier);
+          this.showMessage(`Sao điều ước: +${Math.round(starPoints)} · combo +${SCORE_RULES.starComboGain}`);
           this.removeEntity(index);
           if (this.isPractice && this.practiceStep === 0) this.advancePractice();
           continue;
@@ -391,16 +401,17 @@ export class GameWorld {
         }
         if (entity.kind === "gust") {
           this.audio.play("star");
-          this.score += 90 * this.multiplier;
-          this.multiplier = Math.min(5, this.multiplier + 0.5);
-          this.showMessage("Gió mint: +90 điểm · combo +0.5!");
+          const gustPoints = scoreForGust(this.multiplier);
+          this.score += gustPoints;
+          this.multiplier = nextComboAfterGust(this.multiplier);
+          this.showMessage(`Gió mint: +${Math.round(gustPoints)} điểm · combo +${SCORE_RULES.gustComboGain}!`);
           this.removeEntity(index);
           continue;
         }
         const clearedLowHurdle = entity.kind === "lowHurdle" && this.playerAirHeight > 0.76;
         const clearedCloudGate = entity.kind === "cloudGate" && this.slideTimer > 0.08;
         if (clearedLowHurdle || clearedCloudGate) {
-          this.score += 18 * this.multiplier;
+          this.score += scoreForClear(this.multiplier);
           this.removeEntity(index);
           if (this.isPractice) this.advancePractice();
           continue;
@@ -472,22 +483,23 @@ export class GameWorld {
   private spawnBeat(level: number) {
     const lane = Math.floor(this.random() * 3);
     const roll = this.random();
+    const spawnZ = getSpawnZ(level);
     if (roll < 0.46) {
       const safeLane = Math.floor(this.random() * 3);
       const occupiedLanes = [0, 1, 2].filter((candidate) => candidate !== safeLane);
       const actionKind: EntityKind = this.random() < 0.56 ? "lowHurdle" : "cloudGate";
-      this.spawnEntity(actionKind, occupiedLanes[0], 31);
-      if (level >= 3 && this.random() < 0.36 + level * 0.05) this.spawnEntity(actionKind, occupiedLanes[1], 31);
-      if (this.random() < 0.76) this.spawnEntity("star", safeLane, 34.5);
+      this.spawnEntity(actionKind, occupiedLanes[0], spawnZ);
+      if (level >= 3 && this.random() < 0.3 + level * 0.04) this.spawnEntity(actionKind, occupiedLanes[1], spawnZ);
+      if (this.random() < 0.76) this.spawnEntity("star", safeLane, spawnZ + 4.5);
       return;
     }
     if (roll < 0.83) {
-      this.spawnEntity("star", lane, 30);
-      this.spawnEntity("star", lane, 34.5);
-      if (level >= 2) this.spawnEntity("star", lane, 39);
+      this.spawnEntity("star", lane, spawnZ);
+      this.spawnEntity("star", lane, spawnZ + 4.5);
+      if (level >= 2) this.spawnEntity("star", lane, spawnZ + 9);
       return;
     }
-    this.spawnEntity(roll < 0.92 ? "shield" : "gust", lane, 32);
+    this.spawnEntity(roll < 0.92 ? "shield" : "gust", lane, spawnZ + 2);
   }
 
   private spawnEntity(kind: EntityKind, lane: number, z: number) {

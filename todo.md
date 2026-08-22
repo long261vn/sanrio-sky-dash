@@ -46,6 +46,12 @@
 - [ ] Kiểm thử runtime mobile: đổi làn, nhảy đệm thấp, trượt cổng mây, nhặt sao, khiên và vòng gió.
 - [ ] Ghi lại bằng chứng QA runtime mobile cho từng nhóm vật thể sau batch sửa mới.
 - [ ] Kiểm thử trực tiếp thao tác đổi làn trên desktop/mobile thay vì suy ra từ demo tự chạy hoặc số sao tăng.
+- [x] Sửa lỗi minh hoạ thẻ hướng dẫn khiên và vòng gió, bảo đảm asset runtime/tile hiển thị đầy đủ và không méo/cắt.
+- [x] Đặt khoảng spawn tối thiểu, thời gian cảnh báo và quy tắc chống vật thể xuất hiện bất thình lình trong làn đang chạy.
+- [x] Thiết kế lại mục đích sao: phần thưởng tức thời, mốc combo và mối liên hệ rõ với tổng điểm.
+- [x] Viết công thức điểm dễ hiểu, hiển thị trong hướng dẫn và HUD mà không gây rối trong lúc chạy.
+- [x] Bổ sung test cho công thức điểm, mốc sao và quy tắc spawn cảnh báo.
+- [ ] Kiểm thử trực quan power-up/tutorial và nhịp phản ứng sau khi sửa trên desktop/mobile.
 
 - [x] Nâng cấp game lên hạ tầng có cơ sở dữ liệu và API an toàn.
 - [x] Tạo dữ liệu mùa, điểm số, tên người chơi và chỉ mục xếp hạng Top 30.
