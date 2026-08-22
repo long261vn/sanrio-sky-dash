@@ -12,7 +12,7 @@
 - [x] Hiển thị hạng đạt được trong Top 30 và mở bảng xếp hạng khi người chơi vào bảng.
 - [x] Làm mới bảng xếp hạng theo dữ liệu API sau mỗi lượt và xử lý rõ trạng thái ngoài Top 30/lỗi lưu.
 - [x] Tự trở về màn hình chọn nhân vật sau thông báo kết quả và bảng xếp hạng.
-- [ ] Kiểm thử hai lượt liên tiếp bằng cùng người chơi, phản hồi hạng và luồng quay về màn đầu.
+- [x] Kiểm thử hai lượt liên tiếp bằng cùng người chơi, phản hồi hạng và luồng quay về màn đầu.
 - [x] Thiết lập GitHub Pages tự phát hành khi checkpoint đồng bộ lên nhánh main.
 - [x] Bỏ cơ chế tự đóng bảng điểm; chỉ trở về menu khi người chơi chủ động bấm nút.
 - [x] Xác minh API/DB xếp entry hiện có theo score, stars và thời điểm nộp.

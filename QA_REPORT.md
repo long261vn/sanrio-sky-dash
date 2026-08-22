@@ -147,3 +147,7 @@ Hồi quy HUD xác nhận trạng thái hành động nhảy vẫn hiện toast 
 Manus public sau checkpoint `fa565694` và GitHub Pages đều trả cùng mùa `2026-08-22` với đủ 30 placeholder “Đang chờ chuyến bay”; không có entry cũ, sao hoặc combo nào xuất hiện trong bảng hạng đã reset.
 
 Để khớp hoàn toàn với quyết định không tính sao, dòng có người chơi trong Top 30 nay chỉ hiển thị quãng đường và điểm; sao đã bị loại khỏi tiêu chí xếp hạng, điều kiện giữ kỷ lục và phần hiển thị từng hạng. Hồi quy HUD đạt 27 test và build production đạt sau thay đổi này.
+
+Hồi quy UI mới mô phỏng hai game-over liên tiếp cùng hồ sơ “Hana Test”: cả hai lượt tự gửi điểm, lượt thứ hai dùng đúng điểm/quãng đường mới, callback hạng mở bảng Top 30 và nút “Về màn hình đầu” gửi lệnh menu đúng một lần. Bộ test hiện có 28 case đạt cùng TypeScript.
+
+Trong QA mobile, tư thế trượt đã được giảm nén ngang và cân chỉnh lại thân/huy hiệu để gương mặt không còn bị một dải mesh cắt ngang khi đi dưới cổng mây. Lượt QA 390×844 sau sửa giữ mascot, toast “Lướt qua nào!”, cổng mây và bốn nút cảm ứng rõ ràng. Full test (28), TypeScript và build production đạt.

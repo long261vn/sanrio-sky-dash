@@ -1,13 +1,14 @@
 // @vitest-environment jsdom
 import React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { GameSnapshot } from "@/game/types";
 
 const mocks = vi.hoisted(() => ({
   mutate: vi.fn(),
   refetch: vi.fn(),
   setData: vi.fn(),
+  mutationOptions: null as any,
 }));
 
 vi.mock("@/lib/assets", () => ({ assetUrl: (filename: string) => filename }));
@@ -15,7 +16,7 @@ vi.mock("@/lib/trpc", () => ({
   trpc: {
     leaderboard: {
       top30: { useQuery: () => ({ data: { seasonKey: "2026-08-22", rows: [] }, refetch: mocks.refetch }) },
-      submit: { useMutation: () => ({ mutate: mocks.mutate, isPending: false }) },
+      submit: { useMutation: (options: any) => { mocks.mutationOptions = options; return { mutate: mocks.mutate, isPending: false }; } },
     },
     useUtils: () => ({ leaderboard: { top30: { setData: mocks.setData } } }),
   },
@@ -49,6 +50,7 @@ afterEach(() => {
   mocks.mutate.mockReset();
   mocks.refetch.mockReset();
   mocks.setData.mockReset();
+  mocks.mutationOptions = null;
 });
 
 describe("SkyDashHud run flow", () => {
@@ -117,5 +119,31 @@ describe("SkyDashHud run flow", () => {
 
     expect(screen.getByText("Nhảy qua đệm thấp!")).toBeTruthy();
     expect(container.querySelector(".action-callout")).toBeNull();
+  });
+
+  it("auto-saves two consecutive runs for one player and returns safely to the menu", async () => {
+    window.localStorage.setItem("hanaSkyDashPlayerName", "Hana Test");
+    const commandListener = vi.fn();
+    window.addEventListener("skydash:command", commandListener);
+    render(<SkyDashHud />);
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent<GameSnapshot>("skydash:state", { detail: { ...gameoverSnapshot, score: 180, distance: 30 } }));
+    });
+    await waitFor(() => expect(mocks.mutate).toHaveBeenCalledTimes(1));
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent<GameSnapshot>("skydash:state", { detail: { ...gameoverSnapshot, status: "playing" } }));
+      window.dispatchEvent(new CustomEvent<GameSnapshot>("skydash:state", { detail: { ...gameoverSnapshot, score: 240, distance: 42 } }));
+    });
+    await waitFor(() => expect(mocks.mutate).toHaveBeenCalledTimes(2));
+    expect(mocks.mutate.mock.calls[1][0]).toMatchObject({ playerName: "Hana Test", score: 240, distance: 42 });
+
+    await act(async () => {
+      await mocks.mutationOptions.onSuccess({ seasonKey: "2026-08-22", rows: [], rank: 1, improved: true, enteredTop30: true });
+    });
+    fireEvent.click(screen.getAllByRole("button", { name: "Về màn hình đầu" })[0]);
+    expect(commandListener.mock.calls.map(([event]) => (event as CustomEvent).detail)).toContainEqual({ type: "menu" });
+    window.removeEventListener("skydash:command", commandListener);
   });
 });
