@@ -151,3 +151,5 @@ Manus public sau checkpoint `fa565694` và GitHub Pages đều trả cùng mùa 
 Hồi quy UI mới mô phỏng hai game-over liên tiếp cùng hồ sơ “Hana Test”: cả hai lượt tự gửi điểm, lượt thứ hai dùng đúng điểm/quãng đường mới, callback hạng mở bảng Top 30 và nút “Về màn hình đầu” gửi lệnh menu đúng một lần. Bộ test hiện có 28 case đạt cùng TypeScript.
 
 Trong QA mobile, tư thế trượt đã được giảm nén ngang và cân chỉnh lại thân/huy hiệu để gương mặt không còn bị một dải mesh cắt ngang khi đi dưới cổng mây. Lượt QA 390×844 sau sửa giữ mascot, toast “Lướt qua nào!”, cổng mây và bốn nút cảm ứng rõ ràng. Full test (28), TypeScript và build production đạt.
+
+Manus public sau checkpoint `f411bf0f` xác nhận lượt trượt vẫn tiếp tục ở cấp 1 với HUD gọn, điểm tăng từ quãng đường/vượt cổng, toast “Lướt qua nào!” và canvas render được mascot rõ ràng.
