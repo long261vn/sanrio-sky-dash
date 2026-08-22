@@ -32,18 +32,18 @@ export type LeaderboardRepository = {
 };
 
 export function isScorePlausible(input: Pick<ScoreSubmission, "score" | "stars" | "distance">) {
-  const maximumExpectedScore = Math.max(420, input.distance * 55 + input.stars * 180 + 1_200);
-  const maximumDistance = Math.max(120, input.score * 3 + input.stars * 90);
+  const maximumExpectedScore = Math.max(420, input.distance * 55 + 1_200);
+  const maximumDistance = Math.max(120, input.score * 3);
   return input.score <= maximumExpectedScore && input.distance <= maximumDistance;
 }
 
 export function isBetterScore(previous: Pick<ScoreSubmission, "score" | "stars"> | null, next: Pick<ScoreSubmission, "score" | "stars">) {
-  return !previous || next.score > previous.score || (next.score === previous.score && next.stars > previous.stars);
+  return !previous || next.score > previous.score;
 }
 
 export function rankTop30<T extends { score: number; stars: number; submittedAt: number }>(rows: T[]) {
   return [...rows]
-    .sort((a, b) => b.score - a.score || b.stars - a.stars || a.submittedAt - b.submittedAt)
+    .sort((a, b) => b.score - a.score || a.submittedAt - b.submittedAt)
     .slice(0, 30)
     .map((row, index) => ({ ...row, rank: index + 1 }));
 }
@@ -114,7 +114,7 @@ async function createDatabaseRepository(): Promise<LeaderboardRepository> {
         })
         .from(leaderboardEntries)
         .where(eq(leaderboardEntries.seasonId, seasonId))
-        .orderBy(desc(leaderboardEntries.score), desc(leaderboardEntries.stars), leaderboardEntries.submittedAt)
+        .orderBy(desc(leaderboardEntries.score), leaderboardEntries.submittedAt)
         .limit(30);
     },
   };

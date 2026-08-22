@@ -133,3 +133,5 @@ QA runtime cuối sau khi bỏ banner xác nhận ở 390×844 nhân vật nhả
 Lượt QA desktop dài tiếp tục đến 414m, đạt cấp 4 và 2.614 điểm trước khi kết thúc; HUD đã tăng từ cấp 1 / 8 km/h sang các cấp cao hơn trong khi toast cảnh báo vẫn nhỏ. Trên 390×844, kiểm tra runtime tại mốc 330m hiển thị tốc độ cấp cao 14 km/h cùng đường chạy, nhân vật và bốn điều khiển cảm ứng còn đầy đủ. Các kiểm thử cũng xác nhận tốc độ khởi đầu 8,4 km/h, tăng cấp mỗi 110m, và không vượt giới hạn 21 km/h.
 
 Browser QA sau cùng ở mốc 361–372m xác nhận HUD runtime mới hiển thị **Cấp 4**, **14 km/h**, điểm tăng theo quãng đường và dòng “Vượt vật cản để tăng điểm”; không còn sao, combo hay mốc 10 sao. Canvas vẫn hiển thị nhân vật, cổng mây và ba làn rõ ràng, còn cảnh báo chỉ là toast nhỏ khi có vật cản tới.
+
+Top 30 trống cũng được kiểm tra ở khung 390×844 sau reset: các ô hạng hiển thị rõ dữ liệu chờ, danh sách cuộn độc lập và footer “Về màn hình đầu” không che các dòng xếp hạng.

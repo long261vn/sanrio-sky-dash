@@ -67,17 +67,17 @@ describe("leaderboard safeguards", () => {
     expect(isScorePlausible({ score: 999_999, stars: 0, distance: 1 })).toBe(false);
   });
 
-  it("only replaces a score when score or tied-star count improves", () => {
+  it("only replaces a score when score improves, never because of stars", () => {
     expect(isBetterScore({ score: 300, stars: 3 }, { score: 299, stars: 99 })).toBe(false);
-    expect(isBetterScore({ score: 300, stars: 3 }, { score: 300, stars: 4 })).toBe(true);
+    expect(isBetterScore({ score: 300, stars: 3 }, { score: 300, stars: 4 })).toBe(false);
   });
 
-  it("sorts by score, then stars, and returns at most 30 rows", () => {
+  it("sorts by score then first submission, without stars, and returns at most 30 rows", () => {
     const rows = Array.from({ length: 32 }, (_, index) => ({ score: index % 3 === 0 ? 200 : 100, stars: index, submittedAt: index }));
     const ranked = rankTop30(rows);
     expect(ranked).toHaveLength(30);
-    expect(ranked[0]).toMatchObject({ score: 200, stars: 30, rank: 1 });
-    expect(ranked[0].submittedAt).toBe(30);
+    expect(ranked[0]).toMatchObject({ score: 200, rank: 1 });
+    expect(ranked[0].submittedAt).toBe(0);
   });
 });
 
@@ -102,11 +102,11 @@ describe("submitScore through a repository", () => {
     expect(result.rows[0]).toMatchObject({ playerName: "Long 3", score: 300, submittedAt: 100 });
   });
 
-  it("updates a tied score when the same player collected more stars", async () => {
+  it("does not update a tied score when the same player collected more stars", async () => {
     const repository = createMemoryRepository([{ id: 1, seasonId: 1, ...baseScore, stars: 1, submittedAt: Date.now() - 30_000 }]);
     const result = await submitScore({ ...baseScore, stars: 2 }, repository);
-    expect(result).toMatchObject({ improved: true, rank: 1 });
-    expect(result.rows[0]).toMatchObject({ score: 180, stars: 2 });
+    expect(result).toMatchObject({ improved: false, rank: 1 });
+    expect(result.rows[0]).toMatchObject({ score: 180, stars: 1 });
   });
 
   it("returns the correct rank even when another player uses the same display name", async () => {
