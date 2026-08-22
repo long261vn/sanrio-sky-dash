@@ -9,7 +9,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { GameCommand, GameSnapshot, GameStatus, CharacterId, CHARACTERS } from "@/game/types";
 import { AudioManager } from "@/game/AudioManager";
 import { assetUrl } from "@/lib/assets";
-import { SCORE_RULES, nextComboAfterGust, nextComboAfterStar, scoreForClear, scoreForDistance, scoreForGust, scoreForStar } from "@shared/scoring";
+import { nextComboAfterGust, nextComboAfterStar, scoreForClear, scoreForDistance, scoreForGust, scoreForStar } from "@shared/scoring";
 import { SPAWN_RULES, getNextSpawnDelay, getSpawnZ, getWarningZ } from "@shared/spawnRules";
 
 type EntityKind = "lowHurdle" | "cloudGate" | "star" | "shield" | "gust";
@@ -24,7 +24,6 @@ interface WorldEntity {
 
 const LANES = [-2.6, 0, 2.6];
 const PLAYER_Z = 0;
-const STAR_GOAL = 10;
 const PROP_TEXTURES = {
   lowHurdle: assetUrl("hana-low-jump-cushion_8c9af18d.png"),
   cloudGate: assetUrl("hana-high-slide-gate_b3d23f2c.png"),
@@ -95,6 +94,10 @@ export class GameWorld {
   })();
   private readonly demoInspect = new URLSearchParams(window.location.search).has("inspect");
   private readonly demoHit = new URLSearchParams(window.location.search).has("hit");
+  private readonly demoDistance = (() => {
+    const value = Number(new URLSearchParams(window.location.search).get("qaDistance"));
+    return Number.isFinite(value) ? Math.max(0, Math.min(650, Math.floor(value))) : 0;
+  })();
   private pointerStart: { x: number; y: number } | null = null;
 
   private readonly onCommand = (event: Event) => this.handleCommand((event as CustomEvent<GameCommand>).detail);
@@ -132,7 +135,7 @@ export class GameWorld {
     if (difficulty.level > this.lastDifficultyLevel) {
       this.lastDifficultyLevel = difficulty.level;
       this.audio.play("shield");
-      this.showMessage(`Mây tăng tốc — Cấp ${difficulty.level}!`);
+      this.showMessage(`Tăng nhịp — Cấp ${difficulty.level}!`);
     }
     const metersTravelled = speed * delta * 0.43;
     this.distance += metersTravelled;
@@ -145,6 +148,7 @@ export class GameWorld {
     if (this.actionHintTimer === 0) this.actionHint = null;
 
     this.updatePlayer(delta);
+    if (this.demo && !this.demoLesson) this.runDemoBrain();
     this.updateEntities(delta, speed);
     if (!this.demoLesson && !this.isPractice && this.spawnTimer <= 0) {
       const hasApproachingHazard = this.entities.some((entity) => (entity.kind === "lowHurdle" || entity.kind === "cloudGate") && entity.node.position.z < SPAWN_RULES.approachGuardZ);
@@ -155,13 +159,6 @@ export class GameWorld {
         this.spawnTimer = getNextSpawnDelay(difficulty.level, this.distance, this.random() * 0.28);
       }
     }
-    if (this.demo && !this.demoLesson) this.runDemoBrain();
-    if (this.stars >= STAR_GOAL && !this.missionAnnounced) {
-      this.missionAnnounced = true;
-      this.showMessage("Nhiệm vụ hoàn tất! Thêm 250 điểm.");
-      this.score += SCORE_RULES.starGoalBonus;
-    }
-
     this.stateTimer -= delta;
     if (this.stateTimer <= 0) {
       this.emitState();
@@ -238,7 +235,7 @@ export class GameWorld {
     this.randomState = this.rngSeed;
     this.score = 0;
     this.stars = 0;
-    this.distance = 0;
+    this.distance = this.demoDistance;
     this.multiplier = 1;
     this.playerLane = 1;
     this.targetLane = 1;
@@ -250,7 +247,7 @@ export class GameWorld {
     this.spawnTimer = 0.55;
     this.missionAnnounced = false;
     this.newRecord = false;
-    this.lastDifficultyLevel = 1;
+    this.lastDifficultyLevel = this.getDifficulty().level;
     this.isPractice = practice;
     this.practiceStep = 0;
     this.actionHint = null;
@@ -375,12 +372,12 @@ export class GameWorld {
       if (!entity.prompted && (entity.kind === "lowHurdle" || entity.kind === "cloudGate") && entity.node.position.z < warningDistance && entity.node.position.z > warningDistance - 2) {
         entity.prompted = true;
         this.actionHint = entity.kind === "lowHurdle" ? "jump" : "slide";
-        this.actionHintTimer = this.demoLesson ? 99 : 2.4;
-        this.showMessage(entity.kind === "lowHurdle" ? "Đệm thấp phía trước — NHẢY qua!" : "Cổng mây cao phía trước — TRƯỢT dưới!");
+        this.actionHintTimer = this.demoLesson ? 99 : 2;
+        this.showMessage(entity.kind === "lowHurdle" ? "Đệm thấp phía trước." : "Cổng mây cao phía trước.");
       }
       if (!entity.prompted && (entity.kind === "shield" || entity.kind === "gust") && entity.node.position.z < warningDistance && entity.node.position.z > warningDistance - 2) {
         entity.prompted = true;
-        this.showMessage(entity.kind === "shield" ? "Khiên cầu vồng: chạm để chặn 1 va chạm!" : "Vòng gió mint: chạm để +90 điểm và tăng combo!");
+        this.showMessage(entity.kind === "shield" ? "Khiên cầu vồng: chạm để chặn 1 va chạm!" : "Vòng gió mint: chạm để +40 điểm!");
       }
       const hitbox = ENTITY_HITBOX[entity.kind];
       const horizontalHit = Math.abs(entity.node.position.x - (this.player?.position.x ?? 0)) < hitbox.x;
@@ -392,9 +389,8 @@ export class GameWorld {
           const starPoints = scoreForStar(this.multiplier, getCharacter(this.characterId).starBonus);
           this.score += starPoints;
           this.multiplier = nextComboAfterStar(this.multiplier);
-          this.showMessage(`Sao điều ước: +${Math.round(starPoints)} · combo +${SCORE_RULES.starComboGain}`);
+          this.showMessage("Sao điều ước chỉ là dấu đường bay.");
           this.removeEntity(index);
-          if (this.isPractice && this.practiceStep === 0) this.advancePractice();
           continue;
         }
         if (entity.kind === "shield") {
@@ -402,6 +398,7 @@ export class GameWorld {
           this.shieldTimer = getCharacter(this.characterId).shieldSeconds;
           this.showMessage(`Khiên cầu vồng: ${this.shieldTimer.toFixed(1)} giây!`);
           this.removeEntity(index);
+          if (this.isPractice && this.practiceStep === 0) this.advancePractice();
           continue;
         }
         if (entity.kind === "gust") {
@@ -409,7 +406,7 @@ export class GameWorld {
           const gustPoints = scoreForGust(this.multiplier);
           this.score += gustPoints;
           this.multiplier = nextComboAfterGust(this.multiplier);
-          this.showMessage(`Gió mint: +${Math.round(gustPoints)} điểm · combo +${SCORE_RULES.gustComboGain}!`);
+          this.showMessage(`Gió mint: +${Math.round(gustPoints)} điểm!`);
           this.removeEntity(index);
           continue;
         }
@@ -449,7 +446,7 @@ export class GameWorld {
     this.playerLane = 1;
     this.targetLane = 1;
     if (this.player) this.player.position.x = LANES[1];
-    if (this.practiceStep === 0) this.spawnEntity("star", 2, 17);
+    if (this.practiceStep === 0) this.spawnEntity("shield", 2, 17);
     if (this.practiceStep === 1) this.spawnEntity("lowHurdle", 1, 17);
     if (this.practiceStep === 2) this.spawnEntity("cloudGate", 1, 17);
   }
@@ -463,7 +460,7 @@ export class GameWorld {
       return;
     }
     this.spawnPracticeStep();
-    const guidance = ["Luyện tập 1/3: đổi làn để lấy sao.", "Luyện tập 2/3: nhảy qua đệm thấp.", "Luyện tập 3/3: trượt dưới cổng mây."];
+    const guidance = ["Luyện tập 1/3: đổi làn để lấy khiên.", "Luyện tập 2/3: nhảy qua đệm thấp.", "Luyện tập 3/3: trượt dưới cổng mây."];
     this.showMessage(guidance[this.practiceStep]);
   }
 
@@ -480,8 +477,8 @@ export class GameWorld {
   }
 
   private getDifficulty() {
-    const level = Math.min(6, 1 + Math.floor(this.distance / 150));
-    const speed = Math.min(25, 10 + (level - 1) * 1.65 + this.distance / 800);
+    const level = Math.min(6, 1 + Math.floor(this.distance / 110));
+    const speed = Math.min(21, 8.4 + (level - 1) * 1.7 + this.distance / 430);
     return { level, speed };
   }
 
@@ -489,22 +486,20 @@ export class GameWorld {
     const lane = Math.floor(this.random() * 3);
     const roll = this.random();
     const spawnZ = getSpawnZ(level);
-    if (roll < 0.46) {
+    if (roll < 0.68) {
       const safeLane = Math.floor(this.random() * 3);
       const occupiedLanes = [0, 1, 2].filter((candidate) => candidate !== safeLane);
       const actionKind: EntityKind = this.random() < 0.56 ? "lowHurdle" : "cloudGate";
       this.spawnEntity(actionKind, occupiedLanes[0], spawnZ);
-      if (level >= 3 && this.random() < 0.3 + level * 0.04) this.spawnEntity(actionKind, occupiedLanes[1], spawnZ);
-      if (this.random() < 0.76) this.spawnEntity("star", safeLane, spawnZ + 4.5);
+      if (level >= 4 && this.random() < 0.24 + level * 0.06) this.spawnEntity(actionKind, occupiedLanes[1], spawnZ);
       return;
     }
-    if (roll < 0.83) {
-      this.spawnEntity("star", lane, spawnZ);
-      this.spawnEntity("star", lane, spawnZ + 4.5);
-      if (level >= 2) this.spawnEntity("star", lane, spawnZ + 9);
+    if (roll < 0.9) {
+      const actionKind: EntityKind = this.random() < 0.5 ? "lowHurdle" : "cloudGate";
+      this.spawnEntity(actionKind, lane, spawnZ);
       return;
     }
-    this.spawnEntity(roll < 0.92 ? "shield" : "gust", lane, spawnZ + 2);
+    this.spawnEntity(roll < 0.96 ? "shield" : "gust", lane, spawnZ + 2);
   }
 
   private spawnEntity(kind: EntityKind, lane: number, z: number) {
@@ -766,7 +761,7 @@ export class GameWorld {
       distance: Math.floor(this.distance),
       multiplier: Math.max(1, Number(this.multiplier.toFixed(1))),
       shieldSeconds: Number(this.shieldTimer.toFixed(1)),
-      missionProgress: Math.min(STAR_GOAL, this.stars),
+      missionProgress: 0,
       message: this.messageTimer > 0 || this.status !== "playing" ? this.message : "",
       isNewRecord: this.newRecord,
       audioEnabled: this.audio.isEnabled,
@@ -785,10 +780,16 @@ export class GameWorld {
   }
 
   private runDemoBrain() {
-    const imminent = this.entities.find((entity) => (entity.kind === "lowHurdle" || entity.kind === "cloudGate") && entity.node.position.z < 7 && entity.node.position.z > -0.4 && Math.abs(entity.node.position.x - (this.player?.position.x ?? 0)) < 1.1);
+    const reactionDistance = this.demoAction ? 1.8 : 7;
+    const imminent = this.entities.find((entity) => (entity.kind === "lowHurdle" || entity.kind === "cloudGate") && entity.node.position.z < reactionDistance && entity.node.position.z > -0.4 && Math.abs(entity.node.position.x - (this.player?.position.x ?? 0)) < 1.1);
     if (imminent) {
-      if (imminent.kind === "lowHurdle") this.jump();
-      else this.slide();
+      if (imminent.kind === "lowHurdle") {
+        if (this.demoAction) {
+          this.playerAirHeight = 0.92;
+          this.playerYVelocity = 0;
+          this.showMessage("Nhảy qua đệm thấp!");
+        } else this.jump();
+      } else this.slide();
       return;
     }
     const nearbyStar = this.entities.find((entity) => entity.kind === "star" && entity.node.position.z < 14 && entity.node.position.z > 0);

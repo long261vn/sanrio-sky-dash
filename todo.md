@@ -45,7 +45,7 @@
 - [ ] Ghi lại bằng chứng QA runtime cho từng nhóm vật thể sau batch sửa mới trên desktop và mobile.
 - [ ] Kiểm thử runtime mobile: đổi làn, nhảy đệm thấp, trượt cổng mây, nhặt sao, khiên và vòng gió.
 - [ ] Ghi lại bằng chứng QA runtime mobile cho từng nhóm vật thể sau batch sửa mới.
-[ ] Kiểm thử trực tiếp thao tác đổi làn trên desktop/mobile thay vì suy ra từ demo tự chạy hoặc số sao tăng.
+- [ ] Kiểm thử trực tiếp thao tác đổi làn trên desktop/mobile thay vì suy ra từ demo tự chạy hoặc số sao tăng.
 - [x] Sửa lỗi minh hoạ thẻ hướng dẫn khiên và vòng gió, bảo đảm asset runtime/tile hiển thị đầy đủ và không méo/cắt.
 - [x] Đặt khoảng spawn tối thiểu, thời gian cảnh báo và quy tắc chống vật thể xuất hiện bất thình lình trong làn đang chạy.
 - [x] Thiết kế lại mục đích sao: phần thưởng tức thời, mốc combo và mối liên hệ rõ với tổng điểm.
@@ -144,3 +144,9 @@
 - [x] Tạo nhạc nền vui nhộn và bộ hiệu ứng âm thanh kawaii phù hợp.
 - [x] Tích hợp âm thanh có nút bật/tắt, chỉ bắt đầu sau thao tác người chơi đầu tiên.
 - [x] Kiểm thử desktop/mobile, độ tương phản, tương tác âm thanh và build cuối.
+
+- [x] Thu gọn cảnh báo Nhảy/Trượt để không che nhân vật, làn chạy hoặc vật thể đang tới.
+- [x] Cân bằng lại độ khó theo quãng đường: tăng tốc, rút nhịp spawn và tăng tổ hợp thử thách theo cấp nhưng vẫn công bằng.
+- [x] Làm lại điểm số để sao không còn tạo combo hoặc thưởng mốc 10 sao làm điểm tăng quá nhanh.
+- [x] Reset toàn bộ dữ liệu Top 30 theo yêu cầu và xác minh danh sách trống 30 hạng.
+- [x] Kiểm thử công thức điểm, nhịp độ và cảnh báo mới trên desktop/mobile trước phát hành.

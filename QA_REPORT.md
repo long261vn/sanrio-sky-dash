@@ -117,3 +117,19 @@ Top 30 được đọc trực tiếp từ dữ liệu hiện có, không chèn d
 ### Khắc phục render desktop — 22/08/2026
 
 QA phát hiện một lỗi chỉ xuất hiện ở viewport desktop: HUD vẫn tăng điểm nhưng canvas Babylon trong suốt, log ghi `VERTEX SHADER ERROR` với ký tự `<`. Nguyên nhân là nhánh nạp động shader mặc định nhận nội dung HTML thay vì GLSL. Scene hiện nạp sẵn `default.vertex` và `default.fragment` của Babylon trong bundle, nhờ vậy shader/include được đăng ký nội bộ trước khi tạo `StandardMaterial`. Kiểm tra lại ở 1280×720 cho thấy nhân vật, làn màu hồng, sao và cổng mây cùng hiển thị; khung 390×844 vẫn giữ nhân vật, cổng và bốn nút cảm ứng đúng bố cục.
+
+Sau checkpoint `a894ceb8`, cả **Manus public** và **GitHub Pages** đã nạp được bundle shader mới trên desktop: nhân vật Cinnamoroll, đường chạy hồng, mây 3D và HUD cùng xuất hiện. Lượt demo nhặt sao trên cả hai URL cập nhật `Sao 1/10`, điểm và combo `×1.2`; GitHub Pages cũng tiếp tục lấy ảnh nền từ origin Manus đúng cấu hình CORS/asset hiện có.
+
+### Cân bằng lượt chạy và reset Top 30 — 22/08/2026
+
+Theo phản hồi người chơi, banner Nhảy/Trượt lớn giữa màn hình đã được bỏ. Cảnh báo giờ là toast nhỏ sát HUD, không che người chạy, ba làn hoặc vật cản. Hệ điểm mới không còn combo, thưởng sao hay mốc 10 sao: chạy nhận **6 điểm/m**, nhảy/trượt đúng nhận **32 điểm**, vòng gió nhận **40 điểm cố định**, còn khiên chỉ bảo vệ. Sao không còn xuất hiện trong nhịp spawn thường và không tác động vào điểm hay Top 30.
+
+Nhịp đầu lượt khởi đầu ở 8,4 km/h; cứ mỗi 110m tăng một cấp, đồng thời rút khoảng spawn có giới hạn an toàn 1,05 giây. Chướng ngại xuất hiện xa hơn (58–78 đơn vị) và cảnh báo tối thiểu 2,1 giây, vì vậy độ khó tăng dần bằng phản xạ chứ không phải vật thể xuất hiện đột ngột. Hồi quy xác nhận 25 test đạt, gồm score cố định, tốc độ/cấp tăng dần, giới hạn tốc độ cuối lượt và quy tắc spawn.
+
+Đã reset theo yêu cầu bằng cách xoá toàn bộ entry Top 30 nhưng giữ dữ liệu mùa. SQL xác nhận còn **0** entry; giao diện xác nhận các hạng 1–30 đều là “Đang chờ chuyến bay”.
+
+QA runtime cuối sau khi bỏ banner xác nhận ở 390×844 nhân vật nhảy qua đệm thấp, HUD chỉ có toast nhỏ “Nhảy qua đệm thấp!” ở sát phía trên đường chạy; bốn nút cảm ứng, nhân vật và làn đường đều không bị che. Ở 1280×720, lượt trượt tiếp tục chạy với HUD gọn, toast “Lướt qua nào!” và điểm 48 sau vượt vật cản; không còn callout Nhảy/Trượt lớn giữa màn hình. HUD mới chỉ hiển thị điểm, quãng đường/cấp, tốc độ và trạng thái khiên; không còn sao hay combo.
+
+Lượt QA desktop dài tiếp tục đến 414m, đạt cấp 4 và 2.614 điểm trước khi kết thúc; HUD đã tăng từ cấp 1 / 8 km/h sang các cấp cao hơn trong khi toast cảnh báo vẫn nhỏ. Trên 390×844, kiểm tra runtime tại mốc 330m hiển thị tốc độ cấp cao 14 km/h cùng đường chạy, nhân vật và bốn điều khiển cảm ứng còn đầy đủ. Các kiểm thử cũng xác nhận tốc độ khởi đầu 8,4 km/h, tăng cấp mỗi 110m, và không vượt giới hạn 21 km/h.
+
+Browser QA sau cùng ở mốc 361–372m xác nhận HUD runtime mới hiển thị **Cấp 4**, **14 km/h**, điểm tăng theo quãng đường và dòng “Vượt vật cản để tăng điểm”; không còn sao, combo hay mốc 10 sao. Canvas vẫn hiển thị nhân vật, cổng mây và ba làn rõ ràng, còn cảnh báo chỉ là toast nhỏ khi có vật cản tới.

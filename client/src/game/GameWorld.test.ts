@@ -50,7 +50,8 @@ describe("GameWorld keyboard input", () => {
     const star = collisionWorld("star");
     (star.world as unknown as { updateEntities: (delta: number, speed: number) => void }).updateEntities(0, 0);
     expect(star.world.stars).toBe(1);
-    expect(star.world.multiplier).toBe(1.2);
+    expect(star.world.score).toBe(0);
+    expect(star.world.multiplier).toBe(1);
     expect(star.removeEntity).toHaveBeenCalledWith(0);
 
     const shield = collisionWorld("shield");
@@ -60,15 +61,29 @@ describe("GameWorld keyboard input", () => {
 
     const gust = collisionWorld("gust");
     (gust.world as unknown as { updateEntities: (delta: number, speed: number) => void }).updateEntities(0, 0);
-    expect(gust.world.score).toBe(90);
-    expect(gust.world.multiplier).toBe(1.5);
+    expect(gust.world.score).toBe(40);
+    expect(gust.world.multiplier).toBe(1);
     expect(gust.removeEntity).toHaveBeenCalledWith(0);
 
     for (const kind of ["lowHurdle", "cloudGate"] as const) {
       const obstacle = collisionWorld(kind);
       (obstacle.world as unknown as { updateEntities: (delta: number, speed: number) => void }).updateEntities(0, 0);
-      expect(obstacle.world.score).toBe(18);
+      expect(obstacle.world.score).toBe(32);
       expect(obstacle.removeEntity).toHaveBeenCalledWith(0);
     }
+  });
+
+  it("raises difficulty gradually by distance with a capped late-game speed", () => {
+    const world = Object.create(GameWorld.prototype) as GameWorld & { distance: number };
+    const getDifficulty = () => (world as unknown as { getDifficulty: () => { level: number; speed: number } }).getDifficulty();
+
+    world.distance = 0;
+    expect(getDifficulty()).toEqual({ level: 1, speed: 8.4 });
+    world.distance = 110;
+    expect(getDifficulty().level).toBe(2);
+    expect(getDifficulty().speed).toBeGreaterThan(8.4);
+    world.distance = 550;
+    expect(getDifficulty().level).toBe(6);
+    expect(getDifficulty().speed).toBeLessThanOrEqual(21);
   });
 });
