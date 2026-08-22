@@ -1,5 +1,11 @@
 # Hạng mục cập nhật — Chạy Đua Cùng Hana
 
+- [x] Thu thập log workflow GitHub Pages thất bại và xác định step gây lỗi.
+- [x] Sửa workflow hoặc cấu hình dependency/build tương ứng.
+- [x] Kiểm thử lại chính lệnh build dùng trong GitHub Actions.
+- [ ] Đồng bộ bản sửa để người dùng chạy lại workflow thủ công.
+- [ ] Xác nhận GitHub Pages trả về trang game thay vì 404/lỗi build.
+
 - [x] Rà soát base path, route SPA và nguồn asset để tương thích subpath GitHub Pages.
 - [x] Chuẩn bị cấu hình build và workflow GitHub Pages không làm ảnh hưởng bản game đang public.
 - [x] Kiểm thử build tĩnh ở đường dẫn `/sanrio-sky-dash/`.
