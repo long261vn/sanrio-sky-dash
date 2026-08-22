@@ -101,3 +101,19 @@ Menu đã được làm gọn: nút “Hướng dẫn chơi” hiển thị ch�
 | Vòng gió mint | Vòng gió xoáy, ngôi sao giữa và các xoắn mây đều nguyên hình. | Vòng gió giữ đủ xoắn và ngôi sao giữa, không méo/cắt. | Đạt. |
 
 Nguyên nhân là plane texture trước đây quay theo trục Y của node cha nên có lúc quay cạnh với camera. Bản sửa để mọi sticker luôn đối diện camera và chỉ xoay Z để tạo chuyển động nhẹ. Các ảnh cận cảnh trên xác nhận cả năm nhóm vật thể giữ tỷ lệ, alpha và silhouette ở cả hai breakpoint.
+
+### Hồi quy input và identity — 22/08/2026
+
+Kiểm thử giao diện gọi trực tiếp bốn nút cảm ứng khi HUD ở trạng thái chạy, xác nhận chúng lần lượt phát đúng lệnh **sang trái, nhảy, sang phải, trượt** qua cầu `skydash:command`. Kiểm thử GameWorld tương ứng gọi trực tiếp các phím `ArrowLeft`, `ArrowRight`, `Space` và `ArrowDown`, cho cùng bốn lệnh gameplay. Hai đường input desktop và mobile vì vậy dùng cùng hợp đồng lệnh, không suy ra gián tiếp từ điểm hoặc demo tự chạy.
+
+Recorder trước đó đã ghi chuỗi `menu → playing → gameover` trên GitHub Pages mà không có request leaderboard ở thao tác Start; việc bắt đầu lượt chạy không bị API xếp hạng chặn. Sửa server cho phép một `playerId` cập nhật tên dù lượt mới không vượt kỷ lục cũng đã được test repository; người dùng đã xác nhận trực tiếp tên **“Long 3”** hiển thị đúng sau sửa.
+
+### QA runtime và Top 30 — 22/08/2026
+
+Runtime desktop đã vượt thành công đệm thấp bằng nhảy và cổng mây bằng trượt; sau mỗi vật cản, trạng thái vẫn là `playing`, quãng đường tiếp tục tăng qua 5m và không xuất hiện màn game-over. Ở khung 390×844, HUD giữ bốn nút cảm ứng tách biệt. Lượt nhặt sao cập nhật `Sao 1/10`; lượt nhặt khiên hiện timer trên HUD và vòng bảo vệ quanh nhân vật. Kiểm thử unit va chạm cùng hợp đồng input xác nhận vòng gió cộng 90 điểm, combo +0.5, và cả nhảy/trượt đều cộng đúng 18 điểm khi vượt qua.
+
+Top 30 được đọc trực tiếp từ dữ liệu hiện có, không chèn dữ liệu QA: Alibaba 34.811, Nancy 25.838 và Long 3 12.639 hiện ở ba hạng đầu; cả desktop lẫn mobile cùng thể hiện đúng thứ tự này, sau đó là các ô “Đang chờ chuyến bay”. Ở mobile, header/footer vẫn trong viewport và danh sách có vùng cuộn riêng.
+
+### Khắc phục render desktop — 22/08/2026
+
+QA phát hiện một lỗi chỉ xuất hiện ở viewport desktop: HUD vẫn tăng điểm nhưng canvas Babylon trong suốt, log ghi `VERTEX SHADER ERROR` với ký tự `<`. Nguyên nhân là nhánh nạp động shader mặc định nhận nội dung HTML thay vì GLSL. Scene hiện nạp sẵn `default.vertex` và `default.fragment` của Babylon trong bundle, nhờ vậy shader/include được đăng ký nội bộ trước khi tạo `StandardMaterial`. Kiểm tra lại ở 1280×720 cho thấy nhân vật, làn màu hồng, sao và cổng mây cùng hiển thị; khung 390×844 vẫn giữ nhân vật, cổng và bốn nút cảm ứng đúng bố cục.

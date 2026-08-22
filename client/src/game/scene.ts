@@ -4,9 +4,12 @@ import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 import { UniversalCamera } from "@babylonjs/core/Cameras/universalCamera";
 import { GlowLayer } from "@babylonjs/core/Layers/glowLayer";
 import { GameWorld } from "@/game/GameWorld";
+import "@babylonjs/core/Shaders/default.vertex";
+import "@babylonjs/core/Shaders/default.fragment";
 
 export type GameHandle = {
   scene: Scene;
@@ -18,8 +21,9 @@ export async function createGameScene(engine: Engine, canvas: HTMLCanvasElement)
   scene.clearColor = new Color4(0, 0, 0, 0);
 
   const camera = new UniversalCamera("skyDashCamera", new Vector3(0, 5.7, -12.8), scene);
-  camera.setTarget(new Vector3(0, 0.75, 17));
+  camera.setTarget(new Vector3(0, 0.9, 0));
   camera.fov = 0.86;
+  camera.fovMode = Camera.FOVMODE_VERTICAL_FIXED;
   camera.minZ = 0.1;
   camera.maxZ = 150;
 

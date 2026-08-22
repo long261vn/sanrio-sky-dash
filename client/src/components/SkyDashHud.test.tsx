@@ -84,4 +84,27 @@ describe("SkyDashHud run flow", () => {
     expect(screen.getByRole("list", { name: "30 hạng của tuần" })).toBeTruthy();
     expect(screen.getAllByText("Đang chờ chuyến bay")).toHaveLength(30);
   });
+
+  it("sends lane, jump and slide commands from the touch controls during a run", () => {
+    const commandListener = vi.fn();
+    window.addEventListener("skydash:command", commandListener);
+    render(<SkyDashHud />);
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent<GameSnapshot>("skydash:state", { detail: { ...gameoverSnapshot, status: "playing" } }));
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Sang làn trái" }));
+    fireEvent.click(screen.getByRole("button", { name: "Nhảy" }));
+    fireEvent.click(screen.getByRole("button", { name: "Sang làn phải" }));
+    fireEvent.click(screen.getByRole("button", { name: "Trượt" }));
+
+    expect(commandListener.mock.calls.map(([event]) => (event as CustomEvent).detail)).toEqual([
+      { type: "lane", direction: -1 },
+      { type: "jump" },
+      { type: "lane", direction: 1 },
+      { type: "slide" },
+    ]);
+    window.removeEventListener("skydash:command", commandListener);
+  });
 });

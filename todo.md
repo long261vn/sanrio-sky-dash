@@ -30,22 +30,22 @@
 - [x] Ghi nhận network cùng transition command/state từ menu sang playing, bảo đảm không có request API chặn start.
 - [x] Thêm kiểm thử hồi quy cho UI: tên trống vẫn start được và game-over hiện form đặt tên để lưu hạng.
 - [x] Viết kiểm thử component SkyDashHud: tên trống gửi lệnh Start và snapshot game-over hiển thị form tên.
-- [ ] Quan sát hoặc kiểm thử rõ chuỗi `skydash:command` tới `skydash:state(status=playing)` không phát sinh request leaderboard.
+- [x] Quan sát hoặc kiểm thử rõ chuỗi `skydash:command` tới `skydash:state(status=playing)` không phát sinh request leaderboard.
 - [x] Kiểm tra vì sao UI Top 30 chỉ hiển thị vài dòng thay vì khung đầy đủ 30 hạng có thể cuộn.
 - [x] Thêm danh sách Top 30 cố định chiều cao với thanh cuộn, số thứ hạng 1–30 và trạng thái trống minh bạch.
-- [ ] Chẩn đoán và sửa việc tên hợp lệ mới như “Long 3” không được lưu hoặc không nhận đúng player identity.
+- [x] Chẩn đoán và sửa việc tên hợp lệ mới như “Long 3” không được lưu hoặc không nhận đúng player identity.
 - [x] Rà soát khiên, vòng đổi hướng và các vật phẩm gameplay: vị trí, collision, silhouette và mô tả hướng dẫn.
 - [x] Giải thích rõ giá trị của sao trong HUD/tutorial và liên kết sao với combo, nhiệm vụ hoặc phần thưởng có ý nghĩa.
 - [x] Loại bỏ hoặc thay thế các vật thể vàng giữa đường gây nhiễu nếu không phải vật phẩm có mục đích rõ ràng.
 - [ ] Kiểm thử lại toàn bộ tutorial/vật phẩm/làn đường và Top 30 trên desktop/mobile sau sửa.
-- [ ] Xác minh trực tiếp đổi tên cùng playerId từ “Long” sang “Long 3” hiển thị đúng trong Top 30 sau submit.
+- [x] Xác minh trực tiếp đổi tên cùng playerId từ “Long” sang “Long 3” hiển thị đúng trong Top 30 sau submit.
 - [x] Quyết định rõ mô hình identity một kỷ lục/mỗi thiết bị và mô tả cách đổi tên/đổi hồ sơ cho người dùng chung máy.
 - [x] Chạy QA runtime spawn và nhặt khiên/vòng gió để xác nhận vị trí, collision, thông báo và phần thưởng khớp hướng dẫn.
 - [ ] Kiểm thử hồi quy desktop/mobile sau batch sửa mới: đổi làn, nhảy đệm thấp, trượt cổng mây, nhặt sao/khiên/vòng gió và mở Top 30 30 hạng.
 - [ ] Ghi lại bằng chứng QA runtime cho từng nhóm vật thể sau batch sửa mới trên desktop và mobile.
 - [ ] Kiểm thử runtime mobile: đổi làn, nhảy đệm thấp, trượt cổng mây, nhặt sao, khiên và vòng gió.
 - [ ] Ghi lại bằng chứng QA runtime mobile cho từng nhóm vật thể sau batch sửa mới.
-- [ ] Kiểm thử trực tiếp thao tác đổi làn trên desktop/mobile thay vì suy ra từ demo tự chạy hoặc số sao tăng.
+[ ] Kiểm thử trực tiếp thao tác đổi làn trên desktop/mobile thay vì suy ra từ demo tự chạy hoặc số sao tăng.
 - [x] Sửa lỗi minh hoạ thẻ hướng dẫn khiên và vòng gió, bảo đảm asset runtime/tile hiển thị đầy đủ và không méo/cắt.
 - [x] Đặt khoảng spawn tối thiểu, thời gian cảnh báo và quy tắc chống vật thể xuất hiện bất thình lình trong làn đang chạy.
 - [x] Thiết kế lại mục đích sao: phần thưởng tức thời, mốc combo và mối liên hệ rõ với tổng điểm.

@@ -91,9 +91,10 @@ export class GameWorld {
   })();
   private readonly demoPickup = (() => {
     const pickup = new URLSearchParams(window.location.search).get("pickup");
-    return pickup === "shield" || pickup === "gust" ? pickup : null;
+    return pickup === "star" || pickup === "shield" || pickup === "gust" ? pickup : null;
   })();
   private readonly demoInspect = new URLSearchParams(window.location.search).has("inspect");
+  private readonly demoHit = new URLSearchParams(window.location.search).has("hit");
   private pointerStart: { x: number; y: number } | null = null;
 
   private readonly onCommand = (event: Event) => this.handleCommand((event as CustomEvent<GameCommand>).detail);
@@ -261,16 +262,16 @@ export class GameWorld {
     if (this.demoLesson === "star") this.spawnEntity("star", inspectionLane, inspectionZ);
     if (this.demoAction === "jump") {
       this.entities.splice(0).forEach((entity) => entity.node.dispose(false, true));
-      this.spawnEntity("lowHurdle", 1, 6);
+      this.spawnEntity("lowHurdle", 1, this.demoHit ? 3 : 6);
       this.spawnTimer = 99;
     }
     if (this.demoAction === "slide") {
       this.entities.splice(0).forEach((entity) => entity.node.dispose(false, true));
-      this.spawnEntity("cloudGate", 1, 6);
+      this.spawnEntity("cloudGate", 1, this.demoHit ? 3 : 6);
       this.spawnTimer = 99;
     }
     if (this.demoPickup) {
-      this.spawnEntity(this.demoPickup, inspectionLane, this.demoInspect ? 4.2 : 9);
+      this.spawnEntity(this.demoPickup, 1, this.demoHit ? 0.3 : this.demoInspect ? 4.2 : 9);
       this.spawnTimer = 99;
     }
     if (this.player) this.player.position = new Vector3(0, 0, PLAYER_Z);

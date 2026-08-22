@@ -179,10 +179,10 @@ export default function SkyDashHud() {
           {snapshot.message && <div className="sky-toast">{snapshot.message}</div>}
           {snapshot.actionHint && <div className={`action-callout ${snapshot.actionHint}`}><small>VẬT CẢN SẮP TỚI</small><strong>{snapshot.actionHint === "jump" ? "NHẢY!" : "TRƯỢT!"}</strong><span>{snapshot.actionHint === "jump" ? "SPACE hoặc ↑" : "↓ để trượt dưới"}</span></div>}
           <div className="touch-controls" aria-label="Điều khiển cảm ứng">
-            <button onClick={() => send({ type: "lane", direction: -1 })}>←</button>
-            <button className="jump-control" onClick={() => send({ type: "jump" })}>↑</button>
-            <button onClick={() => send({ type: "lane", direction: 1 })}>→</button>
-            <button className="slide-control" onClick={() => send({ type: "slide" })}>↓</button>
+            <button onClick={() => send({ type: "lane", direction: -1 })} aria-label="Sang làn trái">←</button>
+            <button className="jump-control" onClick={() => send({ type: "jump" })} aria-label="Nhảy">↑</button>
+            <button onClick={() => send({ type: "lane", direction: 1 })} aria-label="Sang làn phải">→</button>
+            <button className="slide-control" onClick={() => send({ type: "slide" })} aria-label="Trượt">↓</button>
           </div>
         </>
       )}
