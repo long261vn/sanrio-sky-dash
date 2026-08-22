@@ -1,0 +1,122 @@
+import { describe, expect, it } from "vitest";
+import {
+  type LeaderboardEntry,
+  type LeaderboardRepository,
+  type ScoreSubmission,
+  getSeasonWindow,
+  isBetterScore,
+  isScorePlausible,
+  listLeaderboard,
+  rankTop30,
+  submitScore,
+} from "./leaderboard";
+
+const baseScore: ScoreSubmission = {
+  playerId: "player-hana",
+  playerName: "Hana",
+  runnerId: "cinnamoroll",
+  score: 180,
+  stars: 0,
+  distance: 20,
+};
+
+function createMemoryRepository(initialEntries: LeaderboardEntry[] = []): LeaderboardRepository {
+  const entries = [...initialEntries];
+  const season = { id: 1, ...getSeasonWindow() };
+  let nextId = Math.max(0, ...entries.map((entry) => entry.id)) + 1;
+
+  return {
+    async upsertSeason() {
+      return season;
+    },
+    async getLatestSeason() {
+      return season;
+    },
+    async getPlayerEntry(seasonId, playerId) {
+      return entries.find((entry) => entry.seasonId === seasonId && entry.playerId === playerId) ?? null;
+    },
+    async insertEntry(entry) {
+      entries.push({ id: nextId++, ...entry });
+    },
+    async updateEntry(id, update) {
+      const entry = entries.find((item) => item.id === id);
+      if (entry) Object.assign(entry, update);
+    },
+    async listEntries(seasonId) {
+      return entries.filter((entry) => entry.seasonId === seasonId);
+    },
+  };
+}
+
+describe("getSeasonWindow", () => {
+  it("keeps a Friday evening in the season that began on the previous Saturday in Vietnam", () => {
+    const window = getSeasonWindow(new Date("2026-08-21T12:00:00.000Z"));
+    expect(window.seasonKey).toBe("2026-08-15");
+  });
+
+  it("creates the new season on Saturday morning in Vietnam", () => {
+    const window = getSeasonWindow(new Date("2026-08-21T18:00:00.000Z"));
+    expect(window.seasonKey).toBe("2026-08-22");
+    expect(window.resetsAt - window.startsAt).toBe(7 * 24 * 60 * 60 * 1000);
+  });
+});
+
+describe("leaderboard safeguards", () => {
+  it("accepts plausible game scores and rejects implausible score-distance combinations", () => {
+    expect(isScorePlausible({ score: 180, stars: 0, distance: 22 })).toBe(true);
+    expect(isScorePlausible({ score: 999_999, stars: 0, distance: 1 })).toBe(false);
+  });
+
+  it("only replaces a score when score or tied-star count improves", () => {
+    expect(isBetterScore({ score: 300, stars: 3 }, { score: 299, stars: 99 })).toBe(false);
+    expect(isBetterScore({ score: 300, stars: 3 }, { score: 300, stars: 4 })).toBe(true);
+  });
+
+  it("sorts by score, then stars, and returns at most 30 rows", () => {
+    const rows = Array.from({ length: 32 }, (_, index) => ({ score: index % 3 === 0 ? 200 : 100, stars: index, submittedAt: index }));
+    const ranked = rankTop30(rows);
+    expect(ranked).toHaveLength(30);
+    expect(ranked[0]).toMatchObject({ score: 200, stars: 30, rank: 1 });
+    expect(ranked[0].submittedAt).toBe(30);
+  });
+});
+
+describe("submitScore through a repository", () => {
+  it("inserts a new score and makes it visible to the Top 30 response", async () => {
+    const result = await submitScore(baseScore, createMemoryRepository());
+    expect(result).toMatchObject({ improved: true, rank: 1 });
+    expect(result.rows).toEqual([expect.objectContaining({ playerName: "Hana", score: 180, rank: 1 })]);
+  });
+
+  it("retains the higher score when a later run is lower", async () => {
+    const repository = createMemoryRepository([{ id: 1, seasonId: 1, ...baseScore, score: 300, submittedAt: Date.now() - 30_000 }]);
+    const result = await submitScore({ ...baseScore, score: 250, distance: 30 }, repository);
+    expect(result).toMatchObject({ improved: false, rank: 1 });
+    expect(result.rows[0]).toMatchObject({ score: 300, stars: 0 });
+  });
+
+  it("updates a tied score when the same player collected more stars", async () => {
+    const repository = createMemoryRepository([{ id: 1, seasonId: 1, ...baseScore, stars: 1, submittedAt: Date.now() - 30_000 }]);
+    const result = await submitScore({ ...baseScore, stars: 2 }, repository);
+    expect(result).toMatchObject({ improved: true, rank: 1 });
+    expect(result.rows[0]).toMatchObject({ score: 180, stars: 2 });
+  });
+
+  it("returns a ranked Top 30 response from the repository", async () => {
+    const seasonId = 1;
+    const entries = Array.from({ length: 31 }, (_, index) => ({
+      id: index + 1,
+      seasonId,
+      playerId: `player-${index}`,
+      playerName: `Mây ${index}`,
+      runnerId: "cinnamoroll",
+      score: index === 30 ? 500 : 100,
+      stars: index,
+      distance: 20,
+      submittedAt: index,
+    }));
+    const result = await listLeaderboard(createMemoryRepository(entries));
+    expect(result.rows).toHaveLength(30);
+    expect(result.rows[0]).toMatchObject({ playerName: "Mây 30", score: 500, rank: 1 });
+  });
+});

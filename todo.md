@@ -1,5 +1,25 @@
 # Hạng mục cập nhật — Chạy Đua Cùng Hana
 
+- [x] Thêm giới hạn gửi điểm theo playerId và kiểm tra tính hợp lệ cơ bản giữa điểm, sao, quãng đường.
+- [x] Viết test cho submit điểm mới, chỉ giữ điểm cao nhất, sắp hạng score/stars và giới hạn Top 30.
+- [ ] Kiểm thử end-to-end lưu điểm từ màn kết quả và hiển thị dữ liệu thật trong Top 30.
+- [ ] Xác minh reset mùa lười trên dữ liệu mùa mới mà không tạo dữ liệu giả trong bảng công khai.
+- [x] Trỏ bundle GitHub Pages đến API leaderboard Manus và giới hạn CORS đúng origin GitHub Pages.
+- [x] Kiểm thử các quy tắc thuần: hợp lý điểm–sao–quãng đường, chỉ thay kỷ lục tốt hơn, thứ tự score→stars→submittedAt và giới hạn 30 dòng.
+- [x] Viết test mock DB cho `submitScore`/`listLeaderboard` để xác nhận ghi và đọc dữ liệu theo API.
+
+- [x] Nâng cấp game lên hạ tầng có cơ sở dữ liệu và API an toàn.
+- [x] Tạo dữ liệu mùa, điểm số, tên người chơi và chỉ mục xếp hạng Top 30.
+- [x] Lập API ghi điểm có validation, giới hạn tên và reset mùa khi có lượt đầu tiên sau thứ Bảy.
+- [x] Thêm nhập tên người chơi và bảng xếp hạng đẹp ở menu/kết quả game.
+- [x] Kiểm thử Top 30, thứ tự điểm, tuần reset và trải nghiệm desktop/mobile.
+
+- [ ] Kiểm tra request hình ảnh và audio trên URL GitHub Pages để xác định lỗi tải asset.
+- [ ] Đóng gói bản sao asset game trong bundle GitHub Pages thay vì phụ thuộc proxy runtime.
+- [ ] Sửa helper asset và workflow build để dùng asset nội bộ khi phát hành GitHub.
+- [ ] Kiểm thử bundle static với hình nền, mascot, vật cản và âm thanh cùng hiển thị.
+- [ ] Đồng bộ bản sửa và chạy lại workflow GitHub Pages thủ công.
+
 - [x] Thu thập log workflow GitHub Pages thất bại và xác định step gây lỗi.
 - [x] Sửa workflow hoặc cấu hình dependency/build tương ứng.
 - [x] Kiểm thử lại chính lệnh build dùng trong GitHub Actions.
