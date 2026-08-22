@@ -2,7 +2,7 @@
 
 - [x] Thêm giới hạn gửi điểm theo playerId và kiểm tra tính hợp lệ cơ bản giữa điểm, sao, quãng đường.
 - [x] Viết test cho submit điểm mới, chỉ giữ điểm cao nhất, sắp hạng score/stars và giới hạn Top 30.
-- [ ] Kiểm thử end-to-end lưu điểm từ màn kết quả và hiển thị dữ liệu thật trong Top 30.
+- [x] Kiểm thử end-to-end lưu điểm từ màn kết quả và hiển thị dữ liệu thật trong Top 30.
 - [x] Xác minh reset mùa lười trên dữ liệu mùa mới mà không tạo dữ liệu giả trong bảng công khai.
 - [x] Trỏ bundle GitHub Pages đến API leaderboard Manus và giới hạn CORS đúng origin GitHub Pages.
 - [x] Kiểm thử các quy tắc thuần: hợp lý điểm–sao–quãng đường, chỉ thay kỷ lục tốt hơn, thứ tự score→stars→submittedAt và giới hạn 30 dòng.

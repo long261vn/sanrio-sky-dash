@@ -86,4 +86,29 @@ describe("GameWorld keyboard input", () => {
     expect(getDifficulty().level).toBe(6);
     expect(getDifficulty().speed).toBeLessThanOrEqual(21);
   });
+
+  it("keeps a safe lane in dense hazard beats and reintroduces star coins", () => {
+    const world = Object.create(GameWorld.prototype) as GameWorld & Record<string, unknown>;
+    const spawnEntity = vi.fn();
+    Object.assign(world, { spawnEntity });
+
+    const random = vi.fn()
+      .mockReturnValueOnce(0.5) // lane centre
+      .mockReturnValueOnce(0.2) // dense hazard beat
+      .mockReturnValueOnce(0.5) // safe lane centre
+      .mockReturnValueOnce(0.2) // low hurdle
+      .mockReturnValueOnce(0.2); // second hazard at level 3
+    (world as unknown as { random: () => number }).random = random;
+    (world as unknown as { spawnBeat: (level: number) => void }).spawnBeat(3);
+    expect(spawnEntity).toHaveBeenCalledTimes(2);
+    expect(spawnEntity.mock.calls.map(([, lane]) => lane).sort()).toEqual([0, 2]);
+
+    spawnEntity.mockClear();
+    (world as unknown as { random: () => number }).random = vi.fn()
+      .mockReturnValueOnce(0.5) // lane centre
+      .mockReturnValueOnce(0.9) // star beat
+      .mockReturnValueOnce(0.2); // add a second star at level 3
+    (world as unknown as { spawnBeat: (level: number) => void }).spawnBeat(3);
+    expect(spawnEntity.mock.calls.map(([kind]) => kind)).toEqual(["star", "star"]);
+  });
 });

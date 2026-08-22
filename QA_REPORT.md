@@ -163,3 +163,7 @@ Sao xu đã trở lại trong nhịp spawn thường, nhận **+4 điểm cố �
 Sau batch này, Top 30 thật hiển thị cùng một dòng **Long** ở hạng 1 trên cả desktop và 390×844, với 553m / 3.611 điểm và không có số sao; các hạng còn lại là placeholder. Cảnh QA mobile ở cấp 3 / 12 km/h hiển thị đồng thời đệm thấp ở làn trái, cổng mây ở làn phải và sao xu ở làn giữa, để xác nhận nhịp dày hơn vẫn giữ một lựa chọn làn rõ ràng. Build production tiếp tục đạt.
 
 GitHub Pages sau khi đồng bộ checkpoint `0ccbdd42` đã hiển thị lượt nhặt sao xu theo bundle mới: điểm tăng từ quãng đường cộng phần thưởng nhỏ, không có combo hay mốc 10 sao; HUD/canvas và asset Manus tiếp tục tải đúng.
+
+Hồi quy GameWorld bổ sung xác nhận mẫu chướng ngại dày ở cấp 3 đặt hai vật cản ở hai làn ngoài, giữ làn giữa an toàn; nhánh vật phẩm cùng cấp sinh lại sao xu. Tổng bộ test tăng lên 29 và kiểm tra kiểu đạt.
+
+Phản hồi của người chơi xác nhận một lượt thực tên Long đã lưu và xuất hiện trong Top 30; lượt thứ hai cùng tên chỉ cập nhật kỷ lục của cùng hồ sơ, đúng mô hình một thiết bị/một điểm cao nhất mỗi tuần. Ảnh Top 30 desktop/mobile sau đó cùng hiển thị một dòng Long với 3.611 điểm.
