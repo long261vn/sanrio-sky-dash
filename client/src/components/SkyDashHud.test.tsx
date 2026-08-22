@@ -75,4 +75,13 @@ describe("SkyDashHud run flow", () => {
     expect(screen.getByRole("textbox", { name: "TÊN HIỂN THỊ TRÊN TOP 30" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Lưu & xem hạng" })).toBeTruthy();
   });
+
+  it("renders all 30 ranked slots even when only a few players have submitted scores", () => {
+    render(<SkyDashHud />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Top 30 tuần" }));
+
+    expect(screen.getByRole("list", { name: "30 hạng của tuần" })).toBeTruthy();
+    expect(screen.getAllByText("Đang chờ chuyến bay")).toHaveLength(30);
+  });
 });

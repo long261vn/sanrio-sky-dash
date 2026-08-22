@@ -27,6 +27,8 @@ const PROP_TEXTURES = {
   lowHurdle: assetUrl("hana-low-jump-cushion_8c9af18d.png"),
   cloudGate: assetUrl("hana-high-slide-gate_b3d23f2c.png"),
   star: assetUrl("hana-star-reward_f0db88ad.png"),
+  shield: "/manus-storage/sky-dash-rainbow-shield-clean_d2fe8879.png",
+  gust: "/manus-storage/sky-dash-mint-gust-clean_688581d2.png",
 } as const;
 const ENTITY_HITBOX: Record<EntityKind, { x: number; z: number }> = {
   lowHurdle: { x: 0.86, z: 0.92 },
@@ -81,6 +83,10 @@ export class GameWorld {
     return requested && CHARACTERS.some((character) => character.id === requested) ? requested : undefined;
   })();
   private readonly demoLesson = new URLSearchParams(window.location.search).get("lesson");
+  private readonly demoPickup = (() => {
+    const pickup = new URLSearchParams(window.location.search).get("pickup");
+    return pickup === "shield" || pickup === "gust" ? pickup : null;
+  })();
   private pointerStart: { x: number; y: number } | null = null;
 
   private readonly onCommand = (event: Event) => this.handleCommand((event as CustomEvent<GameCommand>).detail);
@@ -114,7 +120,7 @@ export class GameWorld {
     if (this.status !== "playing") return;
 
     const difficulty = this.getDifficulty();
-    const speed = this.demoLesson ? 0 : this.isPractice ? 7.6 : difficulty.speed;
+    const speed = this.demoLesson ? 0 : this.isPractice ? 7.6 : this.demoPickup ? 1.1 : difficulty.speed;
     if (difficulty.level > this.lastDifficultyLevel) {
       this.lastDifficultyLevel = difficulty.level;
       this.audio.play("shield");
@@ -237,6 +243,10 @@ export class GameWorld {
     this.actionHintTimer = 0;
     if (this.demoLesson === "jump") this.spawnEntity("lowHurdle", 1, 6);
     if (this.demoLesson === "slide") this.spawnEntity("cloudGate", 1, 6);
+    if (this.demoPickup) {
+      this.spawnEntity(this.demoPickup, 1, 9);
+      this.spawnTimer = 99;
+    }
     if (this.player) this.player.position = new Vector3(0, 0, PLAYER_Z);
     if (practice) {
       this.spawnPracticeStep();
@@ -340,6 +350,10 @@ export class GameWorld {
         this.actionHintTimer = this.demoLesson ? 99 : 2.4;
         this.showMessage(entity.kind === "lowHurdle" ? "Đệm thấp phía trước — NHẢY qua!" : "Cổng mây cao phía trước — TRƯỢT dưới!");
       }
+      if (!entity.prompted && (entity.kind === "shield" || entity.kind === "gust") && entity.node.position.z < 9 && entity.node.position.z > 5) {
+        entity.prompted = true;
+        this.showMessage(entity.kind === "shield" ? "Khiên cầu vồng: chạm để chặn 1 va chạm!" : "Vòng gió mint: chạm để +90 điểm và tăng combo!");
+      }
       const hitbox = ENTITY_HITBOX[entity.kind];
       const horizontalHit = Math.abs(entity.node.position.x - (this.player?.position.x ?? 0)) < hitbox.x;
       const depthHit = Math.abs(entity.node.position.z - PLAYER_Z) < hitbox.z;
@@ -363,8 +377,9 @@ export class GameWorld {
         }
         if (entity.kind === "gust") {
           this.audio.play("star");
-          this.score += 90;
-          this.showMessage("Gió mint: +90 điểm!");
+          this.score += 90 * this.multiplier;
+          this.multiplier = Math.min(5, this.multiplier + 0.5);
+          this.showMessage("Gió mint: +90 điểm · combo +0.5!");
           this.removeEntity(index);
           continue;
         }
@@ -488,12 +503,6 @@ export class GameWorld {
       const rail = MeshBuilder.CreateBox(`puffyRail${x}`, { width: 0.28, height: 0.27, depth: 112 }, this.scene);
       rail.position = new Vector3(x, 0.18, 44);
       rail.material = edgeMaterial;
-    }
-    for (let z = 4; z < 105; z += 8) {
-      const star = MeshBuilder.CreatePolyhedron(`trackStar${z}`, { type: 1, size: 0.22 }, this.scene);
-      star.position = new Vector3(0, 0.14, z);
-      star.material = edgeMaterial;
-      star.rotation.y = Math.PI / 4;
     }
   }
 
@@ -665,26 +674,11 @@ export class GameWorld {
   }
 
   private createShield(root: TransformNode) {
-    const bubble = MeshBuilder.CreateSphere("rainbowBubble", { diameter: 1.15, segments: 20 }, this.scene);
-    bubble.parent = root;
-    const bubbleMaterial = this.material(`bubble-${this.elapsed}`, "#BFE9FF", 0.35);
-    bubbleMaterial.alpha = 0.56;
-    bubble.material = bubbleMaterial;
-    const rainbow = MeshBuilder.CreateTorus("bubbleRainbow", { diameter: 0.65, thickness: 0.1, tessellation: 20 }, this.scene);
-    rainbow.parent = root;
-    rainbow.rotation.x = Math.PI / 2;
-    rainbow.material = this.material(`bubbleRainbow-${this.elapsed}`, "#FF9FB3", 0.5);
+    this.createStickerProp(root, "rainbowShieldPickup", PROP_TEXTURES.shield, 1.52, 1.52, 0.9);
   }
 
   private createGust(root: TransformNode) {
-    const gustMaterial = this.material(`gust-${this.elapsed}`, "#7ED8C7", 0.28);
-    for (const y of [-0.2, 0.08, 0.36]) {
-      const curl = MeshBuilder.CreateTorus(`gustCurl-${y}`, { diameter: 0.7 - y * 0.2, thickness: 0.11, tessellation: 20 }, this.scene);
-      curl.parent = root;
-      curl.position.y = y;
-      curl.rotation.x = Math.PI / 2;
-      curl.material = gustMaterial;
-    }
+    this.createStickerProp(root, "mintGustPickup", PROP_TEXTURES.gust, 1.56, 1.56, 0.9);
   }
 
   private createActionBadge(root: TransformNode, action: "jump" | "slide", y: number) {

@@ -14,6 +14,8 @@ const TARGET_URL = assetUrl("sky-dash-menu-art-retry_f2351b45.png");
 const GUIDE_STAR_URL = assetUrl("hana-star-reward_f0db88ad.png");
 const GUIDE_JUMP_URL = assetUrl("hana-low-jump-cushion_8c9af18d.png");
 const GUIDE_SLIDE_URL = assetUrl("hana-high-slide-gate_b3d23f2c.png");
+const GUIDE_SHIELD_URL = "/manus-storage/sky-dash-rainbow-shield-clean_d2fe8879.png";
+const GUIDE_GUST_URL = "/manus-storage/sky-dash-mint-gust-clean_688581d2.png";
 const PLAYER_ID_KEY = "hanaSkyDashPlayerId";
 const PLAYER_NAME_KEY = "hanaSkyDashPlayerName";
 
@@ -113,10 +115,17 @@ export default function SkyDashHud() {
 
   const selected = useMemo(() => CHARACTERS.find((item) => item.id === selectedId) ?? CHARACTERS[0], [selectedId]);
   const isRunning = snapshot.status === "playing";
+  const leaderboardRows = leaderboard.data?.rows ?? [];
 
   const updatePlayerName = (value: string) => {
     setPlayerName(value);
     window.localStorage.setItem(PLAYER_NAME_KEY, value);
+  };
+  const createNewProfile = () => {
+    window.localStorage.setItem(PLAYER_ID_KEY, crypto.randomUUID());
+    window.localStorage.removeItem(PLAYER_NAME_KEY);
+    setPlayerName("");
+    setNameError("Đã tạo hồ sơ mới. Nhập tên mới để có một kỷ lục riêng nhé.");
   };
   const submitCompletedRun = (run = completedRun) => {
     if (!run) return;
@@ -170,7 +179,7 @@ export default function SkyDashHud() {
               <span><b>{selected.name}</b><small>{selected.tagline}</small></span>
             </div>
             <div className="game-score"><small>Điểm</small><strong>{snapshot.score.toLocaleString("vi-VN")}</strong><span>★ {snapshot.stars} · ×{snapshot.multiplier.toFixed(1)}</span></div>
-            <div className="game-meta"><div className="game-progress"><span>{snapshot.isPractice ? `Luyện tập ${snapshot.practiceStep + 1}/3` : `Mục tiêu ${snapshot.missionProgress}/10 sao`}</span><b><Gauge size={14} /> {snapshot.isPractice ? "Đường mây an toàn" : `Cấp ${snapshot.difficultyLevel} · ${snapshot.speed} km/h`}</b>{snapshot.shieldSeconds > 0 && <em><Zap size={13} /> Khiên {snapshot.shieldSeconds}s</em>}</div><div className="game-actions"><span>{snapshot.distance}m</span><button className="sound-button" onClick={() => send({ type: "toggleAudio" })} aria-label={snapshot.audioEnabled ? "Tắt âm thanh" : "Bật âm thanh"}>{snapshot.audioEnabled ? <Volume2 size={17} /> : <VolumeX size={17} />}</button><button className="pause-button" onClick={() => send({ type: "pause" })} aria-label="Tạm dừng"><Pause size={18} /></button></div></div>
+            <div className="game-meta"><div className="game-progress"><span>{snapshot.isPractice ? `Luyện tập ${snapshot.practiceStep + 1}/3` : `Sao ${snapshot.missionProgress}/10 · thưởng 250 điểm`}</span><b><Gauge size={14} /> {snapshot.isPractice ? "Đường mây an toàn" : `Cấp ${snapshot.difficultyLevel} · ${snapshot.speed} km/h`}</b>{snapshot.shieldSeconds > 0 && <em><Zap size={13} /> Khiên {snapshot.shieldSeconds}s</em>}</div><div className="game-actions"><span>{snapshot.distance}m</span><button className="sound-button" onClick={() => send({ type: "toggleAudio" })} aria-label={snapshot.audioEnabled ? "Tắt âm thanh" : "Bật âm thanh"}>{snapshot.audioEnabled ? <Volume2 size={17} /> : <VolumeX size={17} />}</button><button className="pause-button" onClick={() => send({ type: "pause" })} aria-label="Tạm dừng"><Pause size={18} /></button></div></div>
           </div>
           {snapshot.message && <div className="sky-toast">{snapshot.message}</div>}
           {snapshot.actionHint && <div className={`action-callout ${snapshot.actionHint}`}><small>VẬT CẢN SẮP TỚI</small><strong>{snapshot.actionHint === "jump" ? "NHẢY!" : "TRƯỢT!"}</strong><span>{snapshot.actionHint === "jump" ? "SPACE hoặc ↑" : "↓ để trượt dưới"}</span></div>}
@@ -198,7 +207,7 @@ export default function SkyDashHud() {
             <div className="menu-art-wrap"><img className="menu-art" src={TARGET_URL} alt="Minh hoạ đường chạy trên mây" /><div className="art-sticker">★ Nhặt sao<br />để tăng combo</div></div>
             <div className="selection-drawer">
               <div className="drawer-heading"><div className="selected-runner"><span className="portrait-disc large" style={{ "--character": selected.body, "--accent": selected.accent } as React.CSSProperties}>{selected.icon}</span><div><p>NGƯỜI CHẠY ĐANG CHỌN</p><h2>{selected.name}</h2><span>{selected.tagline}</span></div></div><div className="runner-perks"><span>↥ Nhảy {selected.jumpForce.toFixed(1)}</span><span>★ Thưởng +{Math.round((selected.starBonus - 1) * 100)}%</span><span>◒ Trượt {selected.slideDuration.toFixed(2)}s</span></div></div>
-              <div className="player-profile"><label><span>TÊN NGƯỜI CHƠI · ĐỂ LƯU HẠNG</span><input value={playerName} onChange={(event) => updatePlayerName(event.target.value.slice(0, 20))} placeholder="Có thể nhập sau khi chơi" maxLength={20} /></label><button className="leaderboard-button" onClick={openLeaderboard}><Trophy size={16} /> Top 30 tuần</button></div>
+              <div className="player-profile"><label><span>TÊN NGƯỜI CHƠI · ĐỂ LƯU HẠNG</span><input value={playerName} onChange={(event) => updatePlayerName(event.target.value.slice(0, 20))} placeholder="Có thể nhập sau khi chơi" maxLength={20} /></label><div className="profile-actions"><button className="new-profile-button" onClick={createNewProfile}>Hồ sơ mới</button><button className="leaderboard-button" onClick={openLeaderboard}><Trophy size={16} /> Top 30 tuần</button></div><small className="profile-note">Một hồ sơ giữ một kỷ lục tuần; đổi tên cập nhật dòng hiện tại, còn “Hồ sơ mới” tạo kỷ lục riêng.</small></div>
               {nameError && <p className="score-error menu-name-error">{nameError}</p>}
               <div className="character-grid">
                 {CHARACTERS.map((character) => (
@@ -224,7 +233,7 @@ export default function SkyDashHud() {
       )}
 
       {leaderboardOpen && (
-        <div className="tutorial-scrim leaderboard-scrim"><section className="leaderboard-panel" aria-label="Bảng xếp hạng Top 30"><header><div><p><Crown size={15} /> BẦU TRỜI VINH DANH</p><h2>Top 30 tuần</h2><span>Mùa bắt đầu {leaderboard.data?.seasonKey ?? "thứ Bảy này"} · reset khi có điểm đầu tiên sau thứ Bảy.</span></div><button className="leaderboard-close" onClick={() => setLeaderboardOpen(false)} aria-label="Đóng bảng xếp hạng"><X size={20} /></button></header>{leaderboard.isLoading ? <div className="leaderboard-empty">Đang gọi các vì sao về bảng xếp hạng...</div> : leaderboard.data?.rows.length ? <ol className="leaderboard-list">{leaderboard.data.rows.map((row) => <li key={`${row.rank}-${row.playerName}-${row.score}`} className={`${row.rank <= 3 ? `rank-${row.rank}` : ""} ${row.rank === recentRank && row.playerName === playerName.trim() ? "just-ranked" : ""}`}><b>{row.rank}</b><span className="rank-runner">{CHARACTERS.find((character) => character.id === row.runnerId)?.icon ?? "★"}</span><strong>{row.playerName}</strong><em>{row.distance}m · ★ {row.stars}</em><mark>{row.score.toLocaleString("vi-VN")}</mark></li>)}</ol> : <div className="leaderboard-empty"><span>★</span><b>Chưa có chuyến bay nào.</b><p>Hãy là người đầu tiên ghi tên lên bầu trời!</p></div>}<footer><span>{leaderboard.isFetching ? "Đang xếp lại bảng điểm..." : recentRank ? `Chuyến bay của bạn đang ở hạng #${recentRank}.` : "Chỉ giữ thành tích cao nhất của mỗi người chơi trong tuần."}</span><button className="play-button" onClick={returnToMenu}>Về màn hình đầu</button></footer></section></div>
+        <div className="tutorial-scrim leaderboard-scrim"><section className="leaderboard-panel" aria-label="Bảng xếp hạng Top 30"><header><div><p><Crown size={15} /> BẦU TRỜI VINH DANH</p><h2>Top 30 tuần</h2><span>Mùa bắt đầu {leaderboard.data?.seasonKey ?? "thứ Bảy này"} · kéo để xem đủ 30 hạng.</span></div><button className="leaderboard-close" onClick={() => setLeaderboardOpen(false)} aria-label="Đóng bảng xếp hạng"><X size={20} /></button></header>{leaderboard.isLoading ? <div className="leaderboard-empty">Đang gọi các vì sao về bảng xếp hạng...</div> : <ol className="leaderboard-list" aria-label="30 hạng của tuần">{Array.from({ length: 30 }, (_, index) => { const row = leaderboardRows[index]; const rank = index + 1; return row ? <li key={`${row.rank}-${row.playerName}-${row.score}`} className={`${row.rank <= 3 ? `rank-${row.rank}` : ""} ${row.rank === recentRank && row.playerName === playerName.trim() ? "just-ranked" : ""}`}><b>{row.rank}</b><span className="rank-runner">{CHARACTERS.find((character) => character.id === row.runnerId)?.icon ?? "★"}</span><strong>{row.playerName}</strong><em>{row.distance}m · ★ {row.stars}</em><mark>{row.score.toLocaleString("vi-VN")}</mark></li> : <li className="rank-placeholder" key={`empty-rank-${rank}`}><b>{rank}</b><span className="rank-runner">☁</span><strong>Đang chờ chuyến bay</strong><em>Chưa có điểm</em><mark>—</mark></li>; })}</ol>}<footer><span>{leaderboard.isFetching ? "Đang xếp lại bảng điểm..." : recentRank ? `Chuyến bay của bạn đang ở hạng #${recentRank}.` : "Mỗi người chơi giữ một kỷ lục cao nhất trong tuần; đổi tên sẽ cập nhật dòng của bạn."}</span><button className="play-button" onClick={returnToMenu}>Về màn hình đầu</button></footer></section></div>
       )}
 
       {tutorialOpen && snapshot.status === "menu" && (
@@ -234,13 +243,15 @@ export default function SkyDashHud() {
               <div><p>ĐƯỜNG CHẠY MÂY · HƯỚNG DẪN NHANH</p><h2>Nhìn hình, làm đúng.</h2></div>
               <div className="guide-rule-pill">★ Một vật · Một hành động</div>
             </header>
-            <p className="guide-v2-intro">Ba thẻ dưới đây là <strong>đúng những vật</strong> đang xuất hiện trong đường chạy. Không cần đoán: màu sắc, chiều cao và phím bấm luôn giống nhau.</p>
+            <p className="guide-v2-intro">Năm thẻ dưới đây là <strong>đúng những vật</strong> đang xuất hiện trong đường chạy. Không cần đoán: màu sắc, chiều cao và cách nhận luôn giống nhau.</p>
             <div className="guide-action-grid">
-              <article className="guide-action-card collect-card"><div className="guide-prop-frame"><img src={GUIDE_STAR_URL} alt="Sao điều ước có vòng mint" /></div><div className="guide-action-copy"><span>01 · LẤY</span><h3>Sao điều ước</h3><p>Đổi làn để chạm vào sao. Sao tăng combo.</p><div className="key-caps"><kbd>←</kbd><kbd>→</kbd><b>Đổi làn</b></div></div></article>
+              <article className="guide-action-card collect-card"><div className="guide-prop-frame"><img src={GUIDE_STAR_URL} alt="Sao điều ước có vòng mint" /></div><div className="guide-action-copy"><span>01 · LẤY</span><h3>Sao điều ước</h3><p>Đổi làn để lấy: +30 × combo, combo +0.2. Đủ 10 sao nhận thêm 250 điểm.</p><div className="key-caps"><kbd>←</kbd><kbd>→</kbd><b>Đổi làn</b></div></div></article>
               <article className="guide-action-card jump-card"><div className="guide-prop-frame"><img src={GUIDE_JUMP_URL} alt="Đệm dâu hồng thấp" /></div><div className="guide-action-copy"><span>02 · NHẢY</span><h3>Đệm dâu thấp</h3><p>Vật thấp ở mặt đường: chỉ việc nhảy qua.</p><div className="key-caps"><kbd>SPACE</kbd><kbd>↑</kbd><b>Nhảy qua</b></div></div></article>
               <article className="guide-action-card slide-card"><div className="guide-prop-frame"><img src={GUIDE_SLIDE_URL} alt="Cổng mây cao có khoảng hở bên dưới" /></div><div className="guide-action-copy"><span>03 · TRƯỢT</span><h3>Cổng mây cao</h3><p>Mây treo cao có khoảng hở: trượt dưới cổng.</p><div className="key-caps"><kbd>↓</kbd><b>Trượt dưới</b></div></div></article>
+              <article className="guide-action-card shield-card"><div className="guide-prop-frame"><img src={GUIDE_SHIELD_URL} alt="Khiên cầu vồng trong bong bóng xanh" /></div><div className="guide-action-copy"><span>04 · BẢO VỆ</span><h3>Khiên cầu vồng</h3><p>Đổi làn để chạm vào bong bóng. Khiên che được một va chạm trong thời gian ngắn.</p><div className="key-caps"><kbd>←</kbd><kbd>→</kbd><b>Chạm để lấy</b></div></div></article>
+              <article className="guide-action-card gust-card"><div className="guide-prop-frame"><img src={GUIDE_GUST_URL} alt="Vòng gió mint với sao vàng ở giữa" /></div><div className="guide-action-copy"><span>05 · TĂNG TỐC</span><h3>Vòng gió mint</h3><p>Đổi làn để chạm vào vòng gió: +90 × combo và combo tăng thêm 0.5.</p><div className="key-caps"><kbd>←</kbd><kbd>→</kbd><b>Chạm để lấy</b></div></div></article>
             </div>
-            <footer className="guide-v2-footer"><span>Luật nhớ nhanh: <b>vật thấp nhảy · vật cao trượt · sao thì lấy</b></span><button className="play-button" onClick={() => setTutorialOpen(false)}>Đã rõ, chọn người chạy <ChevronRight size={19} /></button></footer>
+            <footer className="guide-v2-footer"><span>Luật nhớ nhanh: <b>vật thấp nhảy · vật cao trượt · sao/khiên/gió thì đổi làn để lấy</b></span><button className="play-button" onClick={() => setTutorialOpen(false)}>Đã rõ, chọn người chạy <ChevronRight size={19} /></button></footer>
           </section>
         </div>
       )}

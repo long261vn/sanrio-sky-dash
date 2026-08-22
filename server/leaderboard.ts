@@ -166,6 +166,17 @@ export async function submitScore(input: ScoreSubmission, repository?: Leaderboa
       distance: input.distance,
       submittedAt,
     });
+  } else {
+    // Một người chơi chỉ có một kỷ lục/mùa; đổi tên phải cập nhật dòng hiện có
+    // ngay cả khi lượt sau có điểm thấp hơn.
+    await repo.updateEntry(previous.id, {
+      playerName: input.playerName,
+      runnerId: input.runnerId,
+      score: previous.score,
+      stars: previous.stars,
+      distance: previous.distance,
+      submittedAt: previous.submittedAt,
+    });
   }
 
   const leaderboard = await buildLeaderboard(repo);

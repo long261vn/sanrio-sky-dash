@@ -95,6 +95,13 @@ describe("submitScore through a repository", () => {
     expect(result.rows[0]).toMatchObject({ score: 300, stars: 0 });
   });
 
+  it("updates a player's display name on a lower-score run while preserving the personal best", async () => {
+    const repository = createMemoryRepository([{ id: 1, seasonId: 1, ...baseScore, playerName: "Long", score: 300, submittedAt: 100 }]);
+    const result = await submitScore({ ...baseScore, playerName: "Long 3", score: 250, distance: 30 }, repository);
+    expect(result).toMatchObject({ improved: false, rank: 1 });
+    expect(result.rows[0]).toMatchObject({ playerName: "Long 3", score: 300, submittedAt: 100 });
+  });
+
   it("updates a tied score when the same player collected more stars", async () => {
     const repository = createMemoryRepository([{ id: 1, seasonId: 1, ...baseScore, stars: 1, submittedAt: Date.now() - 30_000 }]);
     const result = await submitScore({ ...baseScore, stars: 2 }, repository);
