@@ -5,3 +5,8 @@
 - Modal Top 30 ở trạng thái chưa có dữ liệu hiển thị rõ mùa `2026-08-22` và thông điệp trống thân thiện.
 - Một lượt chơi thử đã đi tới màn kết quả với điểm 168, 0 sao và 20 m. Vùng **Lưu điểm dưới tên** gồm input và nút lưu cạnh nhau, các nút xem bảng / chơi thêm / đổi bạn đồng hành vẫn đọc được.
 - Không gửi dữ liệu thử vào bảng công khai; dữ liệu database được xác nhận đang có 0 mùa và 0 entry trước kiểm tra.
+- Sau checkpoint `1091aead`, URL Manus công khai vẫn trả bundle menu cũ (chưa có input tên hoặc Top 30) và endpoint API trả 500. Đã bắt đầu xử lý bằng cách tách chunk Babylon để build fullstack không bị dừng khi render.
+- Sau khi tách chunk Babylon, build production và bundle GitHub Pages đều thành công. Bản Manus public và `long261vn.github.io/sanrio-sky-dash/` đã hiển thị trường nhập tên cùng nút **Top 30 tuần**; GitHub Pages vẫn tải ảnh từ Manus storage đúng cách.
+- Trên GitHub Pages, modal **Top 30 tuần** mở thành công và đọc API cross-origin: hiển thị mùa `2026-08-22`, trạng thái rỗng và nội dung reset lười. Không có lỗi CORS hay lỗi tải ảnh được quan sát.
+- Một lượt chơi trực tiếp trên GitHub Pages đã tải canvas 3D, mascot, đường chạy, sao, đệm thấp, biển nhắc **NHẢY** và điều khiển bàn phím. Lượt kết thúc hiển thị lại form lưu điểm; không nhập tên hoặc gửi entry thử vào bảng công khai.
+- Console của GitHub Pages sau lượt thử không ghi lỗi runtime hoặc tải audio. Đã bổ sung `404.html` để đường dẫn con của Pages quay lại base `/sanrio-sky-dash/`.

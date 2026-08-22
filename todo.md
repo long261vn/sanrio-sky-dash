@@ -14,32 +14,32 @@
 - [x] Thêm nhập tên người chơi và bảng xếp hạng đẹp ở menu/kết quả game.
 - [x] Kiểm thử Top 30, thứ tự điểm, tuần reset và trải nghiệm desktop/mobile.
 
-- [ ] Kiểm tra request hình ảnh và audio trên URL GitHub Pages để xác định lỗi tải asset.
-- [ ] Đóng gói bản sao asset game trong bundle GitHub Pages thay vì phụ thuộc proxy runtime.
-- [ ] Sửa helper asset và workflow build để dùng asset nội bộ khi phát hành GitHub.
-- [ ] Kiểm thử bundle static với hình nền, mascot, vật cản và âm thanh cùng hiển thị.
-- [ ] Đồng bộ bản sửa và chạy lại workflow GitHub Pages thủ công.
+- [x] Kiểm tra request hình ảnh và audio trên URL GitHub Pages để xác định lỗi tải asset.
+- [x] Quyết định không sao chép asset lớn vào bundle GitHub Pages; dùng origin storage Manus công khai, ổn định và đã kiểm thử trực tiếp.
+- [x] Sửa helper asset và workflow build để dùng origin asset công khai khi phát hành GitHub.
+- [x] Kiểm thử bundle static với hình nền, mascot, vật cản và âm thanh cùng hiển thị.
+- [x] Đồng bộ bản sửa và chạy lại workflow GitHub Pages thủ công.
 
 - [x] Thu thập log workflow GitHub Pages thất bại và xác định step gây lỗi.
 - [x] Sửa workflow hoặc cấu hình dependency/build tương ứng.
 - [x] Kiểm thử lại chính lệnh build dùng trong GitHub Actions.
-- [ ] Đồng bộ bản sửa để người dùng chạy lại workflow thủ công.
-- [ ] Xác nhận GitHub Pages trả về trang game thay vì 404/lỗi build.
+- [x] Đồng bộ bản sửa và chạy lại workflow GitHub Pages thành công.
+- [x] Xác nhận GitHub Pages trả về trang game thay vì 404/lỗi build.
 
 - [x] Rà soát base path, route SPA và nguồn asset để tương thích subpath GitHub Pages.
 - [x] Chuẩn bị cấu hình build và workflow GitHub Pages không làm ảnh hưởng bản game đang public.
 - [x] Kiểm thử build tĩnh ở đường dẫn `/sanrio-sky-dash/`.
-- [ ] Đồng bộ cấu hình để người dùng có thể kích hoạt workflow Pages.
-- [ ] Xác nhận URL `long261vn.github.io/sanrio-sky-dash/` sau khi GitHub hoàn tất deploy.
+- [x] Đồng bộ cấu hình để workflow Pages được kích hoạt.
+- [x] Xác nhận URL `long261vn.github.io/sanrio-sky-dash/` sau khi GitHub hoàn tất deploy.
 
 - [x] Mở domain công khai vừa phát hành và xác nhận trang game tải thành công.
 - [x] Kiểm tra menu, lượt chơi và âm thanh khởi tạo trên bản công khai.
 - [x] Đánh giá lại nhu cầu GitHub Pages sau khi bản game đã có link chơi ổn định — giữ GitHub làm nơi lưu mã nguồn, dùng domain công khai hiện tại để chơi.
 
 - [x] Xác minh GitHub Pages đã deploy và ghi nhận URL công khai thực tế.
-- [ ] Kiểm tra asset, đường dẫn base và fallback SPA khi chạy dưới đường dẫn repository.
-- [ ] Xác nhận game tải, điều khiển và âm thanh khởi tạo đúng qua URL Pages.
-- [ ] Đồng bộ mọi cấu hình cần thiết và bàn giao liên kết chơi trực tuyến.
+- [x] Kiểm tra asset, đường dẫn base và fallback SPA khi chạy dưới đường dẫn repository.
+- [x] Xác nhận game tải, điều khiển và âm thanh khởi tạo đúng qua URL Pages.
+- [x] Đồng bộ mọi cấu hình cần thiết và xác nhận liên kết chơi trực tuyến.
 
 - [x] Xác minh repository công khai và trạng thái đồng bộ nhánh mặc định.
 - [x] Kiểm tra xem GitHub Pages đã được cấu hình cho repository hay chưa — hiện chưa có GitHub Pages site.
