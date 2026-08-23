@@ -259,3 +259,7 @@ Toàn bộ suite hiện có **39 test** đạt, TypeScript và build production 
 | Ngoài Top 20 | Test game-over điểm thấp xác nhận tiêu đề “Chưa vào Top 20 tuần này.” cùng lời động viên thực tế theo điểm; không tự đóng bảng kết quả. | Đạt. |
 
 Suite cuối có **40 test** đạt, TypeScript đạt và build production hoàn tất. Cảnh báo Vite về URL `/manus-storage` là cảnh báo resolve lúc build đã biết; chúng được giữ nguyên để runtime lấy asset công khai, đồng thời UI hiện có fallback an toàn nếu một chân dung không tải được.
+
+### Theo dõi asset public — 23/08/2026
+
+Bản Manus của checkpoint `458f9b25` hiển thị đủ tám chân dung chi tiết trong lưới setup. GitHub Pages của cùng checkpoint trả markup dùng URL tuyệt đối `https://sanriodash-ygyeg6qd.manus.space/manus-storage/...` cho toàn bộ tám ảnh, thay cho path tương đối cũ. Lượt kiểm tra lại sau khi ảnh hoàn tất tải xác nhận Cinnamoroll, Pompompurin, My Melody, Kuromi, Badtz-Maru, Keroppi, Gudetama và Hello Kitty đều hiện chân dung chi tiết; không còn chuyển sang biểu tượng fallback trong điều kiện tải bình thường. Hạng mục public đạt.
