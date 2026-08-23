@@ -23,7 +23,7 @@
 - [x] Kiểm tra console, network và sự kiện command/state của luồng menu đến gameplay.
 - [x] Viết báo cáo QA phân loại lỗi chặn chơi, lỗi logic, lỗi UX và hạng mục không cần sửa.
 - [x] Sửa nguyên nhân chặn bắt đầu lượt chơi và thêm kiểm thử hồi quy tương ứng.
-- [ ] Kiểm tra lại gameplay, game-over, lưu điểm và Top 30 theo một checklist phát hành thống nhất.
+- [x] Kiểm tra lại gameplay, game-over, lưu điểm và Top 30 theo một checklist phát hành thống nhất.
 - [x] Sửa chồng lấn chữ thương hiệu với nút hướng dẫn ở menu màn hình nhỏ.
 - [x] Tái hiện lỗi chặn bắt đầu trên Manus khi tên trống và xác nhận bản sửa start được trên preview cục bộ.
 - [x] Kiểm thử trực tiếp GitHub Pages: tên trống vẫn bấm Chạy vào gameplay.

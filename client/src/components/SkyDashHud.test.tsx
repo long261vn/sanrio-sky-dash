@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   mutate: vi.fn(),
   refetch: vi.fn(),
   setData: vi.fn(),
+  leaderboardData: { seasonKey: "2026-08-22", rows: [] as any[] },
   mutationOptions: null as any,
 }));
 
@@ -15,10 +16,10 @@ vi.mock("@/lib/assets", () => ({ assetUrl: (filename: string) => filename }));
 vi.mock("@/lib/trpc", () => ({
   trpc: {
     leaderboard: {
-      top30: { useQuery: () => ({ data: { seasonKey: "2026-08-22", rows: [] }, refetch: mocks.refetch }) },
+      top30: { useQuery: () => ({ data: mocks.leaderboardData, refetch: mocks.refetch }) },
       submit: { useMutation: (options: any) => { mocks.mutationOptions = options; return { mutate: mocks.mutate, isPending: false }; } },
     },
-    useUtils: () => ({ leaderboard: { top30: { setData: mocks.setData } } }),
+    useUtils: () => ({ leaderboard: { top30: { setData: (...args: any[]) => { mocks.setData(...args); mocks.leaderboardData = args[1]; } } } }),
   },
 }));
 
@@ -50,6 +51,7 @@ afterEach(() => {
   mocks.mutate.mockReset();
   mocks.refetch.mockReset();
   mocks.setData.mockReset();
+  mocks.leaderboardData = { seasonKey: "2026-08-22", rows: [] };
   mocks.mutationOptions = null;
 });
 
@@ -146,5 +148,33 @@ describe("SkyDashHud run flow", () => {
     fireEvent.click(screen.getAllByRole("button", { name: "Về màn hình đầu" })[0]);
     expect(commandListener.mock.calls.map(([event]) => (event as CustomEvent).detail)).toContainEqual({ type: "menu" });
     window.removeEventListener("skydash:command", commandListener);
+  });
+
+  it("mô phỏng game-over đến Top 30 với hai lượt trùng tên và tô đúng lượt vừa lưu", async () => {
+    window.localStorage.setItem("hanaSkyDashPlayerName", "Long");
+    const { container } = render(<SkyDashHud />);
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent<GameSnapshot>("skydash:state", { detail: { ...gameoverSnapshot, score: 420, distance: 68 } }));
+    });
+    await waitFor(() => expect(mocks.mutate).toHaveBeenCalledTimes(1));
+
+    await act(async () => {
+      await mocks.mutationOptions.onSuccess({
+        seasonKey: "2026-08-22",
+        entryId: 202,
+        rank: 2,
+        enteredTop30: true,
+        rows: [
+          { id: 201, rank: 1, playerName: "Long", runnerId: "cinnamoroll", score: 480, stars: 0, distance: 75, submittedAt: 1 },
+          { id: 202, rank: 2, playerName: "Long", runnerId: "kuromi", score: 420, stars: 0, distance: 68, submittedAt: 2 },
+        ],
+      });
+    });
+
+    expect(screen.getAllByText("Long")).toHaveLength(2);
+    expect(screen.getByText("Chuyến bay này đang ở hạng #2.")).toBeTruthy();
+    expect(container.querySelector(".just-ranked")?.textContent).toContain("Long");
+    expect(container.querySelector(".just-ranked")?.textContent).toContain("420");
   });
 });
