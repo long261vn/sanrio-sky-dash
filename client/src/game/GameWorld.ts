@@ -94,6 +94,7 @@ export class GameWorld {
   })();
   private readonly demoInspect = new URLSearchParams(window.location.search).has("inspect");
   private readonly demoHit = new URLSearchParams(window.location.search).has("hit");
+  private readonly demoResult = new URLSearchParams(window.location.search).has("result");
   private readonly demoDense = new URLSearchParams(window.location.search).has("qaDense");
   private readonly demoDistance = (() => {
     const value = Number(new URLSearchParams(window.location.search).get("qaDistance"));
@@ -123,7 +124,14 @@ export class GameWorld {
     canvas.addEventListener("pointerup", this.onPointerUp);
     canvas.addEventListener("pointercancel", this.onPointerCancel);
     this.emitState();
-    if (this.demo || this.demoPractice) window.setTimeout(() => this.start(this.demoCharacter, this.demoPractice), 250);
+    if (this.demoResult) {
+      window.setTimeout(() => {
+        this.score = 1_760;
+        this.distance = 214;
+        this.lastDifficultyLevel = this.getDifficulty().level;
+        this.endRun();
+      }, 250);
+    } else if (this.demo || this.demoPractice) window.setTimeout(() => this.start(this.demoCharacter, this.demoPractice), 250);
   }
 
   update(delta: number) {
@@ -392,7 +400,7 @@ export class GameWorld {
       const depthHit = Math.abs(entity.node.position.z - PLAYER_Z) < hitbox.z;
       if (horizontalHit && depthHit) {
         if (entity.kind === "star") {
-          this.audio.play("star");
+          this.audio.play("pickup");
           this.stars += 1;
           const starPoints = scoreForStar(this.multiplier, getCharacter(this.characterId).starBonus);
           this.score += starPoints;
@@ -410,7 +418,7 @@ export class GameWorld {
           continue;
         }
         if (entity.kind === "gust") {
-          this.audio.play("star");
+          this.audio.play("pickup");
           const gustPoints = scoreForGust(this.multiplier);
           this.score += gustPoints;
           this.multiplier = nextComboAfterGust(this.multiplier);

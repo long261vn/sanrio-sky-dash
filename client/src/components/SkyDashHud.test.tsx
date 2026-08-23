@@ -214,4 +214,30 @@ describe("SkyDashHud run flow", () => {
     expect(screen.getByText("Chưa vào Top 20 tuần này.")).toBeTruthy();
     expect(screen.getByText(/Cố gắng thêm một chuyến bay/)).toBeTruthy();
   });
+
+  it("shares a completed result through the native share sheet", async () => {
+    const share = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "share", { configurable: true, value: share });
+    render(<SkyDashHud />);
+    act(() => {
+      window.dispatchEvent(new CustomEvent<GameSnapshot>("skydash:state", { detail: { ...gameoverSnapshot, score: 880, distance: 96 } }));
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Chia sẻ kết quả" }));
+    await waitFor(() => expect(share).toHaveBeenCalledWith(expect.objectContaining({ title: "Chạy Đua Cùng Hana", text: expect.stringContaining("880 điểm") })));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Đã mở chia sẻ" })).toBeTruthy());
+    Object.defineProperty(navigator, "share", { configurable: true, value: undefined });
+  });
+
+  it("copies the result text when native sharing is unavailable", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "share", { configurable: true, value: undefined });
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
+    render(<SkyDashHud />);
+    act(() => {
+      window.dispatchEvent(new CustomEvent<GameSnapshot>("skydash:state", { detail: { ...gameoverSnapshot, score: 740, distance: 81 } }));
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Chia sẻ kết quả" }));
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith(expect.stringContaining("740 điểm")));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Đã sao chép lời khoe" })).toBeTruthy());
+  });
 });

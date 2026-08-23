@@ -61,6 +61,7 @@ describe("GameWorld keyboard input", () => {
     expect(star.world.stars).toBe(1);
     expect(star.world.score).toBe(4);
     expect(star.world.multiplier).toBe(1);
+    expect((star.world.audio as { play: ReturnType<typeof vi.fn> }).play).toHaveBeenCalledWith("pickup");
     expect(star.removeEntity).toHaveBeenCalledWith(0);
 
     const shield = collisionWorld("shield");
@@ -72,6 +73,7 @@ describe("GameWorld keyboard input", () => {
     (gust.world as unknown as { updateEntities: (delta: number, speed: number) => void }).updateEntities(0, 0);
     expect(gust.world.score).toBe(40);
     expect(gust.world.multiplier).toBe(1);
+    expect((gust.world.audio as { play: ReturnType<typeof vi.fn> }).play).toHaveBeenCalledWith("pickup");
     expect(gust.removeEntity).toHaveBeenCalledWith(0);
 
     for (const kind of ["lowHurdle", "cloudGate"] as const) {
@@ -80,6 +82,21 @@ describe("GameWorld keyboard input", () => {
       expect(obstacle.world.score).toBe(32);
       expect(obstacle.removeEntity).toHaveBeenCalledWith(0);
     }
+  });
+
+  it("plays feedback for jump and the end of a run", () => {
+    const jumpWorld = Object.create(GameWorld.prototype) as GameWorld & Record<string, unknown>;
+    const jumpAudio = { play: vi.fn() };
+    Object.assign(jumpWorld, { player: {}, playerAirHeight: 0, slideTimer: 0, characterId: "cinnamoroll", audio: jumpAudio, showMessage: vi.fn() });
+    (jumpWorld as unknown as { jump: () => void }).jump();
+    expect(jumpAudio.play).toHaveBeenCalledWith("jump");
+
+    const finishWorld = Object.create(GameWorld.prototype) as GameWorld & Record<string, unknown>;
+    const finishAudio = { pauseMusic: vi.fn(), play: vi.fn() };
+    Object.assign(finishWorld, { audio: finishAudio, score: 600, highScore: 700, newRecord: false, setStatus: vi.fn() });
+    (finishWorld as unknown as { endRun: () => void }).endRun();
+    expect(finishAudio.pauseMusic).toHaveBeenCalledOnce();
+    expect(finishAudio.play).toHaveBeenCalledWith("gameover");
   });
 
   it("raises difficulty gradually by distance with a capped late-game speed", () => {

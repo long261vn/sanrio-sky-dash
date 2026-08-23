@@ -180,3 +180,7 @@
 - [x] Tối ưu bước nhập tên/chọn nhân vật cho 390×844, ưu tiên form, lựa chọn và CTA không che nhau hoặc tạo cuộn ngang.
 - [x] Thêm lời chào game-over phân bậc theo điểm, khen theo thứ hạng Top 20 và khuyến khích cụ thể khi chưa vào hạng.
 - [x] Kiểm thử Top 20, hướng dẫn nhóm, thông điệp kết quả và setup mobile trên desktop/mobile.
+
+- [x] Thêm âm thanh phản hồi riêng khi nhảy, nhặt vật phẩm và kết thúc lượt chơi, tôn trọng trạng thái tắt nhạc/âm thanh.
+- [x] Thêm nút chia sẻ thành tích ở màn kết quả với Web Share API và phương án sao chép nội dung khi không được hỗ trợ.
+- [x] Kiểm thử unit/UI cho hiệu ứng âm thanh, nội dung chia sẻ, trạng thái fallback và bố cục màn kết quả desktop/mobile.

@@ -219,3 +219,13 @@ Toàn bộ suite hiện có **33 test** đạt, TypeScript đạt và build prod
 | Kết quả | Test HUD kiểm tra lời chào điểm thấp ngoài Top 20 và lời khen hạng #2 Top 3. Các mức điểm cao/trung bình/thấp cùng phản hồi hạng #1, Top 3, Top 10 hoặc Top 20 được chọn qua helper xác định. | Đạt trong 9 test HUD. |
 
 Toàn bộ suite hiện có **34 test** đạt, TypeScript và build production đạt. Kiểm tra public được thực hiện sau checkpoint để bảo vệ dữ liệu bảng hạng thật.
+
+### Âm thanh phản hồi và chia sẻ thành tích — 23/08/2026
+
+| Hạng mục | Bằng chứng kiểm tra | Kết quả |
+| --- | --- | --- |
+| Âm thanh hành động | Audio manager dùng ba voice luân phiên cho hiệu ứng lặp nhanh; âm lượng nhảy/nhặt được nâng để rõ hơn, còn game-over có voice riêng. GameWorld test xác nhận nhảy gọi `jump`, sao/vòng gió gọi `pickup`, và kết thúc lượt gọi `gameover`; khi tắt âm thanh, manager không phát effect. | Đạt trong 6 test GameWorld. |
+| Chia sẻ thành tích | Nút “Chia sẻ kết quả” tạo nội dung gồm điểm, quãng đường, hạng Top 20 (nếu có) và URL game. Test HUD xác nhận Web Share API nhận title/nội dung; khi API không có, Clipboard API sao chép lời khoe và UI báo rõ. | Đạt trong 11 test HUD. |
+| Bố cục kết quả | Ảnh QA `?result=1` ở desktop 1280×720 và mobile 390×844 cho thấy nút chia sẻ không che form ghi hạng hoặc CTA về màn đầu; trên điện thoại các nút xếp một cột. Cờ QA chỉ tạo màn kết quả cục bộ, không nộp điểm. | Đạt. |
+
+Toàn bộ suite hiện có **37 test** đạt, TypeScript và build production đạt.
