@@ -332,3 +332,5 @@ Retry sau checkpoint `99224a15` xác nhận Manus đã chuyển sang `assets/ind
 | Hình chọn | Bộ ảnh 2D mặt trước đã đúng nhận diện được giữ nguyên, gắn nhãn “Ảnh mặt trước”; preview có chú thích rõ mặt trước/lưng khi chạy. | Đạt desktop và 360×780. |
 | Regression | NullEngine kiểm tra dấu hiệu nhận dạng và trục mắt/lưng cho cả tám mascot; test HUD kiểm tra nhãn preview/ảnh. | 54/54 test đạt. |
 | Build | `pnpm check` và `pnpm build` đạt; chunk Babylon 1,77MB raw/416KB gzip là cảnh báo kích thước đã biết do lazy-load engine. | Đạt. |
+
+Checkpoint `8667334f` đã đồng bộ cả hai bản public. Manus setup hiển thị hint orientation và tám nhãn “Ảnh mặt trước”; demo Cinnamoroll hiện sau đầu, tai dài và đuôi khi chạy về +Z. GitHub Pages cũng xác nhận cùng setup và gameplay. Các URL QA không đặt tên hay gửi điểm nên không tạo entry mới trong Top 20.

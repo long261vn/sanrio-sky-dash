@@ -28,6 +28,8 @@ GitHub Pages đã đồng bộ: setup hiện đủ tám thẻ có nhãn “Ảnh
 
 Để yêu cầu một bundle public mới dễ phân biệt, marker factory được nâng thành `orientation-v4`. `pnpm test` vẫn đạt 54/54, `pnpm check` và `pnpm build` đạt trước checkpoint phát hành lại.
 
+Checkpoint `8667334f` đã đồng bộ Manus: setup hiển thị hint orientation, tám ảnh “Ảnh mặt trước” và preview runtime; demo Cinnamoroll cho thấy sau đầu/tai dài/đuôi từ camera khi mascot chạy +Z. GitHub Pages đã xác nhận cùng setup và gameplay trước đó. Cả hai bản public đạt; tất cả URL QA chạy demo không nộp Top 20.
+
 ## Nguồn và phát hiện đã xác minh
 
 | Nhân vật | Phát hiện nguồn | Hệ quả orientation |

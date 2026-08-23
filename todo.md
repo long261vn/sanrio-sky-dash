@@ -237,4 +237,4 @@
 - [x] Chẩn đoán orientation camera/model khiến mascot quay lưng khi chạy và lập hợp đồng trục hướng chạy thống nhất.
 - [x] Sửa factory mascot và gameplay để mặt nhân vật chạy theo hướng đường chạy, còn mặt sau hiển thị đúng khi camera gameplay theo sau.
 - [x] Cập nhật hình ảnh chọn nhân vật theo đặc tả trước–sau, giữ ảnh 2D mặt trước đúng orientation và gắn nhãn rõ ràng.
-- [ ] Kiểm thử cả tám mascot trong preview/gameplay, regression, mobile và hai bản public trước phát hành.
+- [x] Kiểm thử cả tám mascot trong preview/gameplay, regression, mobile và hai bản public trước phát hành.
