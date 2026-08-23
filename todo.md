@@ -214,4 +214,4 @@
 - [x] Lazy-load Babylon/game canvas sau ý định bắt đầu chơi để giảm tải đầu; kiểm tra lại bundle và nhịp render.
 - [x] Bảo đảm debug logging không lưu header hay token nhạy cảm ở client; giữ đủ dữ liệu chẩn đoán an toàn.
 - [x] Bổ sung regression cho viewport 393×852/412×915, chọn nhân vật, audio preference, accessibility và phân tách tải game.
-- [ ] QA lại trên desktop, 360×780, 393×852, 412×915 và hai liên kết công khai; cập nhật báo cáo và phát hành.
+- [x] QA lại trên desktop, 360×780, 393×852, 412×915 và hai liên kết công khai; cập nhật báo cáo và phát hành.

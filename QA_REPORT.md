@@ -263,3 +263,14 @@ Suite cuối có **40 test** đạt, TypeScript đạt và build production hoà
 ### Theo dõi asset public — 23/08/2026
 
 Bản Manus của checkpoint `458f9b25` hiển thị đủ tám chân dung chi tiết trong lưới setup. GitHub Pages của cùng checkpoint trả markup dùng URL tuyệt đối `https://sanriodash-ygyeg6qd.manus.space/manus-storage/...` cho toàn bộ tám ảnh, thay cho path tương đối cũ. Lượt kiểm tra lại sau khi ảnh hoàn tất tải xác nhận Cinnamoroll, Pompompurin, My Melody, Kuromi, Badtz-Maru, Keroppi, Gudetama và Hello Kitty đều hiện chân dung chi tiết; không còn chuyển sang biểu tượng fallback trong điều kiện tải bình thường. Hạng mục public đạt.
+
+### Batch cải thiện sau audit nghiêm khắc — 23/08/2026
+
+| Hạng mục | Bằng chứng hiện tại | Kết quả |
+| --- | --- | --- |
+| Lưới mascot P0 | Ảnh local `?setup=1` tại 360×780, 393×852 và 412×915 xác nhận tám chân dung và nhãn được phân vùng riêng; ảnh 34px nằm hoàn toàn trong cột 40px tại 391–560px, không còn đè chữ. CSS `background-image` theo `nth-child` đã bị xoá, chỉ còn `<img>` đi qua `assetUrl()` với fallback. | Đạt. |
+| Đường chạy runtime | Demo 360×780 hiển thị ba dải mây cream có chiều sâu, seam blueberry, viền sao-vàng và đệm mây; ánh sáng scene đã hạ để mascot, cổng tím và các làn còn tương phản. | Đạt ở local. |
+| Audio & accessibility | HUD/landing có công tắc riêng nhạc nền và hiệu ứng, giữ preference trong localStorage; focus ring thấy rõ, các control có nhãn aria/`aria-pressed` và vùng chạm mobile tối thiểu 36–40px. | Đạt trong UI regression và ảnh local. |
+| Hiệu năng & bảo mật log | Babylon được tải động sau `skydash:prepare`; Start/Practice được xếp hàng nếu scene còn tải. Build tách `index` 82,15kB và `scene` 27,94kB khỏi chunk Babylon 1,70MB. Collector debug hiện sanitize request/response headers trước khi ghi log. | Đạt qua build/kiểm tra mã. |
+| Regression | 41 test, TypeScript và build production đều đạt. Regression mới xác nhận hai công tắc audio và phát event chuẩn bị canvas trước Start. | Đạt. |
+| Public | Sau retry, Manus `?setup=1&v=cf7e38c8-retry` tải đủ tám chân dung chi tiết, không chồng nhãn ở setup. GitHub Pages `?demo=1&v=cf7e38c8` render đường mây cream, mascot, HUD điểm/quãng đường và hai nút nhạc/hiệu ứng riêng; không phát sinh điểm thử vào Top 20. | Đạt. |
