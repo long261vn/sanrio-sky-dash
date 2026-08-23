@@ -292,3 +292,7 @@ Sau checkpoint `db915897`, Manus public setup hiển thị ảnh mascot, tên/ta
 Preview local 360×780 hiển thị turntable mascot ngay trong khối nhân vật đã chọn, có tự xoay nhẹ và nút “Kéo để xoay 360°”; toàn bộ tên, ba chip chỉ số và lưới tám nhân vật vẫn vừa màn hình. Browser landing xác nhận lần chạm **Bắt đầu hành trình** đi vào setup có preview 360°; handler nhạc được gọi trên `pointerdown` của thao tác hợp lệ, trước khi chuyển màn, để vượt giới hạn autoplay của trình duyệt. UI tiếp tục hiện trạng thái “Nhạc: Bật/Tắt” và hiển thị chỉ dẫn chạm nút Nhạc nếu playback bị chặn.
 
 Lượt kiểm tra Manus đầu tiên của checkpoint `4b6eaa8e` có độ trễ CDN và trả bundle cũ. Đối chiếu repository xác nhận `MascotPreview3D.tsx`, `SkyDashHud.tsx`, `GameCanvas.tsx`, CSS và test đều nằm trong checkpoint; retry sau khi CDN hoàn tất đã hiển thị node preview/nút xoay trên Manus public. GitHub Pages cũng hiển thị node preview, nhãn “Kéo để xoay 360°” và nút xoay 90°. Hạng mục public đạt.
+
+### Preview dùng đúng model gameplay — 23/08/2026
+
+Factory `MascotModel` nay là nguồn dựng duy nhất cho `GameWorld` và preview. Đối chiếu 412×915 cho Cinnamoroll cho thấy cùng đầu/tròn thân, tai, má, huy hiệu và màu; preview không còn dùng ảnh chân dung hoặc mesh mô phỏng khác. Regression có 44 test đạt; Manus public và GitHub Pages của checkpoint `8053da8c` đều trả canvas preview cùng nút xoay model runtime. Hạng mục đạt.

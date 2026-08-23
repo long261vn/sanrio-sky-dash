@@ -225,4 +225,4 @@
 - [x] Bổ sung regression cho preview 360° và retry audio, kiểm thử 360×780/412×915 cùng hai bản public.
 - [x] Tách factory mascot 3D duy nhất để gameplay và preview 360° dùng đúng cùng mesh, màu và phụ kiện.
 - [x] Thay preview CSS hiện tại bằng model runtime thật có xoay 360°/kéo chạm, không còn dùng minh hoạ chân dung thay thế.
-- [ ] Kiểm thử đối chiếu từng silhouette mascot, mobile và hai bản public rồi phát hành.
+- [x] Kiểm thử đối chiếu từng silhouette mascot, mobile và hai bản public rồi phát hành.
