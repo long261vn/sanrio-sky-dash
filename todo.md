@@ -219,4 +219,4 @@
 - [x] Sửa thẻ nhân vật để tên, mô tả và ba chỉ số Nhảy/Trượt/Khiên không chồng lấn ở mobile và desktop.
 - [x] Dựng avatar 3D khác biệt, dễ nhận diện theo từng mascot đã chọn thay cho mô hình chung chỉ đổi màu.
 - [x] Bổ sung regression cho âm thanh menu, bố cục thẻ mascot và profile avatar runtime.
-- [ ] QA lại âm thanh/bố cục/avatar trên 360×780, 412×915, Manus public và GitHub Pages rồi phát hành.
+- [x] QA lại âm thanh/bố cục/avatar trên 360×780, 412×915, Manus public và GitHub Pages rồi phát hành.

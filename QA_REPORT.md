@@ -284,3 +284,5 @@ Thao tác browser tiếp theo xác nhận công tắc landing đổi tức thì 
 Browser gameplay trực tiếp sau khi scene hoàn tất khởi tạo xác nhận Pompompurin có tai cụp nâu, beret pudding và thân vàng; Badtz-Maru có thân đen, bụng sáng, mỏ vàng và ba chỏm đầu. Hai avatar có silhouette tách biệt với Cinnamoroll/Hello Kitty, không chỉ đổi màu của cùng mô hình. Ảnh capture chạy song song đôi khi chụp trước timeout khởi động demo; vì vậy bằng chứng này dùng lượt browser đơn lẻ đã đạt 153–169m.
 
 Hai lượt browser tiếp theo xác nhận Gudetama là dáng trứng vàng thấp, mắt/tay nhỏ và má tròn; Hello Kitty là mặt trắng, tai nhọn, nơ hồng và ria mép. Cả hai chạy qua mốc 138m, không có lỗi runtime và phân biệt được tức thì với Pompompurin/Badtz-Maru.
+
+Sau checkpoint `db915897`, Manus public setup hiển thị ảnh mascot, tên/tagline và ba chip Nhảy–Trượt–Khiên thành các vùng riêng; không còn chồng lên nhau. GitHub Pages chạy demo Hello Kitty qua 165m, render tai, nơ, ria mép, HUD điểm/quãng đường và hai control nhạc/hiệu ứng; không tạo entry thử vào Top 20. Hạng mục phát hành đạt.
