@@ -81,3 +81,13 @@ Gudetama hiện đúng dáng thấp với lòng đỏ vàng và biểu cảm lư
 Cinnamoroll và Keroppi đều đã được kiểm tra trong demo chạy ở quãng đường sớm, không chỉ trong setup. Cinnamoroll giữ đầu/thân trắng, tai dài xanh nhạt và mặt tròn; Keroppi giữ đầu xanh, mắt trắng lớn nhô cao và cổ áo hồng. Điều này xác nhận gameplay đang dùng chính factory đã kiểm thử ở canvas preview.
 
 Badtz-Maru trong gameplay giữ được đầu cánh cụt đen, mào gai, bụng trắng lớn, mỏ và bàn chân vàng. Gudetama giữ dáng lòng đỏ thấp trên lòng trắng, mắt lười và phần trắng vẫn tách được trên đường chạy vàng sáng. Bốn kiểm tra gameplay đại diện (Cinnamoroll, Keroppi, Badtz-Maru, Gudetama) đều dùng đúng factory chung của preview.
+
+## Theo dõi phát hành
+
+Lượt đọc Manus public đầu tiên sau checkpoint `d1f69f20` đã có node canvas preview/runtime và demo chạy Cinnamoroll, nhưng màu thân vẫn giống bundle cũ (xanh đậm). Đây là dấu hiệu CDN chưa đổi bundle model mới, không phải bằng chứng pass public; cần chờ rồi retry với cache-buster trước khi đóng checklist phát hành.
+
+Retry GitHub Pages với cache-buster của checkpoint đã hiển thị Cinnamoroll thân trắng/mặt nhận dạng trong chính canvas runtime; các ảnh portrait 2D vẫn tải qua URL origin Manus tuyệt đối. Manus public cũng trả canvas preview, đủ 8 lựa chọn và demo gameplay mà không tạo entry Top 20 vì không nộp tên. Lượt demo mới ở GitHub Pages sẽ là kiểm tra gameplay công khai cuối cùng.
+
+GitHub Pages demo đã xác nhận Cinnamoroll trắng/tai dài đúng như factory mới. Lượt retry Manus demo tại cùng checkpoint vẫn đang trả model xanh đậm của bundle cũ, vì vậy hạng mục Manus public còn mở và phải retry sau độ trễ CDN; không dùng trạng thái tạm này để kết luận tạo hình phát hành đã đồng bộ.
+
+Lượt retry thứ hai của Manus vẫn giữ model cũ. Việc đọc trực tiếp fingerprint script bị browser chặn do một script cross-origin, nên không coi đó là nguyên nhân lỗi code; phát hành checkpoint cập nhật tiếp theo sẽ được dùng để yêu cầu CDN làm mới rồi kiểm tra lại bằng cache-buster.

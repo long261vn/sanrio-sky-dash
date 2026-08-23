@@ -315,3 +315,5 @@ Factory `MascotModel` đã được dựng lại theo bảng này. Lớp rim/hoo
 | Preview setup | Canvas cùng factory được chọn lần lượt cho 8 nhân vật; Cinnamoroll, My Melody, Kuromi, Keroppi, Gudetama và Hello Kitty đều có dấu hiệu đặc trưng đọc được trong khung. | Đạt cục bộ. |
 | Gameplay runtime | Demo browser riêng xác nhận Cinnamoroll, Keroppi, Badtz-Maru và Gudetama giữ đúng mesh nhận dạng khi chạy. | Đạt cục bộ. |
 | Regression/build | `pnpm test` 53/53, `pnpm check` và `pnpm build` cùng đạt; cảnh báo chunk Babylon 1,77MB là cảnh báo kích thước đã biết do engine được lazy-load. | Đạt. |
+
+Checkpoint `d1f69f20` đã được kiểm tra với cache-buster. Manus public trả setup có canvas preview cùng nút xoay, tám lựa chọn và demo Cinnamoroll; lượt demo không nhập tên nên không tạo dữ liệu Top 20. GitHub Pages trả setup cùng canvas runtime, Cinnamoroll thân trắng/tai dài sau khi CDN đồng bộ, đồng thời tiếp tục dùng origin Manus tuyệt đối cho toàn bộ portrait 2D.
