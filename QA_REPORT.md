@@ -296,3 +296,7 @@ Lượt kiểm tra Manus đầu tiên của checkpoint `4b6eaa8e` có độ tr�
 ### Preview dùng đúng model gameplay — 23/08/2026
 
 Factory `MascotModel` nay là nguồn dựng duy nhất cho `GameWorld` và preview. Đối chiếu 412×915 cho Cinnamoroll cho thấy cùng đầu/tròn thân, tai, má, huy hiệu và màu; preview không còn dùng ảnh chân dung hoặc mesh mô phỏng khác. Regression có 44 test đạt; Manus public và GitHub Pages của checkpoint `8053da8c` đều trả canvas preview cùng nút xoay model runtime. Hạng mục đạt.
+
+### Tạo hình mascot runtime nâng cấp — 23/08/2026
+
+Model chung được tăng tỷ lệ khuôn mặt, mắt/má, tay/chân, mũ/hood, hoa, mỏ, bụng, áo, đuôi, nơ và tai theo silhouette. Lượt setup local chọn Kuromi xác nhận canvas đổi ngay sang cùng model tím/hood/gai đang dùng khi chạy; các ca mobile đại diện cũng xác nhận Cinnamoroll, Pompompurin, My Melody và Hello Kitty giữ nhận diện rõ hơn trên đường mây. Preview tiếp tục gọi factory chung, nên mọi điều chỉnh model runtime tự phản ánh ở 360°.

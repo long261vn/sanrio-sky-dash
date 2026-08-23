@@ -6,6 +6,9 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import "@babylonjs/core/Materials/standardMaterial";
+import "@babylonjs/core/Shaders/ShadersInclude/helperFunctions";
+import "@babylonjs/core/Shaders/default.vertex";
+import "@babylonjs/core/Shaders/default.fragment";
 import type { CharacterDefinition } from "@/game/types";
 import { createMascotModel } from "@/game/MascotModel";
 

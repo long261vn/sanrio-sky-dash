@@ -226,3 +226,6 @@
 - [x] Tách factory mascot 3D duy nhất để gameplay và preview 360° dùng đúng cùng mesh, màu và phụ kiện.
 - [x] Thay preview CSS hiện tại bằng model runtime thật có xoay 360°/kéo chạm, không còn dùng minh hoạ chân dung thay thế.
 - [x] Kiểm thử đối chiếu từng silhouette mascot, mobile và hai bản public rồi phát hành.
+- [x] Nâng factory mascot runtime với tỷ lệ, mắt/má, tai, phụ kiện và dấu hiệu nhận diện riêng rõ hơn cho tám nhân vật.
+- [x] Bảo đảm preview 360° tiếp tục render đúng cùng factory nâng cấp, không tạo model thay thế.
+- [ ] Kiểm thử trực quan gameplay/preview của các silhouette, regression, mobile và hai bản public trước phát hành.
