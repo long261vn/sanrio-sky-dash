@@ -242,4 +242,4 @@
 - [x] Thiết kế lại nội dung/thị giác thẻ PNG để hiển thị đúng mascot đã chọn cùng thành tích thực tế của lượt chơi.
 - [x] Thêm animation nhẹ tai, đuôi, hood hoặc gai theo từng mascot khi chạy, không ảnh hưởng hitbox hay hướng chạy.
 - [x] Bổ sung regression cho dữ liệu thẻ và transform animation mascot; kiểm thử xuất PNG/gameplay trên desktop và mobile.
-- [ ] Xác minh Manus public và GitHub Pages sau phát hành, không tạo dữ liệu thử trong Top 20.
+- [x] Xác minh Manus public và GitHub Pages sau phát hành, không tạo dữ liệu thử trong Top 20.

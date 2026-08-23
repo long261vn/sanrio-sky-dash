@@ -345,3 +345,13 @@ Thẻ PNG nay nhận immutable `completedRun` (hoặc snapshot kết quả nếu
 | Chân dung thẻ | Kiểm tra browser trực tiếp hiển thị thẻ PNG có chân dung Kuromi, tên người chơi, điểm, quãng đường, cấp và hạng cùng một layout. | Đạt cục bộ. |
 | Animation | Factory có chuyển động visual-only cho tai/đuôi Cinnamoroll, tai Pompompurin, hood/tai My Melody, jester/đuôi Kuromi, chỏm Badtz-Maru, mắt Keroppi, lòng trắng Gudetama và tai/nơ Hello Kitty. Root/hitbox không dịch chuyển. | 8 regression motion đạt. |
 | Validation | `pnpm test` 62/62, `pnpm check` và build production đạt. | Đạt. |
+
+Lượt kiểm tra public đầu tiên của checkpoint `49a04b25` cho thấy GitHub Pages đã hiện đúng màn kết quả với 1.760 điểm, cấp 3, 214m và ba thao tác thẻ/chia sẻ. Manus tại cùng thời điểm vẫn trả bundle landing cũ khi mở `?result=1`; đây là độ trễ CDN cần retry, không dùng làm kết quả pass. Các URL kiểm tra không điền tên hoặc bấm lưu hạng nên không ghi dữ liệu thử.
+
+Retry Manus với cache-buster mới đã trả cùng màn kết quả hiện hành, gồm điểm 1.760, cấp 3, quãng đường 214m, Tải thẻ PNG và Chia sẻ thẻ. Fingerprint minified không giữ tên helper nên QA tiếp tục kiểm tra bằng thao tác xuất PNG thực tế; không suy ra pass chỉ từ tên hàm trong bundle.
+
+Trong lượt xuất PNG public, browser kiểm thử từng chuyển sang trang trống nên QA mở lại `?result=1` với cache-buster mới; màn kết quả được khôi phục đầy đủ trước khi tiếp tục thao tác. Đây là trạng thái điều hướng kiểm thử, không có thao tác nhập tên hoặc lưu hạng.
+
+Manus public đã hoàn tất xuất PNG: nút chuyển trạng thái thành “Đã tải thẻ PNG” mà không nhập tên hoặc tạo entry Top 20. GitHub Pages cũng trả cùng màn kết quả và sẵn sàng kiểm tra thao tác tải bằng cùng URL QA.
+
+GitHub Pages cũng hoàn tất xuất PNG và chuyển nút thành “Đã tải thẻ PNG”. Hai bản public đã xác minh hành vi tải thẻ; các lần QA đều không điền tên và không gọi Lưu & xem hạng, nên dữ liệu Top 20 thực được giữ nguyên.
