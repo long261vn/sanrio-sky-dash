@@ -215,3 +215,8 @@
 - [x] Bảo đảm debug logging không lưu header hay token nhạy cảm ở client; giữ đủ dữ liệu chẩn đoán an toàn.
 - [x] Bổ sung regression cho viewport 393×852/412×915, chọn nhân vật, audio preference, accessibility và phân tách tải game.
 - [x] QA lại trên desktop, 360×780, 393×852, 412×915 và hai liên kết công khai; cập nhật báo cáo và phát hành.
+- [x] Khôi phục nhạc nền có khởi phát sau thao tác người chơi ở landing/setup, tôn trọng lựa chọn tắt nhạc đã lưu.
+- [x] Sửa thẻ nhân vật để tên, mô tả và ba chỉ số Nhảy/Trượt/Khiên không chồng lấn ở mobile và desktop.
+- [x] Dựng avatar 3D khác biệt, dễ nhận diện theo từng mascot đã chọn thay cho mô hình chung chỉ đổi màu.
+- [x] Bổ sung regression cho âm thanh menu, bố cục thẻ mascot và profile avatar runtime.
+- [ ] QA lại âm thanh/bố cục/avatar trên 360×780, 412×915, Manus public và GitHub Pages rồi phát hành.

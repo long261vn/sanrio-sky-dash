@@ -46,7 +46,8 @@ export class GameWorld {
   private readonly canvas: HTMLCanvasElement;
   private readonly entities: WorldEntity[] = [];
   private readonly decorations: TransformNode[] = [];
-  private readonly audio = new AudioManager();
+  private readonly audio: AudioManager;
+  private readonly ownsAudio: boolean;
   private readonly rngSeed = 9711;
   private randomState = this.rngSeed;
   private status: GameStatus = "menu";
@@ -111,9 +112,11 @@ export class GameWorld {
   private readonly onPointerUp = (event: PointerEvent) => this.handleSwipe(event);
   private readonly onPointerCancel = () => { this.pointerStart = null; };
 
-  constructor(scene: Scene, canvas: HTMLCanvasElement) {
+  constructor(scene: Scene, canvas: HTMLCanvasElement, audio?: AudioManager) {
     this.scene = scene;
     this.canvas = canvas;
+    this.audio = audio ?? new AudioManager();
+    this.ownsAudio = !audio;
     this.highScore = Number(window.localStorage.getItem("skyDashHighScore") ?? 0);
     this.buildTrack();
     this.buildSkyDecorations();
@@ -179,7 +182,7 @@ export class GameWorld {
     this.entities.forEach((entity) => entity.node.dispose(false, true));
     this.decorations.forEach((node) => node.dispose(false, true));
     this.player?.dispose(false, true);
-    this.audio.dispose();
+    if (this.ownsAudio) this.audio.dispose();
   }
 
   private handleCommand(command: GameCommand) {
@@ -664,14 +667,62 @@ export class GameWorld {
         ear.material = character.silhouette === "bunny" ? accent : body;
       }
     }
+    if (character.silhouette === "cloud") {
+      bodyMesh.scaling = new Vector3(0.75, 0.9, 0.68);
+      head.scaling = new Vector3(1.12, 0.86, 0.82);
+      for (const x of [-0.54, 0.54]) {
+        const ear = MeshBuilder.CreateSphere(`cloudDropEar${x}`, { diameter: 0.5, segments: 18 }, this.scene);
+        ear.parent = visual;
+        ear.position = new Vector3(x, 1.66, -0.02);
+        ear.scaling = new Vector3(0.48, 1.85, 0.62);
+        ear.rotation.z = x * -0.22;
+        ear.material = body;
+      }
+      const cloudTail = MeshBuilder.CreateSphere("cloudTail", { diameter: 0.42, segments: 14 }, this.scene);
+      cloudTail.parent = visual;
+      cloudTail.position = new Vector3(-0.46, 0.68, 0.36);
+      cloudTail.material = accent;
+    }
     if (character.silhouette === "pudding") {
+      bodyMesh.scaling = new Vector3(0.98, 0.83, 0.78);
+      head.scaling = new Vector3(1.1, 0.75, 0.86);
       const beret = MeshBuilder.CreateSphere("puddingBeret", { diameter: 0.75, segments: 16 }, this.scene);
       beret.parent = visual;
       beret.position = new Vector3(0.13, 2.08, -0.03);
       beret.scaling.y = 0.32;
       beret.material = accent;
+      for (const x of [-0.52, 0.52]) {
+        const floppyEar = MeshBuilder.CreateSphere(`puddingEar${x}`, { diameter: 0.43, segments: 16 }, this.scene);
+        floppyEar.parent = visual;
+        floppyEar.position = new Vector3(x, 1.75, 0.08);
+        floppyEar.scaling = new Vector3(0.65, 1.3, 0.58);
+        floppyEar.rotation.z = x * -0.55;
+        floppyEar.material = accent;
+      }
+    }
+    if (character.silhouette === "bunny") {
+      const hood = MeshBuilder.CreateSphere("melodyHood", { diameter: 1.48, segments: 20 }, this.scene);
+      hood.parent = visual;
+      hood.position.y = 1.56;
+      hood.scaling = new Vector3(1.02, 0.99, 0.86);
+      hood.material = accent;
+      head.scaling = new Vector3(0.84, 0.8, 0.76);
+      for (const x of [-0.34, 0.34]) {
+        const ear = MeshBuilder.CreateSphere(`melodyHoodEar${x}`, { diameter: 0.52, segments: 16 }, this.scene);
+        ear.parent = visual;
+        ear.position = new Vector3(x, 2.2, -0.01);
+        ear.scaling = new Vector3(0.72, 1.9, 0.62);
+        ear.rotation.z = x * -0.26;
+        ear.material = accent;
+      }
     }
     if (character.silhouette === "imp") {
+      const hood = MeshBuilder.CreateSphere("kuromiHood", { diameter: 1.45, segments: 20 }, this.scene);
+      hood.parent = visual;
+      hood.position.y = 1.56;
+      hood.scaling = new Vector3(1.03, 0.98, 0.86);
+      hood.material = accent;
+      head.scaling = new Vector3(0.82, 0.8, 0.75);
       for (const x of [-0.4, 0, 0.4]) {
         const spike = MeshBuilder.CreatePolyhedron(`impSpike${x}`, { type: 1, size: 0.4 }, this.scene);
         spike.parent = visual;
@@ -679,8 +730,14 @@ export class GameWorld {
         spike.scaling.y = 1.25;
         spike.material = accent;
       }
+      const skull = MeshBuilder.CreateSphere("kuromiSkull", { diameter: 0.22, segments: 12 }, this.scene);
+      skull.parent = visual;
+      skull.position = new Vector3(0, 2.09, -0.5);
+      skull.material = softAccent;
     }
     if (character.silhouette === "penguin") {
+      bodyMesh.scaling = new Vector3(0.92, 1.2, 0.8);
+      head.scaling = new Vector3(0.94, 0.72, 0.83);
       const belly = MeshBuilder.CreateSphere("penguinBelly", { diameter: 0.9, segments: 18 }, this.scene);
       belly.parent = visual;
       belly.position = new Vector3(0, 0.78, -0.51);
@@ -690,6 +747,12 @@ export class GameWorld {
       beak.parent = visual;
       beak.position = new Vector3(0, 1.45, -0.7);
       beak.material = accent;
+      for (const x of [-0.28, 0, 0.28]) {
+        const tuft = MeshBuilder.CreatePolyhedron(`penguinTuft${x}`, { type: 1, size: 0.22 }, this.scene);
+        tuft.parent = visual;
+        tuft.position = new Vector3(x, 2.07 - Math.abs(x) * 0.25, -0.04);
+        tuft.material = accent;
+      }
     }
     if (character.silhouette === "frog") {
       for (const x of [-0.34, 0.34]) {
@@ -698,6 +761,12 @@ export class GameWorld {
         eyeBulge.position = new Vector3(x, 1.98, -0.25);
         eyeBulge.material = body;
       }
+      head.scaling = new Vector3(1.15, 0.78, 0.9);
+      const mouth = MeshBuilder.CreateSphere("frogMouth", { diameter: 0.16, segments: 12 }, this.scene);
+      mouth.parent = visual;
+      mouth.position = new Vector3(0, 1.38, -0.62);
+      mouth.scaling = new Vector3(1.6, 0.42, 0.25);
+      mouth.material = accent;
     }
     if (character.silhouette === "egg") {
       bodyMesh.scaling = new Vector3(0.75, 1.28, 0.72);
@@ -719,6 +788,13 @@ export class GameWorld {
       bow.position = new Vector3(0.56, 1.92, -0.42);
       bow.scaling.x = 1.45;
       bow.material = accent;
+      for (const x of [-0.52, -0.42, 0.42, 0.52]) {
+        const whisker = MeshBuilder.CreateBox(`kittyWhisker${x}`, { width: 0.28, height: 0.025, depth: 0.025 }, this.scene);
+        whisker.parent = visual;
+        whisker.position = new Vector3(x, 1.48, -0.68);
+        whisker.rotation.z = x < 0 ? -0.12 : 0.12;
+        whisker.material = ink;
+      }
     }
 
     const runnerBadge = MeshBuilder.CreateTorus("runnerBadge", { diameter: 0.38, thickness: 0.07, tessellation: 18 }, this.scene);

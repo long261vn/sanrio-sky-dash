@@ -274,3 +274,13 @@ Bản Manus của checkpoint `458f9b25` hiển thị đủ tám chân dung chi t
 | Hiệu năng & bảo mật log | Babylon được tải động sau `skydash:prepare`; Start/Practice được xếp hàng nếu scene còn tải. Build tách `index` 82,15kB và `scene` 27,94kB khỏi chunk Babylon 1,70MB. Collector debug hiện sanitize request/response headers trước khi ghi log. | Đạt qua build/kiểm tra mã. |
 | Regression | 41 test, TypeScript và build production đều đạt. Regression mới xác nhận hai công tắc audio và phát event chuẩn bị canvas trước Start. | Đạt. |
 | Public | Sau retry, Manus `?setup=1&v=cf7e38c8-retry` tải đủ tám chân dung chi tiết, không chồng nhãn ở setup. GitHub Pages `?demo=1&v=cf7e38c8` render đường mây cream, mascot, HUD điểm/quãng đường và hai nút nhạc/hiệu ứng riêng; không phát sinh điểm thử vào Top 20. | Đạt. |
+
+### Theo dõi sửa audio menu và mascot runtime — 23/08/2026
+
+Ở preview browser, thao tác **Bắt đầu hành trình** đã đi đúng tới setup và thẻ Cinnamoroll giữ tên, tagline cùng ba chip chỉ số ở các vùng hàng riêng. Cơ chế audio menu mới được kích hoạt đồng bộ với chính thao tác chạm này, thay vì chờ Babylon scene khởi tạo; kiểm thử unit xác nhận HUD nhận ngay event preference. Cần kiểm tra nghe thực tế sau build/public vì browser automation không phản hồi mức âm thanh người dùng nghe được.
+
+Thao tác browser tiếp theo xác nhận công tắc landing đổi tức thì từ **Nhạc: Bật** sang **Nhạc: Tắt** và `aria-label` đổi thành “Bật nhạc nền”, ngay khi Babylon chưa được nạp. Điều này xác nhận command, lưu preference và HUD menu đã thông suốt; playback được gọi trong cùng user gesture để thỏa chính sách autoplay của trình duyệt.
+
+Browser gameplay trực tiếp sau khi scene hoàn tất khởi tạo xác nhận Pompompurin có tai cụp nâu, beret pudding và thân vàng; Badtz-Maru có thân đen, bụng sáng, mỏ vàng và ba chỏm đầu. Hai avatar có silhouette tách biệt với Cinnamoroll/Hello Kitty, không chỉ đổi màu của cùng mô hình. Ảnh capture chạy song song đôi khi chụp trước timeout khởi động demo; vì vậy bằng chứng này dùng lượt browser đơn lẻ đã đạt 153–169m.
+
+Hai lượt browser tiếp theo xác nhận Gudetama là dáng trứng vàng thấp, mắt/tay nhỏ và má tròn; Hello Kitty là mặt trắng, tai nhọn, nơ hồng và ria mép. Cả hai chạy qua mốc 138m, không có lỗi runtime và phân biệt được tức thì với Pompompurin/Badtz-Maru.

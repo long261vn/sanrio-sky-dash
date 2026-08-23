@@ -20,6 +20,16 @@ const GUIDE_GUST_URL = assetUrl("sky-dash-mint-gust-clean_688581d2.png");
 const GUIDE_STAR_URL = assetUrl("hana-star-reward_f0db88ad.png");
 const PLAYER_ID_KEY = "hanaSkyDashPlayerId";
 const PLAYER_NAME_KEY = "hanaSkyDashPlayerName";
+const MUSIC_KEY = "hanaSkyDashMusicEnabled";
+const EFFECTS_KEY = "hanaSkyDashEffectsEnabled";
+
+function preferenceEnabled(key: string) {
+  try {
+    return window.localStorage.getItem(key) !== "false";
+  } catch {
+    return true;
+  }
+}
 
 type CompletedRun = GameSnapshot & { runId: number };
 
@@ -43,8 +53,8 @@ const initialSnapshot: GameSnapshot = {
   missionProgress: 0,
   message: "Chọn một người bạn để bắt đầu đường chạy mây.",
   isNewRecord: false,
-  musicEnabled: true,
-  effectsEnabled: true,
+  musicEnabled: preferenceEnabled(MUSIC_KEY),
+  effectsEnabled: preferenceEnabled(EFFECTS_KEY),
   difficultyLevel: 1,
   speed: 10,
   actionHint: null,
@@ -138,6 +148,15 @@ export default function SkyDashHud() {
     };
     window.addEventListener("skydash:state", onState);
     return () => window.removeEventListener("skydash:state", onState);
+  }, []);
+
+  useEffect(() => {
+    const onAudioState = (event: Event) => {
+      const next = (event as CustomEvent<{ musicEnabled: boolean; effectsEnabled: boolean; message?: string }>).detail;
+      setSnapshot((current) => ({ ...current, musicEnabled: next.musicEnabled, effectsEnabled: next.effectsEnabled, message: next.message ?? current.message }));
+    };
+    window.addEventListener("skydash:audio-state", onAudioState);
+    return () => window.removeEventListener("skydash:audio-state", onAudioState);
   }, []);
 
   useEffect(() => {
@@ -319,7 +338,7 @@ export default function SkyDashHud() {
                 <div className="brand-lockup"><img src={LOGO_URL} alt="Biểu tượng ngôi sao điều ước" /><span>CHẠY ĐUA CÙNG HANA</span></div>
                 <div className="landing-utilities"><button className="guide-button" onClick={() => { setTutorialStep(0); setTutorialOpen(true); }}><CircleHelp size={17} /> Hướng dẫn chơi</button><button className="menu-sound-toggle" onClick={() => send({ type: "setMusic", enabled: !snapshot.musicEnabled })} aria-pressed={snapshot.musicEnabled} aria-label={snapshot.musicEnabled ? "Tắt nhạc nền" : "Bật nhạc nền"}>{snapshot.musicEnabled ? <Music2 size={18} /> : <VolumeX size={18} />}<span>Nhạc: {snapshot.musicEnabled ? "Bật" : "Tắt"}</span></button><button className="menu-sound-toggle effects-toggle" onClick={() => send({ type: "setEffects", enabled: !snapshot.effectsEnabled })} aria-pressed={snapshot.effectsEnabled} aria-label={snapshot.effectsEnabled ? "Tắt hiệu ứng âm thanh" : "Bật hiệu ứng âm thanh"}>{snapshot.effectsEnabled ? <Sparkles size={17} /> : <VolumeX size={17} />}<span>Hiệu ứng: {snapshot.effectsEnabled ? "Bật" : "Tắt"}</span></button></div>
               </header>
-              <div className="landing-copy"><p className="eyebrow">ENDLESS RUNNER · CLOUD COLLECTION</p><h1>Bay xa hơn<br />cùng Hana.</h1><p>Một đường chạy mây nhỏ xinh, nơi phản xạ đúng quan trọng hơn tốc độ vội vàng. Nhảy, trượt và đổi làn để tiến vào Top 20 tuần.</p><div className="record-actions"><div className="sky-record-card"><div><span>KỶ LỤC BẦU TRỜI</span><strong>{skyRecord.toLocaleString("vi-VN")}</strong><small>{leaderboardRows.length ? "Điểm dẫn đầu Top 20 tuần" : "Đang chờ chuyến bay đầu tiên"}</small></div><Trophy size={31} /></div><button className="leaderboard-button record-top20" aria-label="Xem Top 20" onClick={openLeaderboard}><Trophy size={16} /> Xem<br />Top 20</button></div><div className="landing-actions"><button className="play-button" onClick={() => { setNameError(""); setMenuStep("setup"); }}><Play size={20} fill="currentColor" /> Bắt đầu hành trình</button></div></div>
+              <div className="landing-copy"><p className="eyebrow">ENDLESS RUNNER · CLOUD COLLECTION</p><h1>Bay xa hơn<br />cùng Hana.</h1><p>Một đường chạy mây nhỏ xinh, nơi phản xạ đúng quan trọng hơn tốc độ vội vàng. Nhảy, trượt và đổi làn để tiến vào Top 20 tuần.</p><div className="record-actions"><div className="sky-record-card"><div><span>KỶ LỤC BẦU TRỜI</span><strong>{skyRecord.toLocaleString("vi-VN")}</strong><small>{leaderboardRows.length ? "Điểm dẫn đầu Top 20 tuần" : "Đang chờ chuyến bay đầu tiên"}</small></div><Trophy size={31} /></div><button className="leaderboard-button record-top20" aria-label="Xem Top 20" onClick={openLeaderboard}><Trophy size={16} /> Xem<br />Top 20</button></div><div className="landing-actions"><button className="play-button" onClick={() => { window.dispatchEvent(new Event("skydash:menu-interact")); setNameError(""); setMenuStep("setup"); }}><Play size={20} fill="currentColor" /> Bắt đầu hành trình</button></div></div>
               <div className="landing-art-wrap"><img className="menu-art" src={TARGET_URL} alt="Minh hoạ đường chạy trên mây" /><div className="art-sticker">Vật thấp: nhảy<br />Cổng cao: trượt</div></div>
             </> : <>
               <header className="setup-header"><button className="quiet-button setup-back" onClick={() => setMenuStep("welcome")}><ChevronLeft size={18} /> Quay lại</button><div className="brand-lockup"><img src={LOGO_URL} alt="" /><span>THIẾT LẬP CHUYẾN BAY</span></div><button className="guide-button" onClick={() => { setTutorialStep(0); setTutorialOpen(true); }}><CircleHelp size={17} /> Hướng dẫn</button></header>

@@ -153,3 +153,12 @@ button { font: inherit; } button:not(:disabled) { cursor: pointer; } button:focu
 .sound-button.effects-control, .menu-sound-toggle.effects-toggle { color: #246f67; background: #eafff8; }.pause-button, .sound-button { min-width: 40px; min-height: 40px; }.menu-sound-toggle { min-height: 40px; }.game-actions { gap: 6px; }
 @media (max-width: 560px) { .landing-utilities { gap: 5px; }.landing-utilities .menu-sound-toggle { min-width: 40px; min-height: 40px; padding: 7px; }.game-actions { gap: 4px; }.pause-button, .sound-button { min-width: 36px; min-height: 36px; }.runner-perks span { font-size: 10px; }.setup-main .character-card { font-size: 10px; }.lesson { font-size: 11px; }.result-stats span { font-size: 9px; } }
 @media (max-width: 390px) and (max-height: 800px) { .setup-selected .runner-perks span { font-size: 8.5px; }.setup-main .character-card { min-height: 44px; font-size: 10px; }.setup-actions .play-button, .setup-actions .practice-button { min-height: 40px; } }
+
+/* Card mascot: tên/miêu tả và chỉ số luôn ở hai hàng độc lập, không tranh chiều ngang với ảnh. */
+.setup-selected { display: grid; grid-template-columns: 54px minmax(0, 1fr); align-items: center; gap: 8px 11px; }
+.setup-selected .selected-runner-portrait { grid-row: 1; width: 54px; height: 54px; }
+.setup-selected > div:nth-child(2) { grid-column: 2; min-width: 0; }
+.setup-selected > div:nth-child(2) h2 { overflow-wrap: anywhere; }
+.setup-selected .runner-perks { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; margin: 0; gap: 6px; }
+.setup-selected .runner-perks span { min-width: 0; padding: 5px 6px; overflow: hidden; border-radius: 999px; text-overflow: ellipsis; white-space: nowrap; font-size: 9px; text-align: center; }
+@media (max-width: 560px) { .setup-selected { grid-template-columns: 44px minmax(0, 1fr); gap: 7px 8px; }.setup-selected .selected-runner-portrait { width: 44px; height: 44px; }.setup-selected .runner-perks { gap: 4px; }.setup-selected .runner-perks span { padding: 5px 3px; font-size: 8px; } }

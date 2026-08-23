@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react";
 import type { Engine } from "@babylonjs/core/Engines/engine";
 import type { GameHandle } from "@/game/scene";
 import type { GameCommand } from "@/game/types";
+import { AudioManager } from "@/game/AudioManager";
 import SkyDashHud from "@/components/SkyDashHud";
 import { assetUrl } from "@/lib/assets";
 
@@ -28,6 +29,10 @@ export default function GameCanvas() {
     let disposed = false;
     let ready = false;
     const queuedCommands: GameCommand[] = [];
+    const menuAudio = new AudioManager();
+    const emitMenuAudioState = (message?: string) => {
+      window.dispatchEvent(new CustomEvent("skydash:audio-state", { detail: { musicEnabled: menuAudio.musicEnabled, effectsEnabled: menuAudio.effectsEnabled, message } }));
+    };
 
     const boot = async () => {
       if (startedRef.current || disposed) return;
@@ -38,7 +43,7 @@ export default function GameCanvas() {
       ]);
       if (disposed) return;
       engine = new BabylonEngine(canvas, true, { alpha: true, preserveDrawingBuffer: true, stencil: true, adaptToDeviceRatio: true });
-      const nextHandle = await createGameScene(engine, canvas);
+      const nextHandle = await createGameScene(engine, canvas, menuAudio);
       if (disposed) { nextHandle.dispose(); return; }
       handle = nextHandle;
       ready = true;
@@ -48,11 +53,34 @@ export default function GameCanvas() {
 
     const onPrepare = () => { void boot(); };
     const onCommand = (event: Event) => {
-      if (!ready && startedRef.current) queuedCommands.push((event as CustomEvent<GameCommand>).detail);
+      const command = (event as CustomEvent<GameCommand>).detail;
+      if (!ready) {
+        if (command.type === "setMusic") {
+          void menuAudio.setMusicEnabled(command.enabled, true).then((started) => emitMenuAudioState(command.enabled && !started ? "Chạm Nhạc để thử lại." : command.enabled ? "Nhạc nền đã bật." : "Nhạc nền đã tắt."));
+          return;
+        }
+        if (command.type === "setEffects") {
+          menuAudio.setEffectsEnabled(command.enabled);
+          if (command.enabled) menuAudio.play("button");
+          emitMenuAudioState(command.enabled ? "Hiệu ứng đã bật." : "Hiệu ứng đã tắt.");
+          return;
+        }
+        if (["select", "start", "practice", "menu"].includes(command.type)) {
+          menuAudio.play("button");
+          void menuAudio.startMusic();
+        }
+        if (startedRef.current) queuedCommands.push(command);
+      }
+    };
+    const onMenuInteract = () => {
+      menuAudio.play("button");
+      void menuAudio.startMusic();
+      emitMenuAudioState();
     };
     const onResize = () => engine?.resize();
     window.addEventListener("skydash:prepare", onPrepare);
     window.addEventListener("skydash:command", onCommand as EventListener);
+    window.addEventListener("skydash:menu-interact", onMenuInteract);
     window.addEventListener("resize", onResize);
     if (isDemoMode()) void boot();
 
@@ -60,9 +88,11 @@ export default function GameCanvas() {
       disposed = true;
       window.removeEventListener("skydash:prepare", onPrepare);
       window.removeEventListener("skydash:command", onCommand as EventListener);
+      window.removeEventListener("skydash:menu-interact", onMenuInteract);
       window.removeEventListener("resize", onResize);
       handle?.dispose();
       engine?.dispose();
+      menuAudio.dispose();
       startedRef.current = false;
     };
   }, []);

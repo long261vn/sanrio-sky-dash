@@ -82,6 +82,28 @@ describe("SkyDashHud run flow", () => {
     window.removeEventListener("skydash:command", commandListener);
   });
 
+  it("mirrors menu audio state before Babylon is ready", () => {
+    render(<SkyDashHud />);
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent("skydash:audio-state", { detail: { musicEnabled: false, effectsEnabled: false, message: "Nhạc nền đã tắt." } }));
+    });
+
+    expect(screen.getByRole("button", { name: "Bật nhạc nền" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Bật hiệu ứng âm thanh" })).toBeTruthy();
+  });
+
+  it("signals a genuine menu interaction before opening character setup", () => {
+    const menuAudioListener = vi.fn();
+    window.addEventListener("skydash:menu-interact", menuAudioListener);
+    render(<SkyDashHud />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Bắt đầu hành trình" }));
+
+    expect(menuAudioListener).toHaveBeenCalledOnce();
+    window.removeEventListener("skydash:menu-interact", menuAudioListener);
+  });
+
   it("requires a name and an explicit character choice before sending Start", () => {
     const commandListener = vi.fn();
     const prepareListener = vi.fn();
@@ -92,6 +114,7 @@ describe("SkyDashHud run flow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Bắt đầu hành trình" }));
     const runButton = screen.getByRole("button", { name: "Chạy cùng Cinnamoroll" });
     expect((runButton as HTMLButtonElement).disabled).toBe(true);
+    expect(document.querySelectorAll(".setup-selected .runner-perks span")).toHaveLength(3);
 
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "Mây Nhỏ" } });
     const cinnamorollCard = screen.getAllByRole("button").find((button) => button.classList.contains("character-card") && button.textContent?.includes("Cinnamoroll"));

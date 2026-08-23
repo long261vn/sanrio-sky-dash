@@ -8,6 +8,7 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { UniversalCamera } from "@babylonjs/core/Cameras/universalCamera";
 import { GlowLayer } from "@babylonjs/core/Layers/glowLayer";
 import { GameWorld } from "@/game/GameWorld";
+import { AudioManager } from "@/game/AudioManager";
 import "@babylonjs/core/Shaders/default.vertex";
 import "@babylonjs/core/Shaders/default.fragment";
 
@@ -16,7 +17,7 @@ export type GameHandle = {
   dispose: () => void;
 };
 
-export async function createGameScene(engine: Engine, canvas: HTMLCanvasElement): Promise<GameHandle> {
+export async function createGameScene(engine: Engine, canvas: HTMLCanvasElement, audio?: AudioManager): Promise<GameHandle> {
   const scene = new Scene(engine);
   scene.clearColor = new Color4(0, 0, 0, 0);
 
@@ -40,7 +41,7 @@ export async function createGameScene(engine: Engine, canvas: HTMLCanvasElement)
   const glow = new GlowLayer("softStarGlow", scene, { mainTextureFixedSize: 512, blurKernelSize: 36 });
   glow.intensity = 0.28;
 
-  const world = new GameWorld(scene, canvas);
+  const world = new GameWorld(scene, canvas, audio);
   const updateObserver = scene.onBeforeRenderObservable.add(() => {
     world.update(scene.getEngine().getDeltaTime() / 1000);
   });
