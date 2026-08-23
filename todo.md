@@ -189,3 +189,9 @@
 - [x] Thêm nút tải thẻ thành tích và ưu tiên gửi file ảnh qua Web Share API khi thiết bị hỗ trợ.
 - [x] Thêm âm thanh riêng khi vượt thành công đệm thấp hoặc cổng mây cao, không trùng âm thanh va chạm/vật phẩm.
 - [x] Kiểm thử xuất/tải thẻ, nội dung ảnh, chia sẻ file, âm thanh clear và bố cục màn kết quả desktop/mobile.
+
+- [x] Tối ưu toàn bộ menu, setup, hướng dẫn và kết quả cho Galaxy S22 360×780, không cắt thông tin hoặc CTA.
+- [x] Tăng tốc sớm hơn và giảm nhịp spawn theo cấp để lượt chơi năng động hơn, vẫn giữ làn an toàn và cảnh báo phản xạ.
+- [x] Bỏ câu giải thích Top 20 dư thừa ở landing, giữ nội dung ngắn gọn và hữu ích.
+- [x] Nâng tạo hình 8 nhân vật mascot theo phong cách kawaii chi tiết hơn, giữ tên và nhận diện riêng từng nhân vật.
+- [x] Kiểm thử Galaxy S22, độ khó mới, lựa chọn nhân vật và build production trước phát hành.

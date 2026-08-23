@@ -248,7 +248,7 @@ export class GameWorld {
     this.landingTimer = 0;
     this.slideTimer = 0;
     this.shieldTimer = 0;
-    this.spawnTimer = 0.55;
+    this.spawnTimer = 0.42;
     this.missionAnnounced = false;
     this.newRecord = false;
     this.lastDifficultyLevel = this.getDifficulty().level;
@@ -494,8 +494,8 @@ export class GameWorld {
   }
 
   private getDifficulty() {
-    const level = Math.min(6, 1 + Math.floor(this.distance / 110));
-    const speed = Math.min(21, 8.4 + (level - 1) * 1.7 + this.distance / 430);
+    const level = Math.min(7, 1 + Math.floor(this.distance / 85));
+    const speed = Math.min(24, 10 + (level - 1) * 1.85 + this.distance / 390);
     return { level, speed };
   }
 
@@ -508,23 +508,23 @@ export class GameWorld {
     const openHazardLanes = [0, 1, 2].filter((lane) => hasSafeLaneSpacing(currentHazards, [lane], spawnZ));
     const lane = Math.floor(this.random() * 3);
 
-    if (roll < 0.62 && openHazardLanes.length > 0) {
+    if (roll < 0.68 && openHazardLanes.length > 0) {
       const safeLane = Math.floor(this.random() * 3);
       const occupiedLanes = [0, 1, 2].filter((candidate) => candidate !== safeLane);
       const actionKind: EntityKind = this.random() < 0.56 ? "lowHurdle" : "cloudGate";
-      const canCreateDouble = level >= 3
-        && this.random() < 0.14 + level * 0.055
+      const canCreateDouble = level >= 2
+        && this.random() < 0.1 + level * 0.06
         && hasSafeLaneSpacing(currentHazards, occupiedLanes, spawnZ);
       const hazardLanes = canCreateDouble ? occupiedLanes : [openHazardLanes[Math.floor(this.random() * openHazardLanes.length)]];
       hazardLanes.forEach((hazardLane) => this.spawnEntity(actionKind, hazardLane, spawnZ));
       return;
     }
-    if (roll < 0.82 && openHazardLanes.length > 0) {
+    if (roll < 0.86 && openHazardLanes.length > 0) {
       const actionKind: EntityKind = this.random() < 0.5 ? "lowHurdle" : "cloudGate";
       this.spawnEntity(actionKind, openHazardLanes[Math.floor(this.random() * openHazardLanes.length)], spawnZ);
       return;
     }
-    if (roll < 0.95) {
+    if (roll < 0.97) {
       this.spawnEntity("star", lane, spawnZ + 3);
       if (level >= 2 && this.random() < 0.44) this.spawnEntity("star", (lane + 1) % 3, spawnZ + 9);
       return;

@@ -105,13 +105,15 @@ describe("GameWorld keyboard input", () => {
     const getDifficulty = () => (world as unknown as { getDifficulty: () => { level: number; speed: number } }).getDifficulty();
 
     world.distance = 0;
-    expect(getDifficulty()).toEqual({ level: 1, speed: 8.4 });
-    world.distance = 110;
+    expect(getDifficulty()).toEqual({ level: 1, speed: 10 });
+    world.distance = 85;
     expect(getDifficulty().level).toBe(2);
-    expect(getDifficulty().speed).toBeGreaterThan(8.4);
+    expect(getDifficulty().speed).toBeGreaterThan(10);
     world.distance = 550;
-    expect(getDifficulty().level).toBe(6);
-    expect(getDifficulty().speed).toBeLessThanOrEqual(21);
+    expect(getDifficulty().level).toBe(7);
+    expect(getDifficulty().speed).toBeGreaterThan(22);
+    world.distance = 99_999;
+    expect(getDifficulty().speed).toBe(24);
   });
 
   it("keeps a safe lane in dense hazard beats and reintroduces star coins", () => {

@@ -11,11 +11,11 @@ describe("spawn công bằng", () => {
 
   it("giữ cảnh báo đủ sớm và tăng nhịp spawn nhưng không tụt dưới sàn an toàn", () => {
     expect(getWarningZ(8)).toBe(SPAWN_RULES.minWarningZ);
-    expect(getWarningZ(10)).toBe(21);
-    expect(getWarningZ(25)).toBeCloseTo(52.5);
+    expect(getWarningZ(10)).toBe(20.5);
+    expect(getWarningZ(25)).toBeCloseTo(51.25);
     expect(getNextSpawnDelay(6, 10_000, 0)).toBe(SPAWN_RULES.minSpawnDelay);
     expect(getNextSpawnDelay(1, 0, 0)).toBeGreaterThan(getNextSpawnDelay(5, 300, 0));
-    expect(getNextSpawnDelay(1, 0, 0)).toBeCloseTo(1.59);
+    expect(getNextSpawnDelay(1, 0, 0)).toBeCloseTo(1.31);
   });
 
   it("cho phép nhịp liên tiếp ở các làn khác nhưng không ép cùng làn quá sát", () => {

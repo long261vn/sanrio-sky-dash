@@ -240,3 +240,7 @@ Toàn bộ suite hiện có **37 test** đạt, TypeScript và build production 
 | Bố cục kết quả | Ảnh QA `?result=1` trên desktop 1280×720 và mobile 390×844 xác nhận Tải thẻ PNG, Chia sẻ thẻ, Chia sẻ kết quả và quay lại nằm gọn; mobile xếp chúng thành một cột. | Đạt. |
 
 Toàn bộ suite hiện có **39 test** đạt, TypeScript và build production đạt.
+
+### Xác minh Galaxy S22 và mascot v3 — 23/08/2026
+
+Ảnh preview 360×780 cho thấy landing, setup và màn kết quả mới đều vừa viewport: CTA, tên, chọn nhân vật và hành động kết quả nằm trọn trong panel. Đã xác minh đủ tám chân dung mascot 3D mới của Cinnamoroll, Pompompurin, My Melody, Kuromi, Badtz-Maru, Keroppi, Gudetama và Hello Kitty hiển thị rõ trong lưới hai cột, không che tên hoặc điều kiện bắt đầu.

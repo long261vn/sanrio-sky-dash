@@ -19,6 +19,7 @@
 | `hana-runner-v2` | Mascot Hana mới, minh hoạ chạy 3/4 với cape coral và sneaker mint. | 128×158px trong gameplay | `/manus-storage/hana-runner-mascot-v2_672361c8.png` |
 | `hana-signals-v2` | Hệ quy chiếu nhìn nhanh: phần thưởng mint/gold và cảnh báo berry/navy. | 96px mỗi đối tượng | `/manus-storage/hana-gameplay-signals-v2_02663f2c.png` |
 | `hana-tutorial-v2` | Hình minh hoạ đổi làn, nhảy và trượt trong onboarding. | 16:9, tutorial panel | `/manus-storage/hana-tutorial-card-v2_79a9bc21.png` |
+| `runner-portraits-v3` | Tám chân dung mascot 3D mềm, nền trong suốt; dùng trực tiếp trong lựa chọn nhân vật mobile/desktop. | 1:1, đọc rõ ở 28–45px | `/manus-storage/sky-dash-cinnamoroll-portrait_2d1461bb.png`, `/manus-storage/sky-dash-pompompurin-portrait-v2_d18be9f4.png`, `/manus-storage/sky-dash-mymelody-portrait-v2_b559f59d.png`, `/manus-storage/sky-dash-kuromi-portrait-v2_7d3f96a4.png`, `/manus-storage/sky-dash-badtzmaru-portrait-v2_c495f683.png`, `/manus-storage/sky-dash-keroppi-portrait-v2_f7ca91aa.png`, `/manus-storage/sky-dash-gudetama-portrait-v2_be6dabcb.png`, `/manus-storage/sky-dash-hellokitty-portrait-v2_f9685a82.png` |
 
 ## Runtime assignment
 
@@ -26,6 +27,7 @@
 - `visual-target` → artwork menu, nguồn QA bố cục cho `?demo`.
 - `wish-star-logo` → dấu nhận diện lớn trong menu và favicon.
 - `character-pack` / `obstacle-pack` → bộ tham chiếu trực quan cho mascot và props procedural trong `GameWorld`.
+- `runner-portraits-v3` → chân dung tải nhanh trong lưới chọn nhân vật; cùng palette đồ chơi mềm với gameplay.
 
 ## Audio
 
