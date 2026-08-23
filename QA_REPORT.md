@@ -302,3 +302,16 @@ Factory `MascotModel` nay là nguồn dựng duy nhất cho `GameWorld` và prev
 Model chung được tăng tỷ lệ khuôn mặt, mắt/má, tay/chân, mũ/hood, hoa, mỏ, bụng, áo, đuôi, nơ và tai theo silhouette. Lượt setup local chọn Kuromi xác nhận canvas đổi ngay sang cùng model tím/hood/gai đang dùng khi chạy; các ca mobile đại diện cũng xác nhận Cinnamoroll, Pompompurin, My Melody và Hello Kitty giữ nhận diện rõ hơn trên đường mây. Preview tiếp tục gọi factory chung, nên mọi điều chỉnh model runtime tự phản ánh ở 360°.
 
 Checkpoint `9fc7aadf` được xác minh trên Manus public và GitHub Pages: canvas preview không trống, có nhãn model runtime và nút xoay; lưới 8 mascot, tên và các chip chỉ số vẫn ổn định. Tạo hình mascot chi tiết cùng preview đồng bộ đạt phát hành.
+
+### Đặc tả nhận dạng mascot và factory runtime — 23/08/2026
+
+Nguồn hồ sơ Sanrio SEA đã được đối chiếu để tạo tài liệu `MASCOT_REFERENCE_SPEC.md`. Bảng đặc tả khóa các dấu hiệu nhìn xa cho tám mascot: Cinnamoroll trắng/tai dài–đuôi cuộn; Pompompurin vàng/beret–tai cụp nâu; My Melody hood hồng–tai rủ–hoa; Kuromi jester đen/skull–đuôi quỷ; Badtz-Maru cánh cụt đen/mào gai–bụng trắng; Keroppi mắt nhô lớn/cổ áo hồng; Gudetama lòng đỏ nằm trên lòng trắng; và Hello Kitty tai mèo–nơ trái/mũi vàng/sáu ria. [Nguồn: Sanrio SEA Characters](https://sanrio-sea.com/characters/)
+
+Factory `MascotModel` đã được dựng lại theo bảng này. Lớp rim/hood được đưa về sau mặt để không che gương mặt ở camera gameplay, và Cinnamoroll dùng rim xanh rất nhạt để giữ nhận diện thân trắng. Preview 360° tiếp tục gọi cùng `createMascotModel`, nên không tồn tại model preview thay thế.
+
+| Kiểm tra | Bằng chứng | Kết quả |
+| --- | --- | --- |
+| Silhouette có contract | Test mới dùng Babylon `NullEngine` kiểm tra mesh nhận dạng cho cả 8 mascot và contract `root`/`visual`/`shieldRing`. | Đạt, 9 test mới. |
+| Preview setup | Canvas cùng factory được chọn lần lượt cho 8 nhân vật; Cinnamoroll, My Melody, Kuromi, Keroppi, Gudetama và Hello Kitty đều có dấu hiệu đặc trưng đọc được trong khung. | Đạt cục bộ. |
+| Gameplay runtime | Demo browser riêng xác nhận Cinnamoroll, Keroppi, Badtz-Maru và Gudetama giữ đúng mesh nhận dạng khi chạy. | Đạt cục bộ. |
+| Regression/build | `pnpm test` 53/53, `pnpm check` và `pnpm build` cùng đạt; cảnh báo chunk Babylon 1,77MB là cảnh báo kích thước đã biết do engine được lazy-load. | Đạt. |

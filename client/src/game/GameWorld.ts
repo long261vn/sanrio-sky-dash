@@ -365,11 +365,11 @@ export class GameWorld {
       visual.scaling.x = isSliding ? 1.12 : isAirborne ? (this.playerYVelocity > 0 ? 0.93 : 1.05) : 1 + landingPulse * 0.11;
       visual.scaling.y = isSliding ? 0.65 : isAirborne ? (this.playerYVelocity > 0 ? 1.08 : 0.97) : 1 - landingPulse * 0.13 + runWave * 0.012;
       visual.scaling.z = 1;
-      const body = visual.getChildMeshes().find((mesh) => mesh.name === "avatarBody");
+      const body = visual.getChildMeshes().find((mesh) => mesh.name === "avatarBody" || mesh.name.endsWith("-avatarBody"));
       if (body) body.position.y = isSliding ? 0.53 : 0.72;
       const ears = visual.getChildMeshes().filter((mesh) => mesh.name.startsWith("avatarEar") || mesh.name.startsWith("kittyEar"));
       ears.forEach((ear, index) => { ear.rotation.z = (index % 2 === 0 ? -1 : 1) * (0.08 + runWave * 0.1 + (isAirborne ? 0.15 : 0)); });
-      const badge = visual.getChildMeshes().find((mesh) => mesh.name === "runnerBadge");
+      const badge = visual.getChildMeshes().find((mesh) => mesh.name === "runnerBadge" || mesh.name.endsWith("-runnerBadge"));
       if (badge) {
         badge.position.y = isSliding ? 0.66 : 0.96;
         badge.rotation.z = isSliding ? -0.18 : runWave * 0.25;
