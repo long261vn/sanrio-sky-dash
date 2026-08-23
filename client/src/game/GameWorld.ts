@@ -8,6 +8,7 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { GameCommand, GameSnapshot, GameStatus, CharacterId, CHARACTERS } from "@/game/types";
 import { AudioManager } from "@/game/AudioManager";
+import { createMascotModel } from "@/game/MascotModel";
 import { assetUrl } from "@/lib/assets";
 import { nextComboAfterGust, nextComboAfterStar, scoreForClear, scoreForDistance, scoreForGust, scoreForStar } from "@shared/scoring";
 import { getNextSpawnDelay, getSpawnZ, getWarningZ, hasSafeLaneSpacing } from "@shared/spawnRules";
@@ -624,6 +625,13 @@ export class GameWorld {
 
   private buildPlayer() {
     this.player?.dispose(false, true);
+    const canonicalCharacter = getCharacter(this.characterId);
+    const canonical = createMascotModel(this.scene, canonicalCharacter, "runner");
+    canonical.root.position = new Vector3(LANES[this.playerLane], 0, PLAYER_Z);
+    this.player = canonical.root;
+    this.playerVisual = canonical.visual;
+    return;
+
     const character = getCharacter(this.characterId);
     const body = this.material(`body-${character.id}`, character.body, 0.06);
     const accent = this.material(`accent-${character.id}`, character.accent, 0.18);

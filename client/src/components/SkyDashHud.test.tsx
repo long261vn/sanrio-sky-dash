@@ -126,7 +126,7 @@ describe("SkyDashHud run flow", () => {
     const runButton = screen.getByRole("button", { name: "Chạy cùng Cinnamoroll" });
     expect((runButton as HTMLButtonElement).disabled).toBe(true);
     expect(document.querySelectorAll(".setup-selected .runner-perks span")).toHaveLength(3);
-    expect(screen.getByRole("img", { name: "Mô hình xoay 3D Cinnamoroll. Kéo để xoay." })).toBeTruthy();
+    expect(screen.getByRole("img", { name: "Mô hình 3D Cinnamoroll đang dùng khi chạy. Kéo để xoay." })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Xoay Cinnamoroll thêm 90 độ" })).toBeTruthy();
 
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "Mây Nhỏ" } });

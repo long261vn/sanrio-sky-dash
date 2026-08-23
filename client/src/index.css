@@ -167,6 +167,7 @@ button { font: inherit; } button:not(:disabled) { cursor: pointer; } button:focu
 .mascot-preview.selected-runner-portrait { position: relative; width: 110px; height: 110px; overflow: hidden; border: 1px solid rgba(89, 181, 209, .45); border-radius: 22px; background: radial-gradient(circle at 50% 35%, #ffffff 0 18%, #e7f8ff 56%, #bfeefa 100%); box-shadow: inset 0 1px 0 #fff, 0 7px 16px rgba(65, 138, 171, .16); cursor: grab; }
 .mascot-preview.selected-runner-portrait:active { cursor: grabbing; }
 .mascot-preview-stage { display: grid; width: 100%; height: 100%; place-items: center; perspective: 520px; touch-action: none; }
+.mascot-preview-canvas { display: block; width: 100%; height: 100%; touch-action: none; }
 .preview-mascot-model { position: relative; width: 62px; height: 73px; transform: rotateX(-7deg) rotateY(var(--turn)); transform-style: preserve-3d; transition: transform 160ms cubic-bezier(.23,1,.32,1); }
 .preview-face { position: absolute; inset: 0; display: grid; overflow: hidden; place-items: center; border: 3px solid var(--accent); border-radius: 22px 22px 28px 28px; background: var(--character); box-shadow: inset 0 0 0 2px rgba(255,255,255,.68); backface-visibility: hidden; }
 .preview-face--front { transform: translateZ(18px); }

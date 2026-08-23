@@ -223,3 +223,6 @@
 - [x] Thêm preview mascot 3D xoay 360° trong bước chọn nhân vật, có tự xoay nhẹ và thao tác kéo/chạm.
 - [x] Làm rõ trạng thái autoplay bị chặn và bảo đảm nhạc menu bắt đầu lại từ lần chạm hợp lệ tiếp theo khi đã bật nhạc.
 - [x] Bổ sung regression cho preview 360° và retry audio, kiểm thử 360×780/412×915 cùng hai bản public.
+- [x] Tách factory mascot 3D duy nhất để gameplay và preview 360° dùng đúng cùng mesh, màu và phụ kiện.
+- [x] Thay preview CSS hiện tại bằng model runtime thật có xoay 360°/kéo chạm, không còn dùng minh hoạ chân dung thay thế.
+- [ ] Kiểm thử đối chiếu từng silhouette mascot, mobile và hai bản public rồi phát hành.

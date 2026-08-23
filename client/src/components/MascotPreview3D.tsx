@@ -1,56 +1,60 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { Scene } from "@babylonjs/core/scene";
+import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
+import { Color4 } from "@babylonjs/core/Maths/math.color";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import "@babylonjs/core/Materials/standardMaterial";
 import type { CharacterDefinition } from "@/game/types";
-import { assetUrl } from "@/lib/assets";
+import { createMascotModel } from "@/game/MascotModel";
 
-function previewPortrait(character: CharacterDefinition) {
-  return assetUrl(character.portrait.split("/").pop() ?? character.portrait);
-}
+type PreviewHandle = { rotateBy: (radians: number) => void; pauseAutoSpin: () => void };
 
+/** Uses the same MascotModel factory as GameWorld. No portrait/card substitute is allowed here. */
 export function MascotPreview3D({ character, className = "" }: { character: CharacterDefinition; className?: string }) {
-  const [turn, setTurn] = useState(0);
-  const dragging = useRef(false);
-  const lastX = useRef(0);
-  const cooldown = useRef(0);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const handleRef = useRef<PreviewHandle | null>(null);
+  const pointerX = useRef<number | null>(null);
 
   useEffect(() => {
-    setTurn(0);
-    const timer = window.setInterval(() => {
-      if (!dragging.current && performance.now() > cooldown.current) setTurn((value) => value + 0.8);
-    }, 48);
-    return () => window.clearInterval(timer);
+    const canvas = canvasRef.current;
+    if (!canvas || typeof WebGLRenderingContext === "undefined") return;
+    const engine = new Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true });
+    const scene = new Scene(engine);
+    scene.clearColor = new Color4(0, 0, 0, 0);
+    const camera = new ArcRotateCamera("mascotPreviewCamera", -Math.PI / 2, 1.18, 4.05, new Vector3(0, 1.15, 0), scene);
+    camera.inputs.clear();
+    const light = new HemisphericLight("mascotPreviewLight", new Vector3(-0.35, 1, -0.7), scene);
+    light.intensity = 1.3;
+    const model = createMascotModel(scene, character, "previewRunner");
+    model.root.scaling = new Vector3(1.1, 1.1, 1.1);
+    model.root.rotation.y = -0.35;
+    let autoResumeAt = performance.now() + 300;
+    handleRef.current = {
+      rotateBy: (radians) => { model.root.rotation.y += radians; autoResumeAt = performance.now() + 1100; },
+      pauseAutoSpin: () => { autoResumeAt = performance.now() + 1100; },
+    };
+    const onResize = () => engine.resize();
+    window.addEventListener("resize", onResize);
+    engine.runRenderLoop(() => {
+      if (performance.now() > autoResumeAt) model.root.rotation.y += 0.012;
+      scene.render();
+    });
+    return () => {
+      window.removeEventListener("resize", onResize);
+      handleRef.current = null;
+      scene.dispose();
+      engine.dispose();
+    };
   }, [character.id]);
 
-  const startDrag = (clientX: number) => {
-    dragging.current = true;
-    lastX.current = clientX;
-    cooldown.current = performance.now() + 1100;
-  };
-  const moveDrag = (clientX: number) => {
-    if (!dragging.current) return;
-    const delta = clientX - lastX.current;
-    setTurn((value) => value + delta * 0.72);
-    lastX.current = clientX;
-    cooldown.current = performance.now() + 1100;
-  };
-  const endDrag = () => { dragging.current = false; cooldown.current = performance.now() + 800; };
-  const style = { "--turn": `${turn}deg`, "--character": character.body, "--accent": character.accent, "--soft": character.accentSoft } as React.CSSProperties;
-
-  return <div className={`mascot-preview ${className}`} style={style} aria-label={`Xem trước 3D ${character.name}`}>
-    <div className="mascot-preview-stage" role="img" aria-label={`Mô hình xoay 3D ${character.name}. Kéo để xoay.`}
-      onPointerDown={(event) => { startDrag(event.clientX); event.currentTarget.setPointerCapture(event.pointerId); }}
-      onPointerMove={(event) => moveDrag(event.clientX)}
-      onPointerUp={(event) => { endDrag(); event.currentTarget.releasePointerCapture(event.pointerId); }}
-      onPointerCancel={endDrag}>
-      <div className={`preview-mascot-model silhouette-${character.silhouette}`}>
-        <i className="preview-ear preview-ear--left" aria-hidden="true" />
-        <i className="preview-ear preview-ear--right" aria-hidden="true" />
-        <i className="preview-topper" aria-hidden="true" />
-        <div className="preview-face preview-face--front"><img src={previewPortrait(character)} alt="" /></div>
-        <div className="preview-face preview-face--back" aria-hidden="true"><b>{character.icon}</b><span>{character.name}</span></div>
-        <i className="preview-side preview-side--left" aria-hidden="true" />
-        <i className="preview-side preview-side--right" aria-hidden="true" />
-      </div>
-    </div>
-    <button type="button" className="preview-spin-button" onClick={() => { setTurn((value) => value + 90); cooldown.current = performance.now() + 900; }} aria-label={`Xoay ${character.name} thêm 90 độ`}><span aria-hidden="true">↻</span> Kéo để xoay 360°</button>
+  return <div className={`mascot-preview ${className}`} aria-label={`Xem trước 3D ${character.name}`}>
+    <canvas ref={canvasRef} className="mascot-preview-canvas" role="img" aria-label={`Mô hình 3D ${character.name} đang dùng khi chạy. Kéo để xoay.`}
+      onPointerDown={(event) => { pointerX.current = event.clientX; event.currentTarget.setPointerCapture(event.pointerId); handleRef.current?.pauseAutoSpin(); }}
+      onPointerMove={(event) => { if (pointerX.current === null) return; handleRef.current?.rotateBy((event.clientX - pointerX.current) * 0.018); pointerX.current = event.clientX; }}
+      onPointerUp={(event) => { pointerX.current = null; event.currentTarget.releasePointerCapture(event.pointerId); }}
+      onPointerCancel={() => { pointerX.current = null; }} />
+    <button type="button" className="preview-spin-button" onClick={() => handleRef.current?.rotateBy(Math.PI / 2)} aria-label={`Xoay ${character.name} thêm 90 độ`}><span aria-hidden="true">↻</span> Xoay model đang chạy</button>
   </div>;
 }
