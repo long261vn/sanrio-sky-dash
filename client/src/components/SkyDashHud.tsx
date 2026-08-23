@@ -75,6 +75,11 @@ function getOutsideTop20Message(score: number) {
   return "Cố gắng thêm một chuyến bay; đổi làn lấy vật phẩm và vượt cổng đúng lúc sẽ giúp điểm tăng nhanh hơn.";
 }
 
+function CharacterPortrait({ character, className }: { character: (typeof CHARACTERS)[number]; className: string }) {
+  const [failed, setFailed] = useState(false);
+  return <span className={`character-portrait ${className} ${failed ? "fallback" : ""}`} style={{ "--character": character.body, "--accent": character.accent } as React.CSSProperties}><img src={character.portrait} alt="" onError={() => setFailed(true)} /><b aria-hidden="true">{character.icon}</b></span>;
+}
+
 export default function SkyDashHud() {
   const [snapshot, setSnapshot] = useState<GameSnapshot>(initialSnapshot);
   const [selectedId, setSelectedId] = useState<CharacterId>("cinnamoroll");
@@ -94,6 +99,7 @@ export default function SkyDashHud() {
   const [cardStatus, setCardStatus] = useState<"idle" | "creating" | "downloaded" | "shared" | "error">("idle");
   const snapshotRef = useRef(initialSnapshot);
   const runIdRef = useRef(0);
+  const leaderboardListRef = useRef<HTMLOListElement>(null);
   const leaderboard = trpc.leaderboard.top20.useQuery(undefined, { staleTime: 0, refetchOnWindowFocus: true });
   const leaderboardUtils = trpc.useUtils();
   const submitScore = trpc.leaderboard.submit.useMutation({
@@ -141,6 +147,14 @@ export default function SkyDashHud() {
   // A completed run has one immutable id, so the mutation is triggered exactly once per run.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [completedRun?.runId]);
+
+  useEffect(() => {
+    if (!leaderboardOpen || recentEntryId === null || !leaderboard.data?.rows.length) return;
+    const highlighted = leaderboardListRef.current?.querySelector<HTMLElement>(`[data-entry-id="${recentEntryId}"]`);
+    if (highlighted && typeof highlighted.scrollIntoView === "function") {
+      highlighted.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+    }
+  }, [leaderboard.data?.rows.length, leaderboardOpen, recentEntryId]);
 
   const selected = useMemo(() => CHARACTERS.find((item) => item.id === selectedId) ?? CHARACTERS[0], [selectedId]);
   const isRunning = snapshot.status === "playing";
@@ -278,7 +292,7 @@ export default function SkyDashHud() {
               <span className="runner-icon" style={{ "--character": selected.body, "--accent": selected.accent } as React.CSSProperties}>{selected.icon}</span>
               <span><b>{selected.name}</b><small>{selected.tagline}</small></span>
             </div>
-            <div className="game-score"><small>Điểm</small><strong>{snapshot.score.toLocaleString("vi-VN")}</strong><span>{snapshot.distance}m · Cấp {snapshot.difficultyLevel}</span></div>
+            <div className="game-score"><small>Điểm</small><strong>{snapshot.score.toLocaleString("vi-VN")}</strong><span>Quãng đường {snapshot.distance}m · Cấp {snapshot.difficultyLevel}</span></div>
             <div className="game-meta"><div className="game-progress"><span>{snapshot.isPractice ? `Luyện tập ${snapshot.practiceStep + 1}/3` : "Vượt vật cản để tăng điểm"}</span><b><Gauge size={14} /> {snapshot.isPractice ? "Đường mây an toàn" : `${snapshot.speed} km/h`}</b>{snapshot.shieldSeconds > 0 && <em><Zap size={13} /> Khiên {snapshot.shieldSeconds}s</em>}</div><div className="game-actions"><button className="sound-button" onClick={() => send({ type: "toggleAudio" })} aria-label={snapshot.audioEnabled ? "Tắt âm thanh" : "Bật âm thanh"}>{snapshot.audioEnabled ? <Volume2 size={17} /> : <VolumeX size={17} />}</button><button className="pause-button" onClick={() => send({ type: "pause" })} aria-label="Tạm dừng"><Pause size={18} /></button></div></div>
           </div>
           {snapshot.message && <div className="sky-toast">{snapshot.message}</div>}
@@ -303,7 +317,7 @@ export default function SkyDashHud() {
               <div className="landing-art-wrap"><img className="menu-art" src={TARGET_URL} alt="Minh hoạ đường chạy trên mây" /><div className="art-sticker">Vật thấp: nhảy<br />Cổng cao: trượt</div></div>
             </> : <>
               <header className="setup-header"><button className="quiet-button setup-back" onClick={() => setMenuStep("welcome")}><ChevronLeft size={18} /> Quay lại</button><div className="brand-lockup"><img src={LOGO_URL} alt="" /><span>THIẾT LẬP CHUYẾN BAY</span></div><button className="guide-button" onClick={() => { setTutorialStep(0); setTutorialOpen(true); }}><CircleHelp size={17} /> Hướng dẫn</button></header>
-              <div className="setup-main"><div className="setup-intro"><p className="eyebrow">BƯỚC 2 / 2 · THIẾT LẬP CHUYẾN BAY</p><h1>Sẵn sàng cất cánh.</h1><p>Điền tên và chạm chọn nhân vật của bạn. Hai bước này giúp chuyến bay được ghi đúng trên Top 20.</p></div><div className="setup-selected"><img className="selected-runner-portrait" src={selected.portrait} alt={`Chân dung ${selected.name}`} /><div><span>{hasChosenCharacter ? "NGƯỜI CHẠY ĐÃ CHỌN" : "HÃY CHỌN MỘT NGƯỜI CHẠY"}</span><h2>{selected.name}</h2><p>{selected.tagline}</p></div><div className="runner-perks"><span>↥ Nhảy {selected.jumpForce.toFixed(1)}</span><span>◒ Trượt {selected.slideDuration.toFixed(2)}s</span><span>◉ Khiên {selected.shieldSeconds.toFixed(1)}s</span></div></div><label className="setup-name"><span>BƯỚC 1 · TÊN NGƯỜI CHƠI <b>BẮT BUỘC</b></span><input value={playerName} onChange={(event) => { updatePlayerName(event.target.value.slice(0, 20)); setNameError(""); }} placeholder="Ví dụ: Mây Nhỏ" maxLength={20} /></label><p className="mobile-setup-tip">BƯỚC 2 · Chạm vào nhân vật bạn muốn chạy cùng.</p><div className="character-grid">{CHARACTERS.map((character) => (<button key={character.id} onClick={() => { setSelectedId(character.id); setHasChosenCharacter(true); setNameError(""); send({ type: "select", characterId: character.id }); }} className={`character-card ${selectedId === character.id ? "selected" : ""} ${hasChosenCharacter ? "chosen" : ""}`} aria-pressed={selectedId === character.id && hasChosenCharacter} style={{ "--character": character.body, "--accent": character.accent } as React.CSSProperties}><span className="portrait-disc">{character.icon}</span><span>{character.name}</span></button>))}</div>{nameError && <p className="score-error">{nameError}</p>}<div className="setup-actions"><button className="practice-button" disabled={!canLaunch} onClick={() => send({ type: "practice", characterId: selectedId })}><Play size={15} fill="currentColor" /> Luyện tập 3 bước</button><button className="play-button" disabled={!canLaunch} onClick={startRun}><Play size={20} fill="currentColor" /> Chạy cùng {selected.name}</button></div>{!canLaunch && <p className="setup-requirements">Cần: {needsLeaderboardName(playerName) ? "nhập tên (2–20 ký tự)" : "✓ tên"} · {!hasChosenCharacter ? "chạm chọn 1 nhân vật" : "✓ nhân vật"}</p>}</div>
+              <div className="setup-main"><div className="setup-intro"><p className="eyebrow">BƯỚC 2 / 2 · THIẾT LẬP CHUYẾN BAY</p><h1>Sẵn sàng cất cánh.</h1><p>Điền tên và chạm chọn nhân vật của bạn. Hai bước này giúp chuyến bay được ghi đúng trên Top 20.</p></div><div className="setup-selected"><CharacterPortrait character={selected} className="selected-runner-portrait" /><div><span>{hasChosenCharacter ? "NGƯỜI CHẠY ĐÃ CHỌN" : "HÃY CHỌN MỘT NGƯỜI CHẠY"}</span><h2>{selected.name}</h2><p>{selected.tagline}</p></div><div className="runner-perks"><span>↥ Nhảy {selected.jumpForce.toFixed(1)}</span><span>◒ Trượt {selected.slideDuration.toFixed(2)}s</span><span>◉ Khiên {selected.shieldSeconds.toFixed(1)}s</span></div></div><label className="setup-name"><span>BƯỚC 1 · TÊN NGƯỜI CHƠI <b>BẮT BUỘC</b></span><input value={playerName} onChange={(event) => { updatePlayerName(event.target.value.slice(0, 20)); setNameError(""); }} placeholder="Ví dụ: Mây Nhỏ" maxLength={20} /></label><p className="mobile-setup-tip">BƯỚC 2 · Chạm vào nhân vật bạn muốn chạy cùng.</p><div className="character-grid">{CHARACTERS.map((character) => (<button key={character.id} onClick={() => { setSelectedId(character.id); setHasChosenCharacter(true); setNameError(""); send({ type: "select", characterId: character.id }); }} className={`character-card ${selectedId === character.id ? "selected" : ""} ${hasChosenCharacter ? "chosen" : ""}`} aria-pressed={selectedId === character.id && hasChosenCharacter}><CharacterPortrait character={character} className="portrait-disc" /><span>{character.name}</span></button>))}</div>{nameError && <p className="score-error">{nameError}</p>}<div className="setup-actions"><button className="practice-button" disabled={!canLaunch} onClick={() => send({ type: "practice", characterId: selectedId })}><Play size={15} fill="currentColor" /> Luyện tập 3 bước</button><button className="play-button" disabled={!canLaunch} onClick={startRun}><Play size={20} fill="currentColor" /> Chạy cùng {selected.name}</button></div>{!canLaunch && <p className="setup-requirements">Cần: {needsLeaderboardName(playerName) ? "nhập tên (2–20 ký tự)" : "✓ tên"} · {!hasChosenCharacter ? "chạm chọn 1 nhân vật" : "✓ nhân vật"}</p>}</div>
             </>}
           </section>
         </div>
@@ -318,7 +332,13 @@ export default function SkyDashHud() {
       )}
 
       {leaderboardOpen && (
-        <div className="tutorial-scrim leaderboard-scrim"><section className="leaderboard-panel" aria-label="Bảng xếp hạng Top 20"><header><div><p><Crown size={15} /> BẦU TRỜI VINH DANH</p><h2>Top 20 tuần</h2><span>Mùa bắt đầu {leaderboard.data?.seasonKey ?? "thứ Bảy này"} · kéo để xem đủ 20 hạng.</span></div><button className="leaderboard-close" onClick={() => setLeaderboardOpen(false)} aria-label="Đóng bảng xếp hạng"><X size={20} /></button></header>{leaderboard.isLoading ? <div className="leaderboard-empty">Đang mở bảng xếp hạng...</div> : <ol className="leaderboard-list" aria-label="20 hạng của tuần">{Array.from({ length: 20 }, (_, index) => { const row = leaderboardRows[index]; const rank = index + 1; return row ? <li key={row.id} className={`${row.rank <= 3 ? `rank-${row.rank}` : ""} ${row.id === recentEntryId ? "just-ranked" : ""}`}><b>{row.rank}</b><span className="rank-runner">{CHARACTERS.find((character) => character.id === row.runnerId)?.icon ?? "☁"}</span><strong>{row.playerName}</strong><em>{row.distance}m</em><mark>{row.score.toLocaleString("vi-VN")}</mark></li> : <li className="rank-placeholder" key={`empty-rank-${rank}`}><b>{rank}</b><span className="rank-runner">☁</span><strong>Đang chờ chuyến bay</strong><em>Chưa có điểm</em><mark>—</mark></li>; })}</ol>}<footer><span>{leaderboard.isFetching ? "Đang xếp lại bảng điểm..." : recentRank ? `Chuyến bay này đang ở hạng #${recentRank}.` : "Mỗi lượt chơi vào Top 20 được lưu thành một dòng riêng, kể cả khi trùng tên."}</span><button className="play-button" onClick={returnToMenu}>Về màn hình đầu</button></footer></section></div>
+        <div className="tutorial-scrim leaderboard-scrim">
+          <section className="leaderboard-panel" aria-label="Bảng xếp hạng Top 20">
+            <header><div><p><Crown size={15} /> BẦU TRỜI VINH DANH</p><h2>Top 20 tuần</h2><span>Mùa bắt đầu {leaderboard.data?.seasonKey ?? "thứ Bảy này"} · kéo để xem đủ 20 hạng.</span></div><button className="leaderboard-close" onClick={() => setLeaderboardOpen(false)} aria-label="Đóng bảng xếp hạng"><X size={20} /></button></header>
+            {leaderboard.isLoading ? <div className="leaderboard-empty">Đang mở bảng xếp hạng...</div> : <ol ref={leaderboardListRef} className="leaderboard-list" aria-label="20 hạng của tuần">{Array.from({ length: 20 }, (_, index) => { const row = leaderboardRows[index]; const rank = index + 1; return row ? <li key={row.id} data-entry-id={row.id} className={`${row.rank <= 3 ? `rank-${row.rank}` : ""} ${row.id === recentEntryId ? "just-ranked" : ""}`}><b>{row.rank}</b><span className="rank-runner">{CHARACTERS.find((character) => character.id === row.runnerId)?.icon ?? "☁"}</span><strong>{row.playerName}</strong><em>{row.distance}m</em><mark>{row.score.toLocaleString("vi-VN")}</mark></li> : <li className="rank-placeholder" key={`empty-rank-${rank}`}><b>{rank}</b><span className="rank-runner">☁</span><strong>Đang chờ chuyến bay</strong><em>Chưa có điểm</em><mark>—</mark></li>; })}</ol>}
+            <footer><span>{leaderboard.isFetching ? "Đang xếp lại bảng điểm..." : recentRank ? `${getRankPraise(recentRank)} Dòng của bạn đang được làm nổi bật.` : "Bảng điểm sẽ chúc mừng khi chuyến bay của bạn vào Top 20."}</span><button className="play-button" onClick={returnToMenu}>Về màn hình đầu</button></footer>
+          </section>
+        </div>
       )}
 
       {tutorialOpen && snapshot.status === "menu" && (

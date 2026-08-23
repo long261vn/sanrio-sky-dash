@@ -195,3 +195,9 @@
 - [x] Bỏ câu giải thích Top 20 dư thừa ở landing, giữ nội dung ngắn gọn và hữu ích.
 - [x] Nâng tạo hình 8 nhân vật mascot theo phong cách kawaii chi tiết hơn, giữ tên và nhận diện riêng từng nhân vật.
 - [x] Kiểm thử Galaxy S22, độ khó mới, lựa chọn nhân vật và build production trước phát hành.
+
+- [x] Sửa lưới chọn nhân vật để luôn hiện nhận diện dự phòng đẹp khi chân dung ảnh chưa tải hoặc lỗi tải.
+- [x] Hiển thị đồng thời điểm và quãng đường rõ ràng, liên tục trong HUD khi người chơi đang chạy.
+- [x] Tự cuộn Top 20 tới đúng hàng điểm vừa nộp, tô nổi bật hạng đó và hiển thị lời chúc mừng theo hạng.
+- [x] Giữ lời động viên rõ ràng khi lượt chơi không lọt Top 20.
+- [x] Kiểm thử desktop/mobile cho fallback mascot, HUD điểm/quãng đường và cuộn hạng tự động Top 20.

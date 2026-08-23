@@ -244,3 +244,18 @@ Toàn bộ suite hiện có **39 test** đạt, TypeScript và build production 
 ### Xác minh Galaxy S22 và mascot v3 — 23/08/2026
 
 Ảnh preview 360×780 cho thấy landing, setup và màn kết quả mới đều vừa viewport: CTA, tên, chọn nhân vật và hành động kết quả nằm trọn trong panel. Đã xác minh đủ tám chân dung mascot 3D mới của Cinnamoroll, Pompompurin, My Melody, Kuromi, Badtz-Maru, Keroppi, Gudetama và Hello Kitty hiển thị rõ trong lưới hai cột, không che tên hoặc điều kiện bắt đầu.
+
+### HUD rõ thành tích và Top 20 tự định vị — 23/08/2026
+
+Ảnh runtime 360×780 xác nhận top bar luôn hiện đồng thời **Điểm 162** và **Quãng đường 27m**, cạnh tên nhân vật, loa và tạm dừng; không còn ẩn điểm/quãng đường ở mobile. Khi callback gửi `entryId` lượt vừa xếp hạng, modal Top 20 mở và `scrollIntoView({ block: "center" })` định vị dòng có ID đó ở trung tâm vùng cuộn. Regression HUD mô phỏng hai lượt tên Long, hạng #2: dòng vừa nộp được tô sáng, lời khen Top 3 xuất hiện ở kết quả/footer và mock xác nhận lệnh cuộn được gọi. Luồng ngoài Top 20 vẫn giữ câu khuyến khích theo mức điểm.
+
+### Khắc phục lưới mascot, HUD và hạng #17 — 23/08/2026
+
+| Hạng mục | Bằng chứng kiểm tra | Kết quả |
+| --- | --- | --- |
+| Chân dung chọn nhân vật | Ảnh preview Galaxy S22 360×780 tại `?setup=1` hiển thị đủ tám thẻ Cinnamoroll, Pompompurin, My Melody, Kuromi, Badtz-Maru, Keroppi, Gudetama và Hello Kitty; ảnh chân dung, tên và viền chọn đều không bị cắt. Component ảnh mới đổi sang biểu tượng nhận diện trên nền màu riêng nếu tải ảnh thất bại; test chủ động phát sự kiện lỗi ảnh xác nhận lớp fallback được kích hoạt. | Đạt. |
+| HUD khi chạy | Ảnh 360×780 tại `?demo=1` hiển thị đồng thời **Điểm 189** và dòng **Quãng đường 31m · Cấp 1** ở top bar, cạnh tên mascot, âm thanh và tạm dừng. Không còn ẩn thông tin này ở breakpoint mobile. | Đạt. |
+| Top 20 hạng sâu | Regression HUD dựng đủ 20 entry, phản hồi điểm mới ở **hạng #17** với `entryId` riêng. Dòng hạng 17 nhận lớp `just-ranked`, hiện lời chúc “bạn đã chinh phục Top 20 tuần này!” và mock xác nhận `scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" })`. | Đạt trong test; không chèn entry kiểm thử vào bảng công khai. |
+| Ngoài Top 20 | Test game-over điểm thấp xác nhận tiêu đề “Chưa vào Top 20 tuần này.” cùng lời động viên thực tế theo điểm; không tự đóng bảng kết quả. | Đạt. |
+
+Suite cuối có **40 test** đạt, TypeScript đạt và build production hoàn tất. Cảnh báo Vite về URL `/manus-storage` là cảnh báo resolve lúc build đã biết; chúng được giữ nguyên để runtime lấy asset công khai, đồng thời UI hiện có fallback an toàn nếu một chân dung không tải được.

@@ -31,6 +31,9 @@ vi.mock("@/lib/achievementCard", () => ({
 
 import SkyDashHud from "./SkyDashHud";
 
+const scrollIntoView = vi.fn();
+Object.defineProperty(HTMLElement.prototype, "scrollIntoView", { configurable: true, value: scrollIntoView });
+
 const gameoverSnapshot: GameSnapshot = {
   status: "gameover",
   characterId: "cinnamoroll",
@@ -59,6 +62,7 @@ afterEach(() => {
   mocks.setData.mockReset();
   mocks.createCard.mockReset();
   mocks.downloadCard.mockReset();
+  scrollIntoView.mockReset();
   mocks.leaderboardData = { seasonKey: "2026-08-22", rows: [] };
   mocks.mutationOptions = null;
 });
@@ -85,6 +89,16 @@ describe("SkyDashHud run flow", () => {
       { type: "start", characterId: "cinnamoroll" },
     ]);
     window.removeEventListener("skydash:command", commandListener);
+  });
+
+  it("keeps a mascot recognisable when its portrait image fails to load", () => {
+    const { container } = render(<SkyDashHud />);
+    fireEvent.click(screen.getByRole("button", { name: "Bắt đầu hành trình" }));
+    const portraitImage = container.querySelector(".character-grid .character-portrait img");
+    expect(portraitImage).toBeTruthy();
+    fireEvent.error(portraitImage!);
+    expect(portraitImage?.parentElement?.classList.contains("fallback")).toBe(true);
+    expect(portraitImage?.parentElement?.textContent).toContain("☁");
   });
 
   it("shows a mandatory name field in setup before a run can begin", () => {
@@ -179,7 +193,7 @@ describe("SkyDashHud run flow", () => {
     window.removeEventListener("skydash:command", commandListener);
   });
 
-  it("mô phỏng game-over đến Top 20 với hai lượt trùng tên, lời khen đúng hạng và tô đúng lượt vừa lưu", async () => {
+  it("mô phỏng game-over đến hạng 17, tự cuộn tới dòng vừa lưu và tô đúng lượt", async () => {
     window.localStorage.setItem("hanaSkyDashPlayerName", "Long");
     const { container } = render(<SkyDashHud />);
 
@@ -192,20 +206,21 @@ describe("SkyDashHud run flow", () => {
       await mocks.mutationOptions.onSuccess({
         seasonKey: "2026-08-22",
         entryId: 202,
-        rank: 2,
+        rank: 17,
         enteredTop20: true,
-        rows: [
-          { id: 201, rank: 1, playerName: "Long", runnerId: "cinnamoroll", score: 480, stars: 0, distance: 75, submittedAt: 1 },
-          { id: 202, rank: 2, playerName: "Long", runnerId: "kuromi", score: 420, stars: 0, distance: 68, submittedAt: 2 },
-        ],
+        rows: Array.from({ length: 20 }, (_, index) => {
+          const rank = index + 1;
+          return { id: rank === 17 ? 202 : 300 + rank, rank, playerName: rank === 17 ? "Long" : `Mây ${rank}`, runnerId: rank === 17 ? "kuromi" : "cinnamoroll", score: rank === 17 ? 420 : 1_000 - rank * 10, stars: 0, distance: rank === 17 ? 68 : 100 - rank, submittedAt: rank };
+        }),
       });
     });
 
-    expect(screen.getAllByText("Long")).toHaveLength(2);
-    expect(screen.getByText("Chuyến bay này đang ở hạng #2.")).toBeTruthy();
+    expect(screen.getAllByText("Long")).toHaveLength(1);
+    expect(screen.getAllByText("Hạng #17: bạn đã chinh phục Top 20 tuần này!")).toHaveLength(1);
     expect(container.querySelector(".just-ranked")?.textContent).toContain("Long");
     expect(container.querySelector(".just-ranked")?.textContent).toContain("420");
-    expect(screen.getByText("Hạng #2: bạn đang ở bục vinh danh Top 3!")).toBeTruthy();
+    await waitFor(() => expect(scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth", block: "center", inline: "nearest" }));
+    expect(screen.getByText("Hạng #17: bạn đã chinh phục Top 20 tuần này!")).toBeTruthy();
   });
 
   it("encourages a low-score run that has not entered Top 20", async () => {
