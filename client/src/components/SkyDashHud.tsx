@@ -10,6 +10,7 @@ import { trpc } from "@/lib/trpc";
 import { canStartSkyDashRun, needsLeaderboardName } from "@shared/runFlow";
 import { SCORE_RULES } from "@shared/scoring";
 import { createAchievementCard, downloadAchievementCard, type AchievementCardInput } from "@/lib/achievementCard";
+import { MascotPreview3D } from "@/components/MascotPreview3D";
 
 const LOGO_URL = assetUrl("sky-dash-logo-retry_53835e27.png");
 const TARGET_URL = assetUrl("sky-dash-menu-art-retry_f2351b45.png");
@@ -91,6 +92,7 @@ function portraitUrl(portrait: string) {
 }
 
 function CharacterPortrait({ character, className }: { character: (typeof CHARACTERS)[number]; className: string }) {
+  if (className.includes("selected-runner-portrait")) return <MascotPreview3D character={character} className={className} />;
   const [failed, setFailed] = useState(false);
   return <span className={`character-portrait ${className} ${failed ? "fallback" : ""}`} style={{ "--character": character.body, "--accent": character.accent } as React.CSSProperties}><img src={portraitUrl(character.portrait)} alt="" onError={() => setFailed(true)} /><b aria-hidden="true">{character.icon}</b></span>;
 }
@@ -112,6 +114,7 @@ export default function SkyDashHud() {
   const [lastSubmissionImproved, setLastSubmissionImproved] = useState<boolean | null>(null);
   const [shareStatus, setShareStatus] = useState<"idle" | "shared" | "copied" | "manual">("idle");
   const [cardStatus, setCardStatus] = useState<"idle" | "creating" | "downloaded" | "shared" | "error">("idle");
+  const [menuAudioHint, setMenuAudioHint] = useState("");
   const snapshotRef = useRef(initialSnapshot);
   const runIdRef = useRef(0);
   const leaderboardListRef = useRef<HTMLOListElement>(null);
@@ -152,8 +155,9 @@ export default function SkyDashHud() {
 
   useEffect(() => {
     const onAudioState = (event: Event) => {
-      const next = (event as CustomEvent<{ musicEnabled: boolean; effectsEnabled: boolean; message?: string }>).detail;
+      const next = (event as CustomEvent<{ musicEnabled: boolean; effectsEnabled: boolean; message?: string; musicStarted?: boolean }>).detail;
       setSnapshot((current) => ({ ...current, musicEnabled: next.musicEnabled, effectsEnabled: next.effectsEnabled, message: next.message ?? current.message }));
+      if (next.message) setMenuAudioHint(next.message);
     };
     window.addEventListener("skydash:audio-state", onAudioState);
     return () => window.removeEventListener("skydash:audio-state", onAudioState);
@@ -309,7 +313,7 @@ export default function SkyDashHud() {
   };
 
   return (
-    <div className="sky-ui" aria-live="polite">
+    <div className="sky-ui" aria-live="polite" onPointerDown={() => { if (snapshot.status === "menu" && snapshot.musicEnabled) window.dispatchEvent(new Event("skydash:menu-interact")); }}>
       {isRunning && (
         <>
           <div className="game-topbar">
@@ -336,7 +340,7 @@ export default function SkyDashHud() {
             {menuStep === "welcome" ? <>
               <header className="landing-topbar">
                 <div className="brand-lockup"><img src={LOGO_URL} alt="Biểu tượng ngôi sao điều ước" /><span>CHẠY ĐUA CÙNG HANA</span></div>
-                <div className="landing-utilities"><button className="guide-button" onClick={() => { setTutorialStep(0); setTutorialOpen(true); }}><CircleHelp size={17} /> Hướng dẫn chơi</button><button className="menu-sound-toggle" onClick={() => send({ type: "setMusic", enabled: !snapshot.musicEnabled })} aria-pressed={snapshot.musicEnabled} aria-label={snapshot.musicEnabled ? "Tắt nhạc nền" : "Bật nhạc nền"}>{snapshot.musicEnabled ? <Music2 size={18} /> : <VolumeX size={18} />}<span>Nhạc: {snapshot.musicEnabled ? "Bật" : "Tắt"}</span></button><button className="menu-sound-toggle effects-toggle" onClick={() => send({ type: "setEffects", enabled: !snapshot.effectsEnabled })} aria-pressed={snapshot.effectsEnabled} aria-label={snapshot.effectsEnabled ? "Tắt hiệu ứng âm thanh" : "Bật hiệu ứng âm thanh"}>{snapshot.effectsEnabled ? <Sparkles size={17} /> : <VolumeX size={17} />}<span>Hiệu ứng: {snapshot.effectsEnabled ? "Bật" : "Tắt"}</span></button></div>
+                <div className="landing-utilities"><button className="guide-button" onClick={() => { setTutorialStep(0); setTutorialOpen(true); }}><CircleHelp size={17} /> Hướng dẫn chơi</button><button className="menu-sound-toggle" onClick={() => send({ type: "setMusic", enabled: !snapshot.musicEnabled })} aria-pressed={snapshot.musicEnabled} aria-label={snapshot.musicEnabled ? "Tắt nhạc nền" : "Bật nhạc nền"}>{snapshot.musicEnabled ? <Music2 size={18} /> : <VolumeX size={18} />}<span>Nhạc: {snapshot.musicEnabled ? "Bật" : "Tắt"}</span></button><button className="menu-sound-toggle effects-toggle" onClick={() => send({ type: "setEffects", enabled: !snapshot.effectsEnabled })} aria-pressed={snapshot.effectsEnabled} aria-label={snapshot.effectsEnabled ? "Tắt hiệu ứng âm thanh" : "Bật hiệu ứng âm thanh"}>{snapshot.effectsEnabled ? <Sparkles size={17} /> : <VolumeX size={17} />}<span>Hiệu ứng: {snapshot.effectsEnabled ? "Bật" : "Tắt"}</span></button>{menuAudioHint && <span className="menu-audio-hint" role="status">{menuAudioHint}</span>}</div>
               </header>
               <div className="landing-copy"><p className="eyebrow">ENDLESS RUNNER · CLOUD COLLECTION</p><h1>Bay xa hơn<br />cùng Hana.</h1><p>Một đường chạy mây nhỏ xinh, nơi phản xạ đúng quan trọng hơn tốc độ vội vàng. Nhảy, trượt và đổi làn để tiến vào Top 20 tuần.</p><div className="record-actions"><div className="sky-record-card"><div><span>KỶ LỤC BẦU TRỜI</span><strong>{skyRecord.toLocaleString("vi-VN")}</strong><small>{leaderboardRows.length ? "Điểm dẫn đầu Top 20 tuần" : "Đang chờ chuyến bay đầu tiên"}</small></div><Trophy size={31} /></div><button className="leaderboard-button record-top20" aria-label="Xem Top 20" onClick={openLeaderboard}><Trophy size={16} /> Xem<br />Top 20</button></div><div className="landing-actions"><button className="play-button" onClick={() => { window.dispatchEvent(new Event("skydash:menu-interact")); setNameError(""); setMenuStep("setup"); }}><Play size={20} fill="currentColor" /> Bắt đầu hành trình</button></div></div>
               <div className="landing-art-wrap"><img className="menu-art" src={TARGET_URL} alt="Minh hoạ đường chạy trên mây" /><div className="art-sticker">Vật thấp: nhảy<br />Cổng cao: trượt</div></div>

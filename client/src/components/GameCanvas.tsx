@@ -30,8 +30,15 @@ export default function GameCanvas() {
     let ready = false;
     const queuedCommands: GameCommand[] = [];
     const menuAudio = new AudioManager();
-    const emitMenuAudioState = (message?: string) => {
-      window.dispatchEvent(new CustomEvent("skydash:audio-state", { detail: { musicEnabled: menuAudio.musicEnabled, effectsEnabled: menuAudio.effectsEnabled, message } }));
+    const emitMenuAudioState = (message?: string, musicStarted?: boolean) => {
+      window.dispatchEvent(new CustomEvent("skydash:audio-state", { detail: { musicEnabled: menuAudio.musicEnabled, effectsEnabled: menuAudio.effectsEnabled, message, musicStarted } }));
+    };
+    const startMenuMusic = (withButton = false) => {
+      if (withButton) menuAudio.play("button");
+      void menuAudio.startMusic().then((started) => emitMenuAudioState(
+        started ? "Nhạc nền đang phát." : menuAudio.musicEnabled ? "Chạm nút Nhạc để bật âm thanh." : "Nhạc nền đang tắt.",
+        started,
+      ));
     };
 
     const boot = async () => {
@@ -56,7 +63,7 @@ export default function GameCanvas() {
       const command = (event as CustomEvent<GameCommand>).detail;
       if (!ready) {
         if (command.type === "setMusic") {
-          void menuAudio.setMusicEnabled(command.enabled, true).then((started) => emitMenuAudioState(command.enabled && !started ? "Chạm Nhạc để thử lại." : command.enabled ? "Nhạc nền đã bật." : "Nhạc nền đã tắt."));
+          void menuAudio.setMusicEnabled(command.enabled, true).then((started) => emitMenuAudioState(command.enabled && !started ? "Chạm nút Nhạc để bật âm thanh." : command.enabled ? "Nhạc nền đang phát." : "Nhạc nền đã tắt.", started));
           return;
         }
         if (command.type === "setEffects") {
@@ -66,16 +73,13 @@ export default function GameCanvas() {
           return;
         }
         if (["select", "start", "practice", "menu"].includes(command.type)) {
-          menuAudio.play("button");
-          void menuAudio.startMusic();
+          startMenuMusic(true);
         }
         if (startedRef.current) queuedCommands.push(command);
       }
     };
     const onMenuInteract = () => {
-      menuAudio.play("button");
-      void menuAudio.startMusic();
-      emitMenuAudioState();
+      startMenuMusic(true);
     };
     const onResize = () => engine?.resize();
     window.addEventListener("skydash:prepare", onPrepare);

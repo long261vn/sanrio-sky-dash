@@ -104,6 +104,17 @@ describe("SkyDashHud run flow", () => {
     window.removeEventListener("skydash:menu-interact", menuAudioListener);
   });
 
+  it("retries menu music from the first touch on a menu surface", () => {
+    const menuAudioListener = vi.fn();
+    window.addEventListener("skydash:menu-interact", menuAudioListener);
+    const { container } = render(<SkyDashHud />);
+
+    fireEvent.pointerDown(container.querySelector(".sky-ui")!);
+
+    expect(menuAudioListener).toHaveBeenCalledOnce();
+    window.removeEventListener("skydash:menu-interact", menuAudioListener);
+  });
+
   it("requires a name and an explicit character choice before sending Start", () => {
     const commandListener = vi.fn();
     const prepareListener = vi.fn();
@@ -115,6 +126,8 @@ describe("SkyDashHud run flow", () => {
     const runButton = screen.getByRole("button", { name: "Chạy cùng Cinnamoroll" });
     expect((runButton as HTMLButtonElement).disabled).toBe(true);
     expect(document.querySelectorAll(".setup-selected .runner-perks span")).toHaveLength(3);
+    expect(screen.getByRole("img", { name: "Mô hình xoay 3D Cinnamoroll. Kéo để xoay." })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Xoay Cinnamoroll thêm 90 độ" })).toBeTruthy();
 
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "Mây Nhỏ" } });
     const cinnamorollCard = screen.getAllByRole("button").find((button) => button.classList.contains("character-card") && button.textContent?.includes("Cinnamoroll"));

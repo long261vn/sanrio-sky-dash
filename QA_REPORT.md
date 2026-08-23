@@ -286,3 +286,7 @@ Browser gameplay trực tiếp sau khi scene hoàn tất khởi tạo xác nhậ
 Hai lượt browser tiếp theo xác nhận Gudetama là dáng trứng vàng thấp, mắt/tay nhỏ và má tròn; Hello Kitty là mặt trắng, tai nhọn, nơ hồng và ria mép. Cả hai chạy qua mốc 138m, không có lỗi runtime và phân biệt được tức thì với Pompompurin/Badtz-Maru.
 
 Sau checkpoint `db915897`, Manus public setup hiển thị ảnh mascot, tên/tagline và ba chip Nhảy–Trượt–Khiên thành các vùng riêng; không còn chồng lên nhau. GitHub Pages chạy demo Hello Kitty qua 165m, render tai, nơ, ria mép, HUD điểm/quãng đường và hai control nhạc/hiệu ứng; không tạo entry thử vào Top 20. Hạng mục phát hành đạt.
+
+### Preview 360° và retry audio menu — 23/08/2026
+
+Preview local 360×780 hiển thị turntable mascot ngay trong khối nhân vật đã chọn, có tự xoay nhẹ và nút “Kéo để xoay 360°”; toàn bộ tên, ba chip chỉ số và lưới tám nhân vật vẫn vừa màn hình. Browser landing xác nhận lần chạm **Bắt đầu hành trình** đi vào setup có preview 360°; handler nhạc được gọi trên `pointerdown` của thao tác hợp lệ, trước khi chuyển màn, để vượt giới hạn autoplay của trình duyệt. UI tiếp tục hiện trạng thái “Nhạc: Bật/Tắt” và hiển thị chỉ dẫn chạm nút Nhạc nếu playback bị chặn.
