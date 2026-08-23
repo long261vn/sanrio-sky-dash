@@ -326,10 +326,10 @@ describe("SkyDashHud run flow", () => {
     mocks.createCard.mockResolvedValue({ blob, filename: "thanh-tich.png" });
     render(<SkyDashHud />);
     act(() => {
-      window.dispatchEvent(new CustomEvent<GameSnapshot>("skydash:state", { detail: { ...gameoverSnapshot, score: 1_760, distance: 214, difficultyLevel: 3 } }));
+      window.dispatchEvent(new CustomEvent<GameSnapshot>("skydash:state", { detail: { ...gameoverSnapshot, characterId: "kuromi", score: 1_760, distance: 214, difficultyLevel: 3 } }));
     });
     fireEvent.click(screen.getByRole("button", { name: "Tải thẻ PNG" }));
-    await waitFor(() => expect(mocks.createCard).toHaveBeenCalledWith(expect.objectContaining({ score: 1_760, distance: 214, level: 3 })));
+    await waitFor(() => expect(mocks.createCard).toHaveBeenCalledWith(expect.objectContaining({ characterName: "Kuromi", characterPortrait: expect.stringContaining("kuromi-portrait"), score: 1_760, distance: 214, level: 3 })));
     await waitFor(() => expect(mocks.downloadCard).toHaveBeenCalledWith(blob, "thanh-tich.png"));
     expect(screen.getByRole("button", { name: "Đã tải thẻ PNG" })).toBeTruthy();
   });

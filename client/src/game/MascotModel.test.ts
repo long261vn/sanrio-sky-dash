@@ -1,7 +1,9 @@
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import { afterEach, describe, expect, it } from "vitest";
 import {
+  animateMascotAccessories,
   createMascotModel,
   GAMEPLAY_MASCOT_FACING_Y,
   MASCOT_MODEL_VERSION,
@@ -20,6 +22,17 @@ const expectedRecognitionMeshes: Record<string, string[]> = {
   keroppi: ["frogEyeWhite", "frogPinkCollar", "frogWhiteStripe"],
   gudetama: ["eggWhite"],
   hellokitty: ["kittyEar", "kittyBowLeft", "kittyWhisker-1-2"],
+};
+
+const expectedMotionMeshes: Record<string, string> = {
+  cinnamoroll: "cloudTailCurl",
+  pompompurin: "puddingDropEar",
+  mymelody: "melodyHoodEar",
+  kuromi: "kuromiDevilTail",
+  badtzmaru: "penguinTuft",
+  keroppi: "frogEyeWhite",
+  gudetama: "eggWhite",
+  hellokitty: "kittyEar",
 };
 
 describe("createMascotModel", () => {
@@ -71,5 +84,18 @@ describe("createMascotModel", () => {
     orientMascotForPreview(model);
     expect(model.root.rotation.y).toBe(PREVIEW_MASCOT_FACING_Y);
     expect(model.root.metadata).toMatchObject({ presentation: "preview-front" });
+  });
+
+  it.each(CHARACTERS)("animates visual-only accessory motion for $name", (character) => {
+    const scene = new Scene(new NullEngine());
+    scenes.push(scene);
+    const model = createMascotModel(scene, character, "motion");
+    const motionMesh = model.visual.getChildMeshes().find((mesh) => mesh.name.includes(expectedMotionMeshes[character.id]));
+    const before = motionMesh?.rotation.z;
+
+    animateMascotAccessories(model.visual, character.silhouette, Math.PI / 2, 1);
+
+    expect(motionMesh?.rotation.z).not.toBe(before);
+    expect(model.root.position.equalsWithEpsilon(Vector3.Zero())).toBe(true);
   });
 });

@@ -8,7 +8,7 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { GameCommand, GameSnapshot, GameStatus, CharacterId, CHARACTERS } from "@/game/types";
 import { AudioManager } from "@/game/AudioManager";
-import { createMascotModel, orientMascotForGameplay } from "@/game/MascotModel";
+import { animateMascotAccessories, createMascotModel, orientMascotForGameplay } from "@/game/MascotModel";
 import { assetUrl } from "@/lib/assets";
 import { nextComboAfterGust, nextComboAfterStar, scoreForClear, scoreForDistance, scoreForGust, scoreForStar } from "@shared/scoring";
 import { getNextSpawnDelay, getSpawnZ, getWarningZ, hasSafeLaneSpacing } from "@shared/spawnRules";
@@ -102,6 +102,7 @@ export class GameWorld {
     const value = Number(new URLSearchParams(window.location.search).get("qaDistance"));
     return Number.isFinite(value) ? Math.max(0, Math.min(650, Math.floor(value))) : 0;
   })();
+  private readonly reducedMotion = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
   private pointerStart: { x: number; y: number } | null = null;
 
   private readonly onCommand = (event: Event) => this.handleCommand((event as CustomEvent<GameCommand>).detail);
@@ -369,6 +370,8 @@ export class GameWorld {
       if (body) body.position.y = isSliding ? 0.53 : 0.72;
       const ears = visual.getChildMeshes().filter((mesh) => mesh.name.startsWith("avatarEar") || mesh.name.startsWith("kittyEar"));
       ears.forEach((ear, index) => { ear.rotation.z = (index % 2 === 0 ? -1 : 1) * (0.08 + runWave * 0.1 + (isAirborne ? 0.15 : 0)); });
+      const accessoryIntensity = (this.reducedMotion ? 0.35 : 1) * (isSliding ? 0.38 : isAirborne ? 1.2 : 1);
+      animateMascotAccessories(visual, getCharacter(this.characterId).silhouette, runPhase * 0.72, accessoryIntensity);
       const badge = visual.getChildMeshes().find((mesh) => mesh.name === "runnerBadge" || mesh.name.endsWith("-runnerBadge"));
       if (badge) {
         badge.position.y = isSliding ? 0.66 : 0.96;

@@ -273,13 +273,18 @@ export default function SkyDashHud() {
     }
   };
   const buildAchievementCard = () => {
+    const run = completedRun ?? snapshot;
+    const runner = CHARACTERS.find((character) => character.id === run.characterId) ?? selected;
     const input: AchievementCardInput = {
-      playerName: playerName.trim() || selected.name,
-      characterIcon: selected.icon,
-      characterName: selected.name,
-      score: snapshot.score,
-      distance: snapshot.distance,
-      level: snapshot.difficultyLevel,
+      playerName: playerName.trim() || runner.name,
+      characterIcon: runner.icon,
+      characterName: runner.name,
+      characterPortrait: portraitUrl(runner.portrait),
+      characterBody: runner.body,
+      characterAccent: runner.accent,
+      score: run.score,
+      distance: run.distance,
+      level: run.difficultyLevel,
       rank: recentRank,
     };
     return createAchievementCard(input);
@@ -299,7 +304,9 @@ export default function SkyDashHud() {
     try {
       const card = await buildAchievementCard();
       const file = new File([card.blob], card.filename, { type: "image/png" });
-      const payload = { files: [file], title: "Thẻ thành tích Chạy Đua Cùng Hana", text: `${playerName.trim() || selected.name} vừa đạt ${snapshot.score.toLocaleString("vi-VN")} điểm!` };
+      const run = completedRun ?? snapshot;
+      const runner = CHARACTERS.find((character) => character.id === run.characterId) ?? selected;
+      const payload = { files: [file], title: "Thẻ thành tích Chạy Đua Cùng Hana", text: `${playerName.trim() || runner.name} vừa chạy cùng ${runner.name} và đạt ${run.score.toLocaleString("vi-VN")} điểm!` };
       if (typeof navigator.share === "function" && typeof navigator.canShare === "function" && navigator.canShare(payload)) {
         await navigator.share(payload);
         setCardStatus("shared");

@@ -238,3 +238,8 @@
 - [x] Sửa factory mascot và gameplay để mặt nhân vật chạy theo hướng đường chạy, còn mặt sau hiển thị đúng khi camera gameplay theo sau.
 - [x] Cập nhật hình ảnh chọn nhân vật theo đặc tả trước–sau, giữ ảnh 2D mặt trước đúng orientation và gắn nhãn rõ ràng.
 - [x] Kiểm thử cả tám mascot trong preview/gameplay, regression, mobile và hai bản public trước phát hành.
+- [x] Rà soát dữ liệu truyền vào thẻ thành tích để xác định điểm, quãng đường, cấp độ, hạng và mascot của lượt chơi hiện tại.
+- [x] Thiết kế lại nội dung/thị giác thẻ PNG để hiển thị đúng mascot đã chọn cùng thành tích thực tế của lượt chơi.
+- [x] Thêm animation nhẹ tai, đuôi, hood hoặc gai theo từng mascot khi chạy, không ảnh hưởng hitbox hay hướng chạy.
+- [x] Bổ sung regression cho dữ liệu thẻ và transform animation mascot; kiểm thử xuất PNG/gameplay trên desktop và mobile.
+- [ ] Xác minh Manus public và GitHub Pages sau phát hành, không tạo dữ liệu thử trong Top 20.

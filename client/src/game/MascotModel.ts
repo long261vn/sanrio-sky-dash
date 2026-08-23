@@ -24,6 +24,49 @@ export function orientMascotForPreview(model: MascotModel) {
   model.root.metadata = { ...model.root.metadata, presentation: "preview-front" };
 }
 
+/** Applies a small run-cycle sway to visual-only meshes; root position and collision stay untouched. */
+export function animateMascotAccessories(visual: TransformNode, silhouette: CharacterDefinition["silhouette"], phase: number, intensity = 1) {
+  const wave = Math.sin(phase) * intensity;
+  const meshes = visual.getChildMeshes();
+  const matching = (marker: string) => meshes.filter((mesh) => mesh.name.includes(marker));
+  const swayPairs = (markers: string[], base: number, amplitude: number) => {
+    meshes.filter((mesh) => markers.some((marker) => mesh.name.includes(marker))).forEach((mesh) => {
+      const side = Math.sign(mesh.position.x) || 1;
+      mesh.rotation.z = side * -base + side * wave * amplitude;
+    });
+  };
+
+  if (silhouette === "cloud") {
+    swayPairs(["cloudDropEar", "cloudInnerEar"], 0.48, 0.16);
+    matching("cloudTailCurl").forEach((tail) => { tail.rotation.x = Math.PI / 2; tail.rotation.z = wave * 0.24; });
+    matching("cloudTailTip").forEach((tip) => { tip.position.y = 0.72 + wave * 0.055; });
+  }
+  if (silhouette === "pudding") swayPairs(["puddingDropEar"], 0.55, 0.12);
+  if (silhouette === "bunny") {
+    swayPairs(["melodyHoodEar", "melodyInnerEar"], 0.28, 0.12);
+    matching("melodyFlowerPetal").forEach((petal, index) => { petal.rotation.z = wave * 0.055 * (index % 2 ? -1 : 1); });
+  }
+  if (silhouette === "imp") {
+    swayPairs(["kuromiJesterPoint"], 0.46, 0.12);
+    matching("kuromiDevilTail").forEach((tail) => { tail.rotation.x = Math.PI / 2; tail.rotation.z = wave * 0.28; });
+    matching("kuromiTailArrow").forEach((arrow) => { arrow.rotation.z = -Math.PI / 2 + wave * 0.28; arrow.position.y = 0.62 + wave * 0.04; });
+  }
+  if (silhouette === "penguin") {
+    swayPairs(["penguinTuft"], 0.16, 0.1);
+  }
+  if (silhouette === "frog") {
+    matching("frogEyeWhite").forEach((eye) => { const side = Math.sign(eye.position.x) || 1; eye.position.y = 2.03 + Math.abs(wave) * 0.025; eye.rotation.z = side * wave * 0.045; });
+  }
+  if (silhouette === "egg") {
+    matching("eggWhite").forEach((white) => { white.rotation.z = wave * 0.035; white.scaling.y = 0.26 + Math.abs(wave) * 0.018; });
+  }
+  if (silhouette === "kitty") {
+    swayPairs(["kittyEar", "kittyInnerEar"], 0.18, 0.08);
+    matching("kittyBowLeft").forEach((bow) => { bow.rotation.z = -0.25 - wave * 0.06; });
+    matching("kittyBowRight").forEach((bow) => { bow.rotation.z = 0.25 + wave * 0.06; });
+  }
+}
+
 function createMaterial(scene: Scene, name: string, hex: string, emissive: number) {
   const material = new StandardMaterial(name, scene);
   material.diffuseColor = Color3.FromHexString(hex);

@@ -2,6 +2,9 @@ export type AchievementCardInput = {
   playerName: string;
   characterIcon: string;
   characterName: string;
+  characterPortrait: string;
+  characterBody: string;
+  characterAccent: string;
   score: number;
   distance: number;
   level: number;
@@ -40,6 +43,36 @@ function drawText(context: CanvasRenderingContext2D, text: string, x: number, y:
   context.fillStyle = color;
   context.textAlign = align;
   context.fillText(text, x, y);
+}
+
+function loadPortrait(src: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("Không tải được chân dung mascot."));
+    image.src = src;
+  });
+}
+
+async function drawMascotPortrait(context: CanvasRenderingContext2D, input: AchievementCardInput) {
+  const size = 252;
+  context.save();
+  context.beginPath();
+  context.arc(WIDTH / 2, 430, 126, 0, Math.PI * 2);
+  context.clip();
+  try {
+    const portrait = await loadPortrait(input.characterPortrait);
+    const scale = Math.max(size / portrait.width, size / portrait.height);
+    const width = portrait.width * scale;
+    const height = portrait.height * scale;
+    context.drawImage(portrait, WIDTH / 2 - width / 2, 430 - height / 2, width, height);
+  } catch {
+    context.fillStyle = input.characterBody;
+    context.fillRect(WIDTH / 2 - size / 2, 430 - size / 2, size, size);
+    drawText(context, input.characterIcon, WIDTH / 2, 480, "190px system-ui", input.characterAccent, "center");
+  }
+  context.restore();
 }
 
 export async function createAchievementCard(input: AchievementCardInput) {
@@ -85,16 +118,16 @@ export async function createAchievementCard(input: AchievementCardInput) {
   context.lineTo(720, 263);
   context.stroke();
 
-  context.fillStyle = "#d7f4f4";
+  context.fillStyle = input.characterBody;
   context.beginPath();
   context.arc(WIDTH / 2, 430, 150, 0, Math.PI * 2);
   context.fill();
   context.lineWidth = 10;
-  context.strokeStyle = "#ffffff";
+  context.strokeStyle = input.characterAccent;
   context.stroke();
-  drawText(context, input.characterIcon, WIDTH / 2, 480, "190px system-ui", "#304d6d", "center");
+  await drawMascotPortrait(context, input);
   drawText(context, input.playerName || input.characterName, WIDTH / 2, 640, "900 52px system-ui", "#314962", "center");
-  drawText(context, `Bay cùng ${input.characterName}`, WIDTH / 2, 682, "700 23px system-ui", "#6d8992", "center");
+  drawText(context, `Đã chạy cùng ${input.characterName}`, WIDTH / 2, 682, "700 23px system-ui", "#6d8992", "center");
 
   roundedRect(context, 152, 736, 776, 170, 30);
   context.fillStyle = "#fff3bd";
@@ -121,7 +154,7 @@ export async function createAchievementCard(input: AchievementCardInput) {
 
   const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
   if (!blob) throw new Error("Không thể xuất thẻ thành tích PNG.");
-  return { blob, filename: `thanh-tich-hana-${input.score}-${input.distance}m.png` };
+  return { blob, filename: `thanh-tich-${input.characterName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${input.score}-${input.distance}m.png` };
 }
 
 export function downloadAchievementCard(blob: Blob, filename: string) {

@@ -334,3 +334,14 @@ Retry sau checkpoint `99224a15` xác nhận Manus đã chuyển sang `assets/ind
 | Build | `pnpm check` và `pnpm build` đạt; chunk Babylon 1,77MB raw/416KB gzip là cảnh báo kích thước đã biết do lazy-load engine. | Đạt. |
 
 Checkpoint `8667334f` đã đồng bộ cả hai bản public. Manus setup hiển thị hint orientation và tám nhãn “Ảnh mặt trước”; demo Cinnamoroll hiện sau đầu, tai dài và đuôi khi chạy về +Z. GitHub Pages cũng xác nhận cùng setup và gameplay. Các URL QA không đặt tên hay gửi điểm nên không tạo entry mới trong Top 20.
+
+### Thẻ thành tích theo mascot và animation phụ kiện — 23/08/2026
+
+Thẻ PNG nay nhận immutable `completedRun` (hoặc snapshot kết quả nếu cần), rồi tra đúng `characterId` của lượt chạy để in điểm, quãng đường, cấp, hạng và chân dung 2D của mascot đã chọn. Nếu ảnh không tải, thẻ vẫn xuất được bằng icon/palette cùng mascot; tên file cũng có slug mascot, điểm và quãng đường. Kiểm tra canvas cục bộ đã dựng thẻ Kuromi 1.760 điểm, 214m, cấp 3, hạng #7 với đúng chân dung Kuromi; PNG tạo thành công, kích thước 601.634 bytes.
+
+| Hạng mục | Bằng chứng | Kết quả |
+| --- | --- | --- |
+| Dữ liệu thẻ | Regression HUD đổi `characterId` của lượt kết quả sang Kuromi và xác nhận renderer nhận portrait Kuromi, 1.760 điểm, 214m, cấp 3. | Đạt. |
+| Chân dung thẻ | Kiểm tra browser trực tiếp hiển thị thẻ PNG có chân dung Kuromi, tên người chơi, điểm, quãng đường, cấp và hạng cùng một layout. | Đạt cục bộ. |
+| Animation | Factory có chuyển động visual-only cho tai/đuôi Cinnamoroll, tai Pompompurin, hood/tai My Melody, jester/đuôi Kuromi, chỏm Badtz-Maru, mắt Keroppi, lòng trắng Gudetama và tai/nơ Hello Kitty. Root/hitbox không dịch chuyển. | 8 regression motion đạt. |
+| Validation | `pnpm test` 62/62, `pnpm check` và build production đạt. | Đạt. |
