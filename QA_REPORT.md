@@ -229,3 +229,14 @@ Toàn bộ suite hiện có **34 test** đạt, TypeScript và build production 
 | Bố cục kết quả | Ảnh QA `?result=1` ở desktop 1280×720 và mobile 390×844 cho thấy nút chia sẻ không che form ghi hạng hoặc CTA về màn đầu; trên điện thoại các nút xếp một cột. Cờ QA chỉ tạo màn kết quả cục bộ, không nộp điểm. | Đạt. |
 
 Toàn bộ suite hiện có **37 test** đạt, TypeScript và build production đạt.
+
+### Thẻ thành tích và âm thanh vượt chướng ngại — 23/08/2026
+
+| Hạng mục | Bằng chứng kiểm tra | Kết quả |
+| --- | --- | --- |
+| Thẻ PNG | Thẻ được dựng trực tiếp từ lượt chơi, khung dọc 1080×1350 có mascot, tên, điểm, quãng đường, cấp độ và hạng Top 20 nếu có. UI test xác nhận dữ liệu điểm 1.760, 214m và cấp 3 được đưa vào bộ dựng, sau đó gọi tải blob PNG với tên file đúng. | Đạt trong 13 test HUD. |
+| Chia sẻ ảnh | Khi `navigator.canShare` hỗ trợ file, app đóng blob thành file PNG rồi mở bảng chia sẻ hệ thống; nếu không, app tải PNG về để người chơi tự đăng lên mạng xã hội. | Đạt trong test HUD. |
+| Âm thanh clear | Tạo chime kawaii ba nốt độc lập, cắt còn 1,44 giây và tải lên kho tài sản web. GameWorld gọi `clear` khi nhảy qua đệm thấp hoặc trượt qua cổng mây thành công, khác với âm thanh va chạm/vật phẩm. | Đạt trong 6 test GameWorld. |
+| Bố cục kết quả | Ảnh QA `?result=1` trên desktop 1280×720 và mobile 390×844 xác nhận Tải thẻ PNG, Chia sẻ thẻ, Chia sẻ kết quả và quay lại nằm gọn; mobile xếp chúng thành một cột. | Đạt. |
+
+Toàn bộ suite hiện có **39 test** đạt, TypeScript và build production đạt.

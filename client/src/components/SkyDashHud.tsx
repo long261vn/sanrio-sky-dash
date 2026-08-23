@@ -3,12 +3,13 @@
  * Các nút phản hồi tức thì; lớp UI chỉ giao tiếp với gameplay bằng CustomEvent.
  */
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Check, ChevronLeft, ChevronRight, CircleHelp, Crown, Gauge, Pause, Play, Share2, Trophy, Volume2, VolumeX, X, Zap } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, CircleHelp, Crown, Download, Gauge, ImageDown, Pause, Play, Share2, Trophy, Volume2, VolumeX, X, Zap } from "lucide-react";
 import { CHARACTERS, type CharacterId, type GameCommand, type GameSnapshot } from "@/game/types";
 import { assetUrl } from "@/lib/assets";
 import { trpc } from "@/lib/trpc";
 import { canStartSkyDashRun, needsLeaderboardName } from "@shared/runFlow";
 import { SCORE_RULES } from "@shared/scoring";
+import { createAchievementCard, downloadAchievementCard, type AchievementCardInput } from "@/lib/achievementCard";
 
 const LOGO_URL = assetUrl("sky-dash-logo-retry_53835e27.png");
 const TARGET_URL = assetUrl("sky-dash-menu-art-retry_f2351b45.png");
@@ -90,6 +91,7 @@ export default function SkyDashHud() {
   const [recentEntryId, setRecentEntryId] = useState<number | null>(null);
   const [lastSubmissionImproved, setLastSubmissionImproved] = useState<boolean | null>(null);
   const [shareStatus, setShareStatus] = useState<"idle" | "shared" | "copied" | "manual">("idle");
+  const [cardStatus, setCardStatus] = useState<"idle" | "creating" | "downloaded" | "shared" | "error">("idle");
   const snapshotRef = useRef(initialSnapshot);
   const runIdRef = useRef(0);
   const leaderboard = trpc.leaderboard.top20.useQuery(undefined, { staleTime: 0, refetchOnWindowFocus: true });
@@ -227,6 +229,45 @@ export default function SkyDashHud() {
       setShareStatus("manual");
     }
   };
+  const buildAchievementCard = () => {
+    const input: AchievementCardInput = {
+      playerName: playerName.trim() || selected.name,
+      characterIcon: selected.icon,
+      characterName: selected.name,
+      score: snapshot.score,
+      distance: snapshot.distance,
+      level: snapshot.difficultyLevel,
+      rank: recentRank,
+    };
+    return createAchievementCard(input);
+  };
+  const downloadAchievement = async () => {
+    setCardStatus("creating");
+    try {
+      const card = await buildAchievementCard();
+      downloadAchievementCard(card.blob, card.filename);
+      setCardStatus("downloaded");
+    } catch {
+      setCardStatus("error");
+    }
+  };
+  const shareAchievement = async () => {
+    setCardStatus("creating");
+    try {
+      const card = await buildAchievementCard();
+      const file = new File([card.blob], card.filename, { type: "image/png" });
+      const payload = { files: [file], title: "Thẻ thành tích Chạy Đua Cùng Hana", text: `${playerName.trim() || selected.name} vừa đạt ${snapshot.score.toLocaleString("vi-VN")} điểm!` };
+      if (typeof navigator.share === "function" && typeof navigator.canShare === "function" && navigator.canShare(payload)) {
+        await navigator.share(payload);
+        setCardStatus("shared");
+      } else {
+        downloadAchievementCard(card.blob, card.filename);
+        setCardStatus("downloaded");
+      }
+    } catch {
+      setCardStatus("error");
+    }
+  };
 
   return (
     <div className="sky-ui" aria-live="polite">
@@ -274,7 +315,7 @@ export default function SkyDashHud() {
       )}
 
       {snapshot.status === "gameover" && (
-        <div className="screen-scrim compact-scrim"><section className="results-panel auto-save-panel"><div className="result-badge">{snapshot.isNewRecord ? "★ KỶ LỤC MỚI" : "☁ CHUYẾN BAY HOÀN TẤT"}</div><h2>{scoreGreeting.title}</h2><p>{scoreGreeting.body}</p><div className="result-stats"><div><span>Điểm bay</span><strong>{snapshot.score.toLocaleString("vi-VN")}</strong></div><div><span>Cấp đạt</span><strong>{snapshot.difficultyLevel}</strong></div><div><span>Quãng đường</span><strong>{snapshot.distance}m</strong></div></div><div className={`auto-save-status ${saveStatus}`}><Trophy size={18} /><div>{saveStatus === "needsName" && <><b>Đặt tên để ghi hạng nhé.</b><span>Tên giúp chuyến bay này sẵn sàng ghi vào Top 20.</span></>}{saveStatus === "saving" && <><b>Đang đồng bộ hành trình...</b><span>Điểm sẽ tự lưu dưới tên {playerName.trim()}.</span></>}{saveStatus === "ranked" && <><b>{getRankPraise(recentRank)}</b><span>Bảng Top 20 đã xếp lại. Bạn chọn khi nào quay về màn đầu.</span></>}{saveStatus === "outside" && <><b>Chưa vào Top 20 tuần này.</b><span>{getOutsideTop20Message(snapshot.score)}</span></>}{saveStatus === "error" && <><b>Chưa thể đồng bộ điểm.</b><span>{nameError || "Kiểm tra kết nối rồi thử lại ở lượt sau."}</span></>}{saveStatus === "idle" && <><b>Chuẩn bị đồng bộ điểm...</b><span>Đợi một nhịp nhé.</span></>}</div></div>{(saveStatus === "needsName" || saveStatus === "error") && <div className="score-save"><label><span>TÊN HIỂN THỊ TRÊN TOP 20</span><input value={playerName} onChange={(event) => updatePlayerName(event.target.value.slice(0, 20))} placeholder="Ví dụ: Mây Nhỏ" maxLength={20} autoFocus /></label><button className="leaderboard-button" disabled={submitScore.isPending} onClick={() => submitCompletedRun()}>{submitScore.isPending ? "Đang lưu..." : "Lưu & xem hạng"}</button></div>}{nameError && <p className="score-error">{nameError}</p>}{saveStatus !== "saving" && <div className="result-actions"><button className="share-button" onClick={() => void shareResult()}><Share2 size={16} /> {shareStatus === "shared" ? "Đã mở chia sẻ" : shareStatus === "copied" ? "Đã sao chép lời khoe" : "Chia sẻ kết quả"}</button>{shareStatus === "manual" && <span className="share-note"><Check size={14} /> Hãy sao chép điểm để khoe với bạn bè nhé.</span>}{saveStatus !== "needsName" && saveStatus !== "error" && <button className="leaderboard-button" onClick={openLeaderboard}><Trophy size={16} /> {saveStatus === "ranked" ? "Mở lại Top 20" : "Xem Top 20"}</button>}<button className="play-button" onClick={returnToMenu}>Về màn hình đầu</button></div>}</section></div>
+        <div className="screen-scrim compact-scrim"><section className="results-panel auto-save-panel"><div className="result-badge">{snapshot.isNewRecord ? "★ KỶ LỤC MỚI" : "☁ CHUYẾN BAY HOÀN TẤT"}</div><h2>{scoreGreeting.title}</h2><p>{scoreGreeting.body}</p><div className="result-stats"><div><span>Điểm bay</span><strong>{snapshot.score.toLocaleString("vi-VN")}</strong></div><div><span>Cấp đạt</span><strong>{snapshot.difficultyLevel}</strong></div><div><span>Quãng đường</span><strong>{snapshot.distance}m</strong></div></div><div className={`auto-save-status ${saveStatus}`}><Trophy size={18} /><div>{saveStatus === "needsName" && <><b>Đặt tên để ghi hạng nhé.</b><span>Tên giúp chuyến bay này sẵn sàng ghi vào Top 20.</span></>}{saveStatus === "saving" && <><b>Đang đồng bộ hành trình...</b><span>Điểm sẽ tự lưu dưới tên {playerName.trim()}.</span></>}{saveStatus === "ranked" && <><b>{getRankPraise(recentRank)}</b><span>Bảng Top 20 đã xếp lại. Bạn chọn khi nào quay về màn đầu.</span></>}{saveStatus === "outside" && <><b>Chưa vào Top 20 tuần này.</b><span>{getOutsideTop20Message(snapshot.score)}</span></>}{saveStatus === "error" && <><b>Chưa thể đồng bộ điểm.</b><span>{nameError || "Kiểm tra kết nối rồi thử lại ở lượt sau."}</span></>}{saveStatus === "idle" && <><b>Chuẩn bị đồng bộ điểm...</b><span>Đợi một nhịp nhé.</span></>}</div></div>{(saveStatus === "needsName" || saveStatus === "error") && <div className="score-save"><label><span>TÊN HIỂN THỊ TRÊN TOP 20</span><input value={playerName} onChange={(event) => updatePlayerName(event.target.value.slice(0, 20))} placeholder="Ví dụ: Mây Nhỏ" maxLength={20} autoFocus /></label><button className="leaderboard-button" disabled={submitScore.isPending} onClick={() => submitCompletedRun()}>{submitScore.isPending ? "Đang lưu..." : "Lưu & xem hạng"}</button></div>}{nameError && <p className="score-error">{nameError}</p>}{saveStatus !== "saving" && <div className="result-actions"><button className="achievement-button" disabled={cardStatus === "creating"} onClick={() => void downloadAchievement()}><Download size={16} /> {cardStatus === "creating" ? "Đang tạo thẻ..." : cardStatus === "downloaded" ? "Đã tải thẻ PNG" : "Tải thẻ PNG"}</button><button className="share-button" disabled={cardStatus === "creating"} onClick={() => void shareAchievement()}><ImageDown size={16} /> {cardStatus === "shared" ? "Đã mở chia sẻ thẻ" : "Chia sẻ thẻ"}</button><button className="share-button" onClick={() => void shareResult()}><Share2 size={16} /> {shareStatus === "shared" ? "Đã mở chia sẻ" : shareStatus === "copied" ? "Đã sao chép lời khoe" : "Chia sẻ kết quả"}</button>{cardStatus === "error" && <span className="share-note"><Check size={14} /> Chưa tạo được thẻ, hãy thử lại nhé.</span>}{shareStatus === "manual" && <span className="share-note"><Check size={14} /> Hãy sao chép điểm để khoe với bạn bè nhé.</span>}{saveStatus !== "needsName" && saveStatus !== "error" && <button className="leaderboard-button" onClick={openLeaderboard}><Trophy size={16} /> {saveStatus === "ranked" ? "Mở lại Top 20" : "Xem Top 20"}</button>}<button className="play-button" onClick={returnToMenu}>Về màn hình đầu</button></div>}</section></div>
       )}
 
       {leaderboardOpen && (

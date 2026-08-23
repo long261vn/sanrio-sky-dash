@@ -1,7 +1,7 @@
 /** Chạy Đua Cùng Hana: âm thanh chỉ phát sau một thao tác thực của người chơi. */
 import { assetUrl } from "@/lib/assets";
 
-type EffectName = "button" | "pickup" | "jump" | "slide" | "shield" | "gameover";
+type EffectName = "button" | "pickup" | "jump" | "slide" | "shield" | "clear" | "gameover";
 
 const BGM_URL = assetUrl("hana-sky-dash-bgm_c55c1f2d.mp3");
 const EFFECT_URLS: Record<EffectName, string> = {
@@ -10,13 +10,14 @@ const EFFECT_URLS: Record<EffectName, string> = {
   jump: assetUrl("jump_ae7164a5.mp3"),
   slide: assetUrl("slide_52cc7eb5.mp3"),
   shield: assetUrl("shield_492fe0ae.mp3"),
+  clear: assetUrl("sky-dash-obstacle-clear-short_c5cf1a4e.mp3"),
   gameover: assetUrl("gameover_34b8453a.mp3"),
 };
 
 export class AudioManager {
   private readonly bgm = new Audio(BGM_URL);
   private readonly effects: Record<EffectName, HTMLAudioElement[]>;
-  private readonly effectCursors: Record<EffectName, number> = { button: 0, pickup: 0, jump: 0, slide: 0, shield: 0, gameover: 0 };
+  private readonly effectCursors: Record<EffectName, number> = { button: 0, pickup: 0, jump: 0, slide: 0, shield: 0, clear: 0, gameover: 0 };
   private enabled = true;
   private unlocked = false;
 
@@ -31,7 +32,7 @@ export class AudioManager {
         const voices = Array.from({ length: voiceCount }, () => {
           const audio = new Audio(url);
           audio.preload = "auto";
-          audio.volume = name === "gameover" ? 0.7 : name === "jump" || name === "pickup" ? 0.64 : 0.58;
+          audio.volume = name === "gameover" ? 0.7 : name === "jump" || name === "pickup" || name === "clear" ? 0.64 : 0.58;
           return audio;
         });
         return [name, voices];

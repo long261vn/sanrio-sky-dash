@@ -184,3 +184,8 @@
 - [x] Thêm âm thanh phản hồi riêng khi nhảy, nhặt vật phẩm và kết thúc lượt chơi, tôn trọng trạng thái tắt nhạc/âm thanh.
 - [x] Thêm nút chia sẻ thành tích ở màn kết quả với Web Share API và phương án sao chép nội dung khi không được hỗ trợ.
 - [x] Kiểm thử unit/UI cho hiệu ứng âm thanh, nội dung chia sẻ, trạng thái fallback và bố cục màn kết quả desktop/mobile.
+
+- [x] Thiết kế và tạo thẻ thành tích PNG chứa nhân vật, điểm, quãng đường, cấp độ và hạng Top 20 nếu có.
+- [x] Thêm nút tải thẻ thành tích và ưu tiên gửi file ảnh qua Web Share API khi thiết bị hỗ trợ.
+- [x] Thêm âm thanh riêng khi vượt thành công đệm thấp hoặc cổng mây cao, không trùng âm thanh va chạm/vật phẩm.
+- [x] Kiểm thử xuất/tải thẻ, nội dung ảnh, chia sẻ file, âm thanh clear và bố cục màn kết quả desktop/mobile.

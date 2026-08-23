@@ -8,6 +8,8 @@ const mocks = vi.hoisted(() => ({
   mutate: vi.fn(),
   refetch: vi.fn(),
   setData: vi.fn(),
+  createCard: vi.fn(),
+  downloadCard: vi.fn(),
   leaderboardData: { seasonKey: "2026-08-22", rows: [] as any[] },
   mutationOptions: null as any,
 }));
@@ -21,6 +23,10 @@ vi.mock("@/lib/trpc", () => ({
     },
     useUtils: () => ({ leaderboard: { top20: { setData: (...args: any[]) => { mocks.setData(...args); mocks.leaderboardData = args[1]; } } } }),
   },
+}));
+vi.mock("@/lib/achievementCard", () => ({
+  createAchievementCard: mocks.createCard,
+  downloadAchievementCard: mocks.downloadCard,
 }));
 
 import SkyDashHud from "./SkyDashHud";
@@ -51,6 +57,8 @@ afterEach(() => {
   mocks.mutate.mockReset();
   mocks.refetch.mockReset();
   mocks.setData.mockReset();
+  mocks.createCard.mockReset();
+  mocks.downloadCard.mockReset();
   mocks.leaderboardData = { seasonKey: "2026-08-22", rows: [] };
   mocks.mutationOptions = null;
 });
@@ -239,5 +247,35 @@ describe("SkyDashHud run flow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Chia sẻ kết quả" }));
     await waitFor(() => expect(writeText).toHaveBeenCalledWith(expect.stringContaining("740 điểm")));
     await waitFor(() => expect(screen.getByRole("button", { name: "Đã sao chép lời khoe" })).toBeTruthy());
+  });
+
+  it("downloads an achievement PNG with the completed run data", async () => {
+    const blob = new Blob(["card"], { type: "image/png" });
+    mocks.createCard.mockResolvedValue({ blob, filename: "thanh-tich.png" });
+    render(<SkyDashHud />);
+    act(() => {
+      window.dispatchEvent(new CustomEvent<GameSnapshot>("skydash:state", { detail: { ...gameoverSnapshot, score: 1_760, distance: 214, difficultyLevel: 3 } }));
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Tải thẻ PNG" }));
+    await waitFor(() => expect(mocks.createCard).toHaveBeenCalledWith(expect.objectContaining({ score: 1_760, distance: 214, level: 3 })));
+    await waitFor(() => expect(mocks.downloadCard).toHaveBeenCalledWith(blob, "thanh-tich.png"));
+    expect(screen.getByRole("button", { name: "Đã tải thẻ PNG" })).toBeTruthy();
+  });
+
+  it("shares the achievement PNG when file sharing is supported", async () => {
+    const blob = new Blob(["card"], { type: "image/png" });
+    const share = vi.fn().mockResolvedValue(undefined);
+    mocks.createCard.mockResolvedValue({ blob, filename: "thanh-tich.png" });
+    Object.defineProperty(navigator, "canShare", { configurable: true, value: vi.fn().mockReturnValue(true) });
+    Object.defineProperty(navigator, "share", { configurable: true, value: share });
+    render(<SkyDashHud />);
+    act(() => {
+      window.dispatchEvent(new CustomEvent<GameSnapshot>("skydash:state", { detail: { ...gameoverSnapshot, score: 1_120 } }));
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Chia sẻ thẻ" }));
+    await waitFor(() => expect(share).toHaveBeenCalledWith(expect.objectContaining({ files: expect.any(Array) })));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Đã mở chia sẻ thẻ" })).toBeTruthy());
+    Object.defineProperty(navigator, "canShare", { configurable: true, value: undefined });
+    Object.defineProperty(navigator, "share", { configurable: true, value: undefined });
   });
 });

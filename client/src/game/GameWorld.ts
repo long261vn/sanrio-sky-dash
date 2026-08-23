@@ -429,6 +429,7 @@ export class GameWorld {
         const clearedLowHurdle = entity.kind === "lowHurdle" && this.playerAirHeight > 0.76;
         const clearedCloudGate = entity.kind === "cloudGate" && this.slideTimer > 0.08;
         if (clearedLowHurdle || clearedCloudGate) {
+          this.audio.play("clear");
           this.score += scoreForClear(this.multiplier);
           this.removeEntity(index);
           if (this.isPractice) this.advancePractice();

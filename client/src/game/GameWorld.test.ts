@@ -80,6 +80,7 @@ describe("GameWorld keyboard input", () => {
       const obstacle = collisionWorld(kind);
       (obstacle.world as unknown as { updateEntities: (delta: number, speed: number) => void }).updateEntities(0, 0);
       expect(obstacle.world.score).toBe(32);
+      expect((obstacle.world.audio as { play: ReturnType<typeof vi.fn> }).play).toHaveBeenCalledWith("clear");
       expect(obstacle.removeEntity).toHaveBeenCalledWith(0);
     }
   });
