@@ -228,4 +228,4 @@
 - [x] Kiểm thử đối chiếu từng silhouette mascot, mobile và hai bản public rồi phát hành.
 - [x] Nâng factory mascot runtime với tỷ lệ, mắt/má, tai, phụ kiện và dấu hiệu nhận diện riêng rõ hơn cho tám nhân vật.
 - [x] Bảo đảm preview 360° tiếp tục render đúng cùng factory nâng cấp, không tạo model thay thế.
-- [ ] Kiểm thử trực quan gameplay/preview của các silhouette, regression, mobile và hai bản public trước phát hành.
+- [x] Kiểm thử trực quan gameplay/preview của các silhouette, regression, mobile và hai bản public trước phát hành.

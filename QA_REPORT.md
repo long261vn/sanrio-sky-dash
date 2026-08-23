@@ -300,3 +300,5 @@ Factory `MascotModel` nay là nguồn dựng duy nhất cho `GameWorld` và prev
 ### Tạo hình mascot runtime nâng cấp — 23/08/2026
 
 Model chung được tăng tỷ lệ khuôn mặt, mắt/má, tay/chân, mũ/hood, hoa, mỏ, bụng, áo, đuôi, nơ và tai theo silhouette. Lượt setup local chọn Kuromi xác nhận canvas đổi ngay sang cùng model tím/hood/gai đang dùng khi chạy; các ca mobile đại diện cũng xác nhận Cinnamoroll, Pompompurin, My Melody và Hello Kitty giữ nhận diện rõ hơn trên đường mây. Preview tiếp tục gọi factory chung, nên mọi điều chỉnh model runtime tự phản ánh ở 360°.
+
+Checkpoint `9fc7aadf` được xác minh trên Manus public và GitHub Pages: canvas preview không trống, có nhãn model runtime và nút xoay; lưới 8 mascot, tên và các chip chỉ số vẫn ổn định. Tạo hình mascot chi tiết cùng preview đồng bộ đạt phát hành.
