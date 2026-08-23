@@ -8,7 +8,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import type { CharacterDefinition } from "@/game/types";
 
 export type MascotModel = { root: TransformNode; visual: TransformNode; shieldRing: Mesh };
-export const MASCOT_MODEL_VERSION = "orientation-v3";
+export const MASCOT_MODEL_VERSION = "orientation-v4";
 export const GAMEPLAY_MASCOT_FACING_Y = Math.PI;
 export const PREVIEW_MASCOT_FACING_Y = 0;
 

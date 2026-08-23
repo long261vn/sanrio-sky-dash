@@ -18,6 +18,16 @@ Lượt chạy trực tiếp xác nhận Cinnamoroll giờ chạy về `+Z`: cam
 
 Ảnh 2D trong lưới chọn được giữ làm minh hoạ **mặt trước** vì đây là bộ hình người chơi đã xác nhận đúng nhận diện; mỗi thẻ nay ghi rõ “Ảnh mặt trước” và có nhãn truy cập tương ứng. Preview 360° mở ở mặt trước cùng factory runtime, còn gameplay nhìn lưng khi mascot chạy về phía trước. Kiểm thử UI bảo vệ hai nhãn này.
 
+## Theo dõi phát hành
+
+Lượt public đầu tiên sau checkpoint `9c881d28` trả setup/gameplay bundle cũ trên cả Manus và GitHub Pages: chưa có dòng “Preview 360°: mặt trước · gameplay: nhìn lưng khi chạy” hoặc nhãn “Ảnh mặt trước”. Đây là trạng thái CDN/Pages chưa đồng bộ, không dùng làm kết quả phát hành; cần retry cache-buster trước khi đóng QA public.
+
+Retry Manus hiện vẫn tải `assets/index-saIMwz_X.js`; kiểm tra bundle cùng origin không có marker `orientation-v3`, nhãn ảnh mặt trước hoặc hint orientation. Đây là bằng chứng CDN cũ, không phải lỗi code mới; tiếp tục retry sau khoảng đồng bộ.
+
+GitHub Pages đã đồng bộ: setup hiện đủ tám thẻ có nhãn “Ảnh mặt trước” và hint orientation, còn demo Cinnamoroll cho thấy sau đầu/tai dài/đuôi cuộn từ camera phía sau khi chạy +Z. Không có tên người chơi nào được nộp trong URL QA. Manus vẫn cần retry riêng.
+
+Để yêu cầu một bundle public mới dễ phân biệt, marker factory được nâng thành `orientation-v4`. `pnpm test` vẫn đạt 54/54, `pnpm check` và `pnpm build` đạt trước checkpoint phát hành lại.
+
 ## Nguồn và phát hiện đã xác minh
 
 | Nhân vật | Phát hiện nguồn | Hệ quả orientation |
