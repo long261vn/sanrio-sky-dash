@@ -203,3 +203,6 @@
 - [x] Kiểm thử desktop/mobile cho fallback mascot, HUD điểm/quãng đường và cuộn hạng tự động Top 20.
 - [x] Sửa resolver URL chân dung mascot để GitHub Pages tải ảnh chi tiết từ origin công khai thay vì chỉ dùng fallback biểu tượng.
 - [x] Kiểm thử lại Manus public và GitHub Pages cho đủ tám chân dung sau khi phát hành.
+- [x] QA nghiêm khắc tái hiện lỗi chân dung mascot đè chữ ở màn thiết lập trên desktop và mobile.
+- [x] QA end-to-end đồ họa, responsive, gameplay, điều khiển, leaderboard, âm thanh và bản công khai.
+- [x] Lập báo cáo lỗi/cải tiến có mức ưu tiên, bằng chứng và khuyến nghị xử lý; không tự sửa mã trong đợt audit.
