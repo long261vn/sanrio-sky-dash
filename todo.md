@@ -167,3 +167,10 @@
 - [x] Kiểm thử dữ liệu Top 30 nhiều lượt cùng tên, spawn liên tục, cổng mây và menu hai bước trên desktop/mobile.
 - [x] Kiểm thử trực tiếp mobile runtime đủ sáu hành vi: đổi làn, nhảy, trượt, nhặt sao, khiên và vòng gió; lưu bằng chứng riêng từng hành vi.
 - [x] Cập nhật QA checklist phát hành hợp nhất cho tutorial, vật phẩm, ba làn và Top 30 trên desktop/mobile của bản mới nhất.
+
+- [x] Chẩn đoán và sửa các vùng chồng lấn hoặc tỷ lệ bất hợp lý của landing trên khung desktop.
+- [x] Chuyển hướng dẫn thành các cửa sổ từng bước, có tiến độ, nút tiếp và bỏ qua ở mọi bước.
+- [x] Bắt buộc người chơi nhập tên và chọn nhân vật trong bước thiết lập trước khi bắt đầu lượt chạy.
+- [x] Đưa nút xem Top 30 cạnh khối Kỷ lục bầu trời, giữ rõ ràng trên desktop và mobile.
+- [x] Nâng cổng mây hoặc hạ tỷ lệ nhân vật để khoảng trượt cao, dễ nhận biết và không tạo va chạm trực quan.
+- [x] Kiểm thử desktop/mobile cho landing, setup, hướng dẫn bỏ qua, điều kiện bắt đầu và cổng mây mới.

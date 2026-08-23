@@ -56,29 +56,48 @@ afterEach(() => {
 });
 
 describe("SkyDashHud run flow", () => {
-  it("sends Start even when the player has not named a leaderboard entry", () => {
+  it("requires a name and an explicit character choice before sending Start", () => {
     const commandListener = vi.fn();
     window.addEventListener("skydash:command", commandListener);
     render(<SkyDashHud />);
 
     fireEvent.click(screen.getByRole("button", { name: "Bắt đầu hành trình" }));
-    fireEvent.click(screen.getByRole("button", { name: "Chạy cùng Cinnamoroll" }));
+    const runButton = screen.getByRole("button", { name: "Chạy cùng Cinnamoroll" });
+    expect((runButton as HTMLButtonElement).disabled).toBe(true);
 
-    expect(commandListener).toHaveBeenCalledOnce();
-    expect((commandListener.mock.calls[0][0] as CustomEvent).detail).toEqual({ type: "start", characterId: "cinnamoroll" });
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Mây Nhỏ" } });
+    const cinnamorollCard = screen.getAllByRole("button").find((button) => button.classList.contains("character-card") && button.textContent?.includes("Cinnamoroll"));
+    expect(cinnamorollCard).toBeTruthy();
+    fireEvent.click(cinnamorollCard!);
+    expect((runButton as HTMLButtonElement).disabled).toBe(false);
+    fireEvent.click(runButton);
+
+    expect(commandListener.mock.calls.map(([event]) => (event as CustomEvent).detail)).toEqual([
+      { type: "select", characterId: "cinnamoroll" },
+      { type: "start", characterId: "cinnamoroll" },
+    ]);
     window.removeEventListener("skydash:command", commandListener);
   });
 
-  it("shows the leaderboard name form after a nameless game-over instead of blocking the run", () => {
+  it("shows a mandatory name field in setup before a run can begin", () => {
     render(<SkyDashHud />);
 
-    act(() => {
-      window.dispatchEvent(new CustomEvent<GameSnapshot>("skydash:state", { detail: gameoverSnapshot }));
-    });
+    fireEvent.click(screen.getByRole("button", { name: "Bắt đầu hành trình" }));
 
-    expect(screen.getByText("Đặt tên để ghi hạng nhé.")).toBeTruthy();
-    expect(screen.getByRole("textbox", { name: "TÊN HIỂN THỊ TRÊN TOP 30" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Lưu & xem hạng" })).toBeTruthy();
+    expect(screen.getByText("BƯỚC 1 · TÊN NGƯỜI CHƠI")).toBeTruthy();
+    expect(screen.getByText("BẮT BUỘC")).toBeTruthy();
+    expect(screen.getByText(/Cần: nhập tên/)).toBeTruthy();
+  });
+
+  it("opens a short paged tutorial and lets the player skip it at any step", () => {
+    render(<SkyDashHud />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Hướng dẫn chơi" }));
+    expect(screen.getByText("BƯỚC 1 / 4 · NHẶT")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Tiếp theo" }));
+    expect(screen.getByText("BƯỚC 2 / 4 · NHẢY")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /Bỏ qua/ }));
+    expect(screen.queryByText("BƯỚC 2 / 4 · NHẢY")).toBeNull();
   });
 
   it("renders all 30 ranked slots even when only a few players have submitted scores", () => {

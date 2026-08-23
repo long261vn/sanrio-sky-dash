@@ -196,3 +196,15 @@ Chuỗi hành vi được bao phủ qua hai tầng kiểm tra: test HUD gọi tr
 Test HUD end-to-end mới mô phỏng chuỗi **game-over → tự gửi điểm → callback Top 30** cho tên `Long`: phản hồi gồm hai entry `Long` có ID khác nhau, hạng 1 và hạng 2; UI hiển thị cả hai dòng và chỉ tô dòng ID của lượt mới nhất. Test repository server đồng thời xác nhận cùng `playerId` có thể lưu hai lượt độc lập, lượt ngoài Top 30 vẫn được lưu nhưng không bị báo nhầm là đã vào hạng. Toàn bộ suite hiện có **31 test** đạt.
 
 Trên bản public, không tạo điểm thử để bảo vệ bảng hạng đang có người chơi thật. Thay vào đó, Manus public đã xác nhận landing mới, Top 30 đủ 30 slot và entry thật `Long 2` (3.999 điểm); GitHub Pages cũng đã tải bundle mới và đồng bộ đúng Kỷ lục bầu trời 3.999 sau khi API hoàn tất. Kết hợp với migration không mất dữ liệu và test E2E cục bộ, checklist phát hành cho gameplay, game-over, save flow và Top 30 được đóng mà không làm bẩn dữ liệu công khai.
+
+### Sửa layout desktop, hướng dẫn phân bước và setup bắt buộc — 23/08/2026
+
+| Hạng mục | Bằng chứng kiểm tra | Kết quả |
+| --- | --- | --- |
+| Landing desktop | Ảnh preview 1440×900 cho thấy Kỷ lục bầu trời và nút Top 30 nằm cùng một hàng, CTA tách rõ phía dưới; phần copy, hình minh hoạ và footer đều vừa một viewport. | Đạt. |
+| Setup desktop | QA tái hiện panel cũ để lộ khoảng trống lớn và cuộn ngang. Sau khi reset lưới panel cha về một cột, ảnh preview cho thấy form, 8 nhân vật và CTA dùng đủ chiều ngang, không còn thanh cuộn ngang. | Đạt. |
+| Hướng dẫn | Ảnh desktop và 390×844 thể hiện cửa sổ 1/4 với nút Bỏ qua, chỉ báo tiến độ, Trước/Tiếp; nội dung mỗi cửa sổ vừa panel, không cần cuộn qua năm thẻ dài. | Đạt. |
+| Điều kiện chạy | UI test xác nhận nút Chạy/Luyện tập bị khoá cho đến khi tên có từ hai ký tự và người chơi chạm chọn một nhân vật; sau đó cầu event gửi `select` rồi `start`. | Đạt. |
+| Cổng mây | Demo cổng mây ở desktop/mobile dùng hình học 2,78 × 3,04 tại y=2,12; tư thế trượt hạ visual xuống và nén còn 65%. Cổng, khoảng hở, biển cảnh báo, nhân vật và HUD cùng thấy rõ. | Đạt. |
+
+Toàn bộ suite hiện có **33 test** đạt, TypeScript đạt và build production hoàn thành. Xác minh CDN/public sẽ thực hiện sau checkpoint, không tạo điểm thử trên bảng xếp hạng thật.

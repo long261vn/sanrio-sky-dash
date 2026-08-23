@@ -341,18 +341,18 @@ export class GameWorld {
     this.player.scaling.set(1, 1, 1);
     if (this.playerVisual) {
       const visual = this.playerVisual;
-      visual.position.y = isSliding ? 0.25 : 0.2 + (isAirborne ? Math.sin(this.elapsed * 10) * 0.025 : runWave * 0.028);
+      visual.position.y = isSliding ? 0.16 : 0.2 + (isAirborne ? Math.sin(this.elapsed * 10) * 0.025 : runWave * 0.028);
       visual.rotation.z = isSliding ? -0.06 : isAirborne ? laneDelta * -0.018 : laneDelta * -0.026 + runWave * 0.012;
       visual.scaling.x = isSliding ? 1.12 : isAirborne ? (this.playerYVelocity > 0 ? 0.93 : 1.05) : 1 + landingPulse * 0.11;
-      visual.scaling.y = isSliding ? 0.72 : isAirborne ? (this.playerYVelocity > 0 ? 1.08 : 0.97) : 1 - landingPulse * 0.13 + runWave * 0.012;
+      visual.scaling.y = isSliding ? 0.65 : isAirborne ? (this.playerYVelocity > 0 ? 1.08 : 0.97) : 1 - landingPulse * 0.13 + runWave * 0.012;
       visual.scaling.z = 1;
       const body = visual.getChildMeshes().find((mesh) => mesh.name === "avatarBody");
-      if (body) body.position.y = isSliding ? 0.6 : 0.72;
+      if (body) body.position.y = isSliding ? 0.53 : 0.72;
       const ears = visual.getChildMeshes().filter((mesh) => mesh.name.startsWith("avatarEar") || mesh.name.startsWith("kittyEar"));
       ears.forEach((ear, index) => { ear.rotation.z = (index % 2 === 0 ? -1 : 1) * (0.08 + runWave * 0.1 + (isAirborne ? 0.15 : 0)); });
       const badge = visual.getChildMeshes().find((mesh) => mesh.name === "runnerBadge");
       if (badge) {
-        badge.position.y = isSliding ? 0.72 : 0.96;
+        badge.position.y = isSliding ? 0.66 : 0.96;
         badge.rotation.z = isSliding ? -0.18 : runWave * 0.25;
       }
     }
@@ -713,7 +713,7 @@ export class GameWorld {
   }
 
   private createCloudGate(root: TransformNode) {
-    this.createStickerProp(root, "highSlideGate", PROP_TEXTURES.cloudGate, 2.66, 2.78, 1.92);
+    this.createStickerProp(root, "highSlideGate", PROP_TEXTURES.cloudGate, 2.78, 3.04, 2.12);
   }
 
   private createStar(root: TransformNode) {

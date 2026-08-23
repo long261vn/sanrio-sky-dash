@@ -2,12 +2,15 @@ import { describe, expect, it } from "vitest";
 import { canStartSkyDashRun, needsLeaderboardName } from "../shared/runFlow";
 
 describe("run flow", () => {
-  it("always allows a player to begin a run, even before naming a leaderboard entry", () => {
-    expect(canStartSkyDashRun()).toBe(true);
+  it("requires both a valid player name and an explicit character selection before a run", () => {
+    expect(canStartSkyDashRun("", false)).toBe(false);
+    expect(canStartSkyDashRun("Hana", false)).toBe(false);
+    expect(canStartSkyDashRun("", true)).toBe(false);
+    expect(canStartSkyDashRun("Mây Nhỏ", true)).toBe(true);
     expect(needsLeaderboardName("")).toBe(true);
   });
 
-  it("only asks for a name at the point of leaderboard saving", () => {
+  it("keeps the same two-character validation for player names", () => {
     expect(needsLeaderboardName(" A ")).toBe(true);
     expect(needsLeaderboardName("Mây Nhỏ")).toBe(false);
   });

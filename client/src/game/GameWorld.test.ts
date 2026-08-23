@@ -27,6 +27,15 @@ function collisionWorld(kind: TestEntityKind) {
 }
 
 describe("GameWorld keyboard input", () => {
+  it("builds a raised cloud gate with a taller clear slide silhouette", () => {
+    const world = Object.create(GameWorld.prototype) as GameWorld & { createStickerProp: ReturnType<typeof vi.fn>; createCloudGate: (root: unknown) => void };
+    world.createStickerProp = vi.fn();
+
+    world.createCloudGate({});
+
+    expect(world.createStickerProp).toHaveBeenCalledWith(expect.anything(), "highSlideGate", expect.any(String), 2.78, 3.04, 2.12);
+  });
+
   it("maps desktop lane, jump and slide keys to the same gameplay commands", () => {
     const world = Object.create(GameWorld.prototype) as GameWorld & {
       handleCommand: ReturnType<typeof vi.fn>;
