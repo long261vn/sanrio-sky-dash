@@ -99,3 +99,5 @@ Kiểm tra bundle cùng origin xác nhận `index-BBY9yNlY.js` của Manus khôn
 Đối chiếu trực tiếp đã xác nhận bundle GitHub Pages `index-D_4u4v4U.js` có cả `E6F8FF` và `cloudTailCurl`, không còn marker rim cũ. Vì vậy GitHub Pages đã phát hành đúng factory mới; chỉ Manus còn chờ bundle thay thế.
 
 Factory hiện công bố marker `recognition-v2` tại `root.metadata.mascotFactory`, kèm `characterId`, để mọi scene runtime tự mô tả đúng phiên bản silhouette đang dùng. Regression kiểm tra marker này cho cả tám nhân vật. Sau thay đổi, `pnpm test` đạt 53/53, `pnpm check` và `pnpm build` đều đạt.
+
+Sau checkpoint `99224a15`, Manus đã đổi sang bundle `index-VfM3vOIh.js`: bundle cùng origin có `E6F8FF` và `cloudTailCurl`, xác nhận factory silhouette mới đã phát hành. GitHub Pages cũng có hai marker này trong bundle riêng và demo đã hiện Cinnamoroll trắng/tai dài. Như vậy cả hai bản public đều dùng factory runtime nhận dạng mới; các lượt kiểm tra không nộp tên nên không tạo dữ liệu Top 20.

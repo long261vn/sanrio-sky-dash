@@ -232,4 +232,4 @@
 - [x] Nghiên cứu nguồn đáng tin cậy và lập bảng đặc điểm nhận dạng cho Cinnamoroll, Pompompurin, My Melody, Kuromi, Badtz-Maru, Keroppi, Gudetama và Hello Kitty.
 - [x] Chuyển bảng nhận dạng thành đặc tả tạo hình mascot runtime, ưu tiên Cinnamoroll trắng/tai dài và dấu hiệu gương mặt đúng nhận diện.
 - [x] Dựng lại factory mascot chung để gameplay và preview 360° cùng bám sát bảng đặc điểm, không dùng model thay thế.
-- [ ] Kiểm thử silhouette, mobile, regression và hai bản public; cập nhật tài liệu đặc tả trước phát hành.
+- [x] Kiểm thử silhouette, mobile, regression và hai bản public; cập nhật tài liệu đặc tả trước phát hành.
