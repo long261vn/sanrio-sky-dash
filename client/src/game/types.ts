@@ -47,7 +47,8 @@ export type GameCommand =
   | { type: "resume" }
   | { type: "restart" }
   | { type: "menu" }
-  | { type: "toggleAudio" }
+  | { type: "setMusic"; enabled: boolean }
+  | { type: "setEffects"; enabled: boolean }
   | { type: "practice"; characterId?: CharacterId };
 
 export interface GameSnapshot {
@@ -62,7 +63,8 @@ export interface GameSnapshot {
   missionProgress: number;
   message: string;
   isNewRecord: boolean;
-  audioEnabled: boolean;
+  musicEnabled: boolean;
+  effectsEnabled: boolean;
   difficultyLevel: number;
   speed: number;
   actionHint: "jump" | "slide" | null;

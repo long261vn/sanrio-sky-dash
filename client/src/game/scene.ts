@@ -30,12 +30,12 @@ export async function createGameScene(engine: Engine, canvas: HTMLCanvasElement)
   const skyLight = new HemisphericLight("skyLight", new Vector3(0, 1, 0.2), scene);
   skyLight.diffuse = Color3.FromHexString("#FFF8E6");
   skyLight.groundColor = Color3.FromHexString("#7CC5E8");
-  skyLight.intensity = 1.08;
+  skyLight.intensity = 0.88;
 
   const keyLight = new DirectionalLight("sunshine", new Vector3(-0.25, -1, 0.25), scene);
   keyLight.position = new Vector3(8, 18, -12);
   keyLight.diffuse = Color3.FromHexString("#FFF1BF");
-  keyLight.intensity = 0.78;
+  keyLight.intensity = 0.6;
 
   const glow = new GlowLayer("softStarGlow", scene, { mainTextureFixedSize: 512, blurKernelSize: 36 });
   glow.intensity = 0.28;

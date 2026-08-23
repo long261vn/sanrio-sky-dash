@@ -184,11 +184,18 @@ export class GameWorld {
 
   private handleCommand(command: GameCommand) {
     if (!command) return;
-    if (command.type === "toggleAudio") {
-      void this.audio.toggle(this.status === "playing").then((started) => {
-        this.showMessage(!this.audio.isEnabled ? "Âm thanh đã tắt." : started ? "Nhạc nền đã bật — mây đang ngân nga!" : "Không phát được nhạc. Chạm loa để thử lại.");
+    if (command.type === "setMusic") {
+      void this.audio.setMusicEnabled(command.enabled, this.status === "playing").then((started) => {
+        this.showMessage(!this.audio.musicEnabled ? "Nhạc nền đã tắt." : started ? "Nhạc nền đã bật — mây đang ngân nga!" : "Không phát được nhạc. Chạm nhạc để thử lại.");
         this.emitState();
       });
+      this.emitState();
+      return;
+    }
+    if (command.type === "setEffects") {
+      this.audio.setEffectsEnabled(command.enabled);
+      if (command.enabled) this.audio.play("button");
+      this.showMessage(command.enabled ? "Hiệu ứng đã bật." : "Hiệu ứng đã tắt.");
       this.emitState();
       return;
     }
@@ -544,12 +551,21 @@ export class GameWorld {
   }
 
   private buildTrack() {
-    const trackMaterial = this.material("cloudRibbon", "#C85A7B", 0.06);
-    const laneMaterial = this.material("laneSeam", "#1F5F93", 0.14);
-    const edgeMaterial = this.material("trackEdge", "#F7B632", 0.16);
+    const trackMaterial = this.material("cloudRibbon", "#D9BD7C", 0.025);
+    const laneCloudMaterial = this.material("laneCloudCream", "#F4DFA8", 0.04);
+    const laneSoftMaterial = this.material("laneCloudSoft", "#EAD09A", 0.04);
+    const laneMaterial = this.material("laneSeam", "#5AAED2", 0.1);
+    const edgeMaterial = this.material("trackEdge", "#FFFDF4", 0.02);
+    const wishTrimMaterial = this.material("wishStarTrim", "#F4C54B", 0.12);
+    const puffMaterial = this.material("trackCloudPuff", "#FFFDF4", 0.015);
     const track = MeshBuilder.CreateGround("cloudRibbonTrack", { width: 9.15, height: 112, subdivisions: 2 }, this.scene);
     track.position.z = 44;
     track.material = trackMaterial;
+    [-2.6, 0, 2.6].forEach((x, index) => {
+      const lane = MeshBuilder.CreateGround(`cloudLane${index}`, { width: 2.47, height: 112, subdivisions: 1 }, this.scene);
+      lane.position = new Vector3(x, 0.012, 44);
+      lane.material = index === 1 ? laneCloudMaterial : laneSoftMaterial;
+    });
     for (const x of [-1.3, 1.3]) {
       const seam = MeshBuilder.CreateBox(`laneSeam${x}`, { width: 0.19, height: 0.13, depth: 112 }, this.scene);
       seam.position = new Vector3(x, 0.065, 44);
@@ -559,6 +575,20 @@ export class GameWorld {
       const rail = MeshBuilder.CreateBox(`puffyRail${x}`, { width: 0.28, height: 0.27, depth: 112 }, this.scene);
       rail.position = new Vector3(x, 0.18, 44);
       rail.material = edgeMaterial;
+    }
+    for (const x of [-4.35, 4.35]) {
+      const trim = MeshBuilder.CreateBox(`wishTrim${x}`, { width: 0.1, height: 0.12, depth: 112 }, this.scene);
+      trim.position = new Vector3(x, 0.22, 44);
+      trim.material = wishTrimMaterial;
+    }
+    for (let index = 0; index < 16; index += 1) {
+      const z = index * 7.2 - 5;
+      for (const x of [-4.82, 4.82]) {
+        const puff = MeshBuilder.CreateSphere(`trackPuff${index}-${x}`, { diameter: 0.82, segments: 12 }, this.scene);
+        puff.position = new Vector3(x + (index % 2 === 0 ? 0.12 : -0.12), 0.18, z);
+        puff.scaling = new Vector3(1.1, 0.5, 0.86);
+        puff.material = puffMaterial;
+      }
     }
   }
 
@@ -794,7 +824,8 @@ export class GameWorld {
       missionProgress: 0,
       message: this.messageTimer > 0 || this.status !== "playing" ? this.message : "",
       isNewRecord: this.newRecord,
-      audioEnabled: this.audio.isEnabled,
+      musicEnabled: this.audio.musicEnabled,
+      effectsEnabled: this.audio.effectsEnabled,
       difficultyLevel: this.getDifficulty().level,
       speed: Math.round(this.getDifficulty().speed),
       actionHint: this.actionHintTimer > 0 ? this.actionHint : null,

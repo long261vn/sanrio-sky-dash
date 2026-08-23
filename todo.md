@@ -206,3 +206,12 @@
 - [x] QA nghiêm khắc tái hiện lỗi chân dung mascot đè chữ ở màn thiết lập trên desktop và mobile.
 - [x] QA end-to-end đồ họa, responsive, gameplay, điều khiển, leaderboard, âm thanh và bản công khai.
 - [x] Lập báo cáo lỗi/cải tiến có mức ưu tiên, bằng chứng và khuyến nghị xử lý; không tự sửa mã trong đợt audit.
+- [x] Sửa P0 lưới chọn nhân vật 391–560px để ảnh mascot không đè tên, giữ target chạm tối thiểu 44px và thêm regression responsive.
+- [x] Gỡ CSS `background-image` chân dung theo nth-child, giữ một nguồn ảnh `assetUrl()` cùng fallback đã kiểm thử.
+- [x] Đồng nhất đường chạy runtime với nhận diện mây–kem–blueberry–sao điều ước của landing và phản ánh màu/nhận diện nhân vật trong gameplay.
+- [x] Nâng typography mobile, focus ring, nhãn aria và điều khiển một tay cho setup, HUD, hướng dẫn, kết quả và Top 20.
+- [x] Tách công tắc nhạc nền/hiệu ứng, lưu tùy chọn người chơi và cân lại mức âm lượng các nhóm âm thanh.
+- [x] Lazy-load Babylon/game canvas sau ý định bắt đầu chơi để giảm tải đầu; kiểm tra lại bundle và nhịp render.
+- [x] Bảo đảm debug logging không lưu header hay token nhạy cảm ở client; giữ đủ dữ liệu chẩn đoán an toàn.
+- [x] Bổ sung regression cho viewport 393×852/412×915, chọn nhân vật, audio preference, accessibility và phân tách tải game.
+- [ ] QA lại trên desktop, 360×780, 393×852, 412×915 và hai liên kết công khai; cập nhật báo cáo và phát hành.

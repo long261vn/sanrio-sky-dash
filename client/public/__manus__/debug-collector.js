@@ -470,7 +470,7 @@
     var requestHeaders = {};
     try {
       if (init.headers) {
-        requestHeaders = Object.fromEntries(new Headers(init.headers).entries());
+        requestHeaders = sanitizeValue(Object.fromEntries(new Headers(init.headers).entries()));
       }
     } catch (e) {
       requestHeaders = { _parseError: true };
@@ -500,7 +500,7 @@
         entry.response = {
           status: response.status,
           statusText: response.statusText,
-          headers: Object.fromEntries(response.headers.entries()),
+          headers: sanitizeValue(Object.fromEntries(response.headers.entries())),
           body: null,
         };
 

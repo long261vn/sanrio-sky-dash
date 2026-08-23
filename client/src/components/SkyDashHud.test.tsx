@@ -46,7 +46,8 @@ const gameoverSnapshot: GameSnapshot = {
   missionProgress: 0,
   message: "Chuyến bay kết thúc, thử thêm một lần nữa nhé.",
   isNewRecord: false,
-  audioEnabled: true,
+  musicEnabled: true,
+  effectsEnabled: true,
   difficultyLevel: 1,
   speed: 10,
   actionHint: null,
@@ -68,9 +69,24 @@ afterEach(() => {
 });
 
 describe("SkyDashHud run flow", () => {
-  it("requires a name and an explicit character choice before sending Start", () => {
+  it("sends independent commands for music and effects preferences", () => {
     const commandListener = vi.fn();
     window.addEventListener("skydash:command", commandListener);
+    render(<SkyDashHud />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Tắt nhạc nền" }));
+    fireEvent.click(screen.getByRole("button", { name: "Tắt hiệu ứng âm thanh" }));
+
+    expect(commandListener).toHaveBeenCalledWith(expect.objectContaining({ detail: { type: "setMusic", enabled: false } }));
+    expect(commandListener).toHaveBeenCalledWith(expect.objectContaining({ detail: { type: "setEffects", enabled: false } }));
+    window.removeEventListener("skydash:command", commandListener);
+  });
+
+  it("requires a name and an explicit character choice before sending Start", () => {
+    const commandListener = vi.fn();
+    const prepareListener = vi.fn();
+    window.addEventListener("skydash:command", commandListener);
+    window.addEventListener("skydash:prepare", prepareListener);
     render(<SkyDashHud />);
 
     fireEvent.click(screen.getByRole("button", { name: "Bắt đầu hành trình" }));
@@ -88,7 +104,9 @@ describe("SkyDashHud run flow", () => {
       { type: "select", characterId: "cinnamoroll" },
       { type: "start", characterId: "cinnamoroll" },
     ]);
+    expect(prepareListener).toHaveBeenCalledOnce();
     window.removeEventListener("skydash:command", commandListener);
+    window.removeEventListener("skydash:prepare", prepareListener);
   });
 
   it("keeps a mascot recognisable when its portrait image fails to load", () => {

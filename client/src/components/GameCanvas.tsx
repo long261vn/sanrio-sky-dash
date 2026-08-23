@@ -1,14 +1,19 @@
 /**
- * Mây Bông & Kẹo Ngọt: canvas Babylon trong suốt nằm trên bầu trời minh hoạ;
- * React chỉ là postcard frame và HUD, còn gameplay độc lập trong `game/`.
+ * Mây Bông & Kẹo Ngọt: React giữ postcard/HUD nhẹ; Babylon chỉ nạp khi cần chạy.
+ * Lệnh đầu tiên được xếp hàng để lần chạm "Chạy" không bao giờ bị mất trong lúc tải scene.
  */
 import { useEffect, useRef } from "react";
-import { Engine } from "@babylonjs/core/Engines/engine";
-import { createGameScene, type GameHandle } from "@/game/scene";
+import type { Engine } from "@babylonjs/core/Engines/engine";
+import type { GameHandle } from "@/game/scene";
+import type { GameCommand } from "@/game/types";
 import SkyDashHud from "@/components/SkyDashHud";
 import { assetUrl } from "@/lib/assets";
 
 const SKY_BACKGROUND_URL = assetUrl("sky-dash-background-retry_124d904a.png");
+const isDemoMode = () => {
+  const query = new URLSearchParams(window.location.search);
+  return query.has("demo") || query.has("practice") || query.has("result") || query.has("lesson") || query.has("qaAction") || query.has("pickup") || query.has("qaDense");
+};
 
 export default function GameCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -16,23 +21,48 @@ export default function GameCanvas() {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || startedRef.current) return;
-    startedRef.current = true;
-    const engine = new Engine(canvas, true, { alpha: true, preserveDrawingBuffer: true, stencil: true, adaptToDeviceRatio: true });
+    if (!canvas) return;
+
+    let engine: Engine | null = null;
     let handle: GameHandle | null = null;
     let disposed = false;
-    createGameScene(engine, canvas).then((nextHandle) => {
+    let ready = false;
+    const queuedCommands: GameCommand[] = [];
+
+    const boot = async () => {
+      if (startedRef.current || disposed) return;
+      startedRef.current = true;
+      const [{ Engine: BabylonEngine }, { createGameScene }] = await Promise.all([
+        import("@babylonjs/core/Engines/engine"),
+        import("@/game/scene"),
+      ]);
+      if (disposed) return;
+      engine = new BabylonEngine(canvas, true, { alpha: true, preserveDrawingBuffer: true, stencil: true, adaptToDeviceRatio: true });
+      const nextHandle = await createGameScene(engine, canvas);
       if (disposed) { nextHandle.dispose(); return; }
       handle = nextHandle;
+      ready = true;
       engine.runRenderLoop(() => nextHandle.scene.render());
-    });
-    const onResize = () => engine.resize();
+      queuedCommands.splice(0).forEach((command) => window.dispatchEvent(new CustomEvent<GameCommand>("skydash:command", { detail: command })));
+    };
+
+    const onPrepare = () => { void boot(); };
+    const onCommand = (event: Event) => {
+      if (!ready && startedRef.current) queuedCommands.push((event as CustomEvent<GameCommand>).detail);
+    };
+    const onResize = () => engine?.resize();
+    window.addEventListener("skydash:prepare", onPrepare);
+    window.addEventListener("skydash:command", onCommand as EventListener);
     window.addEventListener("resize", onResize);
+    if (isDemoMode()) void boot();
+
     return () => {
       disposed = true;
+      window.removeEventListener("skydash:prepare", onPrepare);
+      window.removeEventListener("skydash:command", onCommand as EventListener);
       window.removeEventListener("resize", onResize);
       handle?.dispose();
-      engine.dispose();
+      engine?.dispose();
       startedRef.current = false;
     };
   }, []);
