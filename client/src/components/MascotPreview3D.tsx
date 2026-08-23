@@ -10,7 +10,7 @@ import "@babylonjs/core/Shaders/ShadersInclude/helperFunctions";
 import "@babylonjs/core/Shaders/default.vertex";
 import "@babylonjs/core/Shaders/default.fragment";
 import type { CharacterDefinition } from "@/game/types";
-import { createMascotModel } from "@/game/MascotModel";
+import { createMascotModel, orientMascotForPreview } from "@/game/MascotModel";
 
 type PreviewHandle = { rotateBy: (radians: number) => void; pauseAutoSpin: () => void };
 
@@ -31,6 +31,7 @@ export function MascotPreview3D({ character, className = "" }: { character: Char
     const light = new HemisphericLight("mascotPreviewLight", new Vector3(-0.35, 1, -0.7), scene);
     light.intensity = 1.3;
     const model = createMascotModel(scene, character, "previewRunner");
+    orientMascotForPreview(model);
     model.root.scaling = new Vector3(1.1, 1.1, 1.1);
     model.root.rotation.y = -0.35;
     let autoResumeAt = performance.now() + 300;

@@ -8,7 +8,21 @@ import type { Scene } from "@babylonjs/core/scene";
 import type { CharacterDefinition } from "@/game/types";
 
 export type MascotModel = { root: TransformNode; visual: TransformNode; shieldRing: Mesh };
-export const MASCOT_MODEL_VERSION = "recognition-v2";
+export const MASCOT_MODEL_VERSION = "orientation-v3";
+export const GAMEPLAY_MASCOT_FACING_Y = Math.PI;
+export const PREVIEW_MASCOT_FACING_Y = 0;
+
+/** Keeps the shared mesh, but presents its face along the +Z runner direction. */
+export function orientMascotForGameplay(model: MascotModel) {
+  model.root.rotation.y = GAMEPLAY_MASCOT_FACING_Y;
+  model.root.metadata = { ...model.root.metadata, presentation: "gameplay-forward" };
+}
+
+/** Keeps the turntable at the front-facing angle before the player rotates it. */
+export function orientMascotForPreview(model: MascotModel) {
+  model.root.rotation.y = PREVIEW_MASCOT_FACING_Y;
+  model.root.metadata = { ...model.root.metadata, presentation: "preview-front" };
+}
 
 function createMaterial(scene: Scene, name: string, hex: string, emissive: number) {
   const material = new StandardMaterial(name, scene);
@@ -73,7 +87,6 @@ export function createMascotModel(scene: Scene, character: CharacterDefinition, 
   const accent = createMaterial(scene, `accent-${character.id}`, character.accent, 0.18);
   const softAccent = createMaterial(scene, `soft-${character.id}`, character.accentSoft, 0.08);
   const ink = createMaterial(scene, `ink-${character.id}`, "#233C62", 0.04);
-  const rim = createMaterial(scene, `rim-${character.id}`, rimTone, 0.14);
   const cream = createMaterial(scene, `cream-${character.id}`, "#FFF9E8", 0.05);
   const golden = createMaterial(scene, `golden-${character.id}`, "#FFD45C", 0.18);
   const berry = createMaterial(scene, `berry-${character.id}`, "#F56E91", 0.2);
@@ -85,11 +98,14 @@ export function createMascotModel(scene: Scene, character: CharacterDefinition, 
   const visual = new TransformNode(`${rootName}-visual`, scene);
   visual.parent = root;
   visual.position = new Vector3(0, 0.2, -0.12);
+  const backShell = character.silhouette === "bunny" ? accent
+    : character.silhouette === "imp" ? darkHood
+      : body;
 
   const bodyMesh = sphere(scene, visual, `${rootName}-avatarBody`, new Vector3(0, 0.72, 0), 1.18, body, new Vector3(0.82, 1.05, 0.72));
-  const bodyRim = sphere(scene, visual, `${rootName}-bodyRim`, new Vector3(0, 0.72, 0.2), 1.26, rim, new Vector3(0.86, 1.1, 0.6));
+  const bodyRim = sphere(scene, visual, `${rootName}-bodyRim`, new Vector3(0, 0.72, 0.2), 1.26, backShell, new Vector3(0.86, 1.1, 0.6));
   const head = sphere(scene, visual, `${rootName}-avatarHead`, new Vector3(0, 1.55, 0), 1.32, body, new Vector3(1, 0.94, 0.82));
-  const headRim = sphere(scene, visual, `${rootName}-headRim`, new Vector3(0, 1.55, 0.22), 1.44, rim, new Vector3(1.04, 0.98, 0.62));
+  const headRim = sphere(scene, visual, `${rootName}-headRim`, new Vector3(0, 1.55, 0.22), 1.44, backShell, new Vector3(1.04, 0.98, 0.62));
 
   const eyes: Mesh[] = [];
   const cheeks: Mesh[] = [];

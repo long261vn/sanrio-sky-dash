@@ -321,3 +321,14 @@ Checkpoint `d1f69f20` đã được kiểm tra với cache-buster. Manus public 
 Để phân biệt bundle factory mới khi phát hành, `MascotModel` công bố marker `recognition-v2` trên `root.metadata` cùng `characterId`; test NullEngine kiểm tra marker trên cả tám lựa chọn. Lần validation cuối vẫn đạt 53/53 test, TypeScript và build production. GitHub Pages bundle đã có marker palette/đuôi mới; Manus CDN sẽ được retry sau checkpoint kế tiếp, không tạo lượt điểm thử.
 
 Retry sau checkpoint `99224a15` xác nhận Manus đã chuyển sang `assets/index-VfM3vOIh.js`, có marker palette Cinnamoroll mới `E6F8FF` và mesh `cloudTailCurl`. GitHub Pages bundle cũng có cùng hai marker và demo Cinnamoroll trắng/tai dài. Hai bản public đã đồng bộ factory mascot runtime; không có lượt QA nào được nộp vào Top 20.
+
+### Orientation runner và đặc tả trước–sau — 23/08/2026
+
+Đã lập `MASCOT_ORIENTATION_SPEC.md` với bảng trước–sau cho cả tám mascot, dựa trên hồ sơ và minh hoạ của Sanrio SEA. Hợp đồng runtime được sửa: camera đứng phía âm trục Z nhìn về +Z, mascot chạy về +Z và do đó gameplay nhìn lưng đúng thiết kế; preview 360° bắt đầu tại mặt trước cùng factory, không dùng mesh thay thế. [Nguồn: Sanrio SEA Characters](https://sanrio-sea.com/characters/)
+
+| Hạng mục | Kiểm tra | Kết quả |
+| --- | --- | --- |
+| Orientation | `orientMascotForGameplay()` quay root `π` quanh trục Y; mắt/mũi local -Z đi về hướng chạy +Z, còn `headRim`/đuôi hướng camera. | Đạt. |
+| Hình chọn | Bộ ảnh 2D mặt trước đã đúng nhận diện được giữ nguyên, gắn nhãn “Ảnh mặt trước”; preview có chú thích rõ mặt trước/lưng khi chạy. | Đạt desktop và 360×780. |
+| Regression | NullEngine kiểm tra dấu hiệu nhận dạng và trục mắt/lưng cho cả tám mascot; test HUD kiểm tra nhãn preview/ảnh. | 54/54 test đạt. |
+| Build | `pnpm check` và `pnpm build` đạt; chunk Babylon 1,77MB raw/416KB gzip là cảnh báo kích thước đã biết do lazy-load engine. | Đạt. |

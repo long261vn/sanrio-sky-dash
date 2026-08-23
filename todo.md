@@ -233,3 +233,8 @@
 - [x] Chuyển bảng nhận dạng thành đặc tả tạo hình mascot runtime, ưu tiên Cinnamoroll trắng/tai dài và dấu hiệu gương mặt đúng nhận diện.
 - [x] Dựng lại factory mascot chung để gameplay và preview 360° cùng bám sát bảng đặc điểm, không dùng model thay thế.
 - [x] Kiểm thử silhouette, mobile, regression và hai bản public; cập nhật tài liệu đặc tả trước phát hành.
+- [x] Nghiên cứu và lập bảng đặc điểm mặt trước–mặt sau cho tám mascot, đối chiếu nguồn tham chiếu và ảnh chọn nhân vật hiện có.
+- [x] Chẩn đoán orientation camera/model khiến mascot quay lưng khi chạy và lập hợp đồng trục hướng chạy thống nhất.
+- [x] Sửa factory mascot và gameplay để mặt nhân vật chạy theo hướng đường chạy, còn mặt sau hiển thị đúng khi camera gameplay theo sau.
+- [x] Cập nhật hình ảnh chọn nhân vật theo đặc tả trước–sau, giữ ảnh 2D mặt trước đúng orientation và gắn nhãn rõ ràng.
+- [ ] Kiểm thử cả tám mascot trong preview/gameplay, regression, mobile và hai bản public trước phát hành.

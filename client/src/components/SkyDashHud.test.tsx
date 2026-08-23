@@ -128,6 +128,9 @@ describe("SkyDashHud run flow", () => {
     expect(document.querySelectorAll(".setup-selected .runner-perks span")).toHaveLength(3);
     expect(screen.getByRole("img", { name: "Mô hình 3D Cinnamoroll đang dùng khi chạy. Kéo để xoay." })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Xoay Cinnamoroll thêm 90 độ" })).toBeTruthy();
+    expect(screen.getByText("Preview 360°: mặt trước · gameplay: nhìn lưng khi chạy")).toBeTruthy();
+    expect(screen.getByLabelText("Ảnh mặt trước Cinnamoroll")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Chọn Cinnamoroll; ảnh mặt trước" })).toBeTruthy();
 
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "Mây Nhỏ" } });
     const cinnamorollCard = screen.getAllByRole("button").find((button) => button.classList.contains("character-card") && button.textContent?.includes("Cinnamoroll"));
