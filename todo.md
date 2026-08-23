@@ -222,4 +222,4 @@
 - [x] QA lại âm thanh/bố cục/avatar trên 360×780, 412×915, Manus public và GitHub Pages rồi phát hành.
 - [x] Thêm preview mascot 3D xoay 360° trong bước chọn nhân vật, có tự xoay nhẹ và thao tác kéo/chạm.
 - [x] Làm rõ trạng thái autoplay bị chặn và bảo đảm nhạc menu bắt đầu lại từ lần chạm hợp lệ tiếp theo khi đã bật nhạc.
-- [ ] Bổ sung regression cho preview 360° và retry audio, kiểm thử 360×780/412×915 cùng hai bản public.
+- [x] Bổ sung regression cho preview 360° và retry audio, kiểm thử 360×780/412×915 cùng hai bản public.

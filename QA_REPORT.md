@@ -290,3 +290,5 @@ Sau checkpoint `db915897`, Manus public setup hiển thị ảnh mascot, tên/ta
 ### Preview 360° và retry audio menu — 23/08/2026
 
 Preview local 360×780 hiển thị turntable mascot ngay trong khối nhân vật đã chọn, có tự xoay nhẹ và nút “Kéo để xoay 360°”; toàn bộ tên, ba chip chỉ số và lưới tám nhân vật vẫn vừa màn hình. Browser landing xác nhận lần chạm **Bắt đầu hành trình** đi vào setup có preview 360°; handler nhạc được gọi trên `pointerdown` của thao tác hợp lệ, trước khi chuyển màn, để vượt giới hạn autoplay của trình duyệt. UI tiếp tục hiện trạng thái “Nhạc: Bật/Tắt” và hiển thị chỉ dẫn chạm nút Nhạc nếu playback bị chặn.
+
+Lượt kiểm tra Manus đầu tiên của checkpoint `4b6eaa8e` có độ trễ CDN và trả bundle cũ. Đối chiếu repository xác nhận `MascotPreview3D.tsx`, `SkyDashHud.tsx`, `GameCanvas.tsx`, CSS và test đều nằm trong checkpoint; retry sau khi CDN hoàn tất đã hiển thị node preview/nút xoay trên Manus public. GitHub Pages cũng hiển thị node preview, nhãn “Kéo để xoay 360°” và nút xoay 90°. Hạng mục public đạt.
