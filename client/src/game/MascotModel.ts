@@ -8,6 +8,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import type { CharacterDefinition } from "@/game/types";
 
 export type MascotModel = { root: TransformNode; visual: TransformNode; shieldRing: Mesh };
+export const MASCOT_MODEL_VERSION = "recognition-v2";
 
 function createMaterial(scene: Scene, name: string, hex: string, emissive: number) {
   const material = new StandardMaterial(name, scene);
@@ -80,6 +81,7 @@ export function createMascotModel(scene: Scene, character: CharacterDefinition, 
   const darkHood = createMaterial(scene, `dark-hood-${character.id}`, "#33243D", 0.1);
 
   const root = new TransformNode(rootName, scene);
+  root.metadata = { mascotFactory: MASCOT_MODEL_VERSION, characterId: character.id };
   const visual = new TransformNode(`${rootName}-visual`, scene);
   visual.parent = root;
   visual.position = new Vector3(0, 0.2, -0.12);

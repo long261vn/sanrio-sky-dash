@@ -91,3 +91,11 @@ Retry GitHub Pages với cache-buster của checkpoint đã hiển thị Cinnamo
 GitHub Pages demo đã xác nhận Cinnamoroll trắng/tai dài đúng như factory mới. Lượt retry Manus demo tại cùng checkpoint vẫn đang trả model xanh đậm của bundle cũ, vì vậy hạng mục Manus public còn mở và phải retry sau độ trễ CDN; không dùng trạng thái tạm này để kết luận tạo hình phát hành đã đồng bộ.
 
 Lượt retry thứ hai của Manus vẫn giữ model cũ. Việc đọc trực tiếp fingerprint script bị browser chặn do một script cross-origin, nên không coi đó là nguyên nhân lỗi code; phát hành checkpoint cập nhật tiếp theo sẽ được dùng để yêu cầu CDN làm mới rồi kiểm tra lại bằng cache-buster.
+
+Sau lần phát hành lại, Manus đang tải `assets/index-BBY9yNlY.js` nhưng ảnh gameplay vẫn cho Cinnamoroll xanh đậm. Cần kiểm tra chính bundle cùng origin có chứa marker factory mới (`E6F8FF` và `cloudTailCurl`) trước khi retry tiếp, thay vì suy đoán từ ảnh.
+
+Kiểm tra bundle cùng origin xác nhận `index-BBY9yNlY.js` của Manus không có cả hai marker factory mới. Ngược lại, GitHub Pages đã hiển thị Cinnamoroll trắng bằng canvas runtime. Đây là phân kỳ phát hành/CDN của Manus, không phải lỗi bản build hay factory; tiếp tục theo dõi bundle Manus sau khi publish lại.
+
+Đối chiếu trực tiếp đã xác nhận bundle GitHub Pages `index-D_4u4v4U.js` có cả `E6F8FF` và `cloudTailCurl`, không còn marker rim cũ. Vì vậy GitHub Pages đã phát hành đúng factory mới; chỉ Manus còn chờ bundle thay thế.
+
+Factory hiện công bố marker `recognition-v2` tại `root.metadata.mascotFactory`, kèm `characterId`, để mọi scene runtime tự mô tả đúng phiên bản silhouette đang dùng. Regression kiểm tra marker này cho cả tám nhân vật. Sau thay đổi, `pnpm test` đạt 53/53, `pnpm check` và `pnpm build` đều đạt.

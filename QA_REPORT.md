@@ -317,3 +317,5 @@ Factory `MascotModel` đã được dựng lại theo bảng này. Lớp rim/hoo
 | Regression/build | `pnpm test` 53/53, `pnpm check` và `pnpm build` cùng đạt; cảnh báo chunk Babylon 1,77MB là cảnh báo kích thước đã biết do engine được lazy-load. | Đạt. |
 
 Checkpoint `d1f69f20` đã được kiểm tra với cache-buster. Manus public trả setup có canvas preview cùng nút xoay, tám lựa chọn và demo Cinnamoroll; lượt demo không nhập tên nên không tạo dữ liệu Top 20. GitHub Pages trả setup cùng canvas runtime, Cinnamoroll thân trắng/tai dài sau khi CDN đồng bộ, đồng thời tiếp tục dùng origin Manus tuyệt đối cho toàn bộ portrait 2D.
+
+Để phân biệt bundle factory mới khi phát hành, `MascotModel` công bố marker `recognition-v2` trên `root.metadata` cùng `characterId`; test NullEngine kiểm tra marker trên cả tám lựa chọn. Lần validation cuối vẫn đạt 53/53 test, TypeScript và build production. GitHub Pages bundle đã có marker palette/đuôi mới; Manus CDN sẽ được retry sau checkpoint kế tiếp, không tạo lượt điểm thử.

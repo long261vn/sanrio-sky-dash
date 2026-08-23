@@ -1,7 +1,7 @@
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { afterEach, describe, expect, it } from "vitest";
-import { createMascotModel } from "./MascotModel";
+import { createMascotModel, MASCOT_MODEL_VERSION } from "./MascotModel";
 import { CHARACTERS } from "./types";
 
 const expectedRecognitionMeshes: Record<string, string[]> = {
@@ -33,6 +33,7 @@ describe("createMascotModel", () => {
     const names = model.visual.getChildMeshes().map((mesh) => mesh.name).join("|");
 
     expect(model.root.name).toBe("spec");
+    expect(model.root.metadata).toMatchObject({ mascotFactory: MASCOT_MODEL_VERSION, characterId: character.id });
     expect(model.shieldRing.name).toBe("shieldRing");
     expectedRecognitionMeshes[character.id].forEach((marker) => expect(names).toContain(marker));
   });
