@@ -18,8 +18,8 @@
 - [x] Xác minh API/DB xếp entry hiện có theo score, stars và thời điểm nộp.
 - [x] Làm mới dữ liệu Top 30 thật từ server sau mỗi lượt, không chỉ dựa vào cache cục bộ.
 - [x] Hiển thị thông báo rõ ràng khi điểm mới không lọt Top 30 và để người chơi tự quay lại menu.
-- [ ] Kiểm thử dữ liệu thật có nhiều tên, thay đổi điểm cao và thứ hạng cập nhật ngay trong bảng.
-- [ ] Tái hiện lỗi không bắt đầu được lượt chơi trên Manus và GitHub Pages.
+- [x] Kiểm thử dữ liệu thật có nhiều tên, thay đổi điểm cao và thứ hạng cập nhật ngay trong bảng.
+- [x] Tái hiện lỗi không bắt đầu được lượt chơi trên Manus và GitHub Pages.
 - [x] Kiểm tra console, network và sự kiện command/state của luồng menu đến gameplay.
 - [x] Viết báo cáo QA phân loại lỗi chặn chơi, lỗi logic, lỗi UX và hạng mục không cần sửa.
 - [x] Sửa nguyên nhân chặn bắt đầu lượt chơi và thêm kiểm thử hồi quy tương ứng.
@@ -37,21 +37,21 @@
 - [x] Rà soát khiên, vòng đổi hướng và các vật phẩm gameplay: vị trí, collision, silhouette và mô tả hướng dẫn.
 - [x] Giải thích rõ giá trị của sao trong HUD/tutorial và liên kết sao với combo, nhiệm vụ hoặc phần thưởng có ý nghĩa.
 - [x] Loại bỏ hoặc thay thế các vật thể vàng giữa đường gây nhiễu nếu không phải vật phẩm có mục đích rõ ràng.
-- [ ] Kiểm thử lại toàn bộ tutorial/vật phẩm/làn đường và Top 30 trên desktop/mobile sau sửa.
+- [x] Kiểm thử lại toàn bộ tutorial/vật phẩm/làn đường và Top 30 trên desktop/mobile sau sửa.
 - [x] Xác minh trực tiếp đổi tên cùng playerId từ “Long” sang “Long 3” hiển thị đúng trong Top 30 sau submit.
 - [x] Quyết định rõ mô hình identity một kỷ lục/mỗi thiết bị và mô tả cách đổi tên/đổi hồ sơ cho người dùng chung máy.
 - [x] Chạy QA runtime spawn và nhặt khiên/vòng gió để xác nhận vị trí, collision, thông báo và phần thưởng khớp hướng dẫn.
-- [ ] Kiểm thử hồi quy desktop/mobile sau batch sửa mới: đổi làn, nhảy đệm thấp, trượt cổng mây, nhặt sao/khiên/vòng gió và mở Top 30 30 hạng.
-- [ ] Ghi lại bằng chứng QA runtime cho từng nhóm vật thể sau batch sửa mới trên desktop và mobile.
-- [ ] Kiểm thử runtime mobile: đổi làn, nhảy đệm thấp, trượt cổng mây, nhặt sao, khiên và vòng gió.
-- [ ] Ghi lại bằng chứng QA runtime mobile cho từng nhóm vật thể sau batch sửa mới.
-- [ ] Kiểm thử trực tiếp thao tác đổi làn trên desktop/mobile thay vì suy ra từ demo tự chạy hoặc số sao tăng.
+- [x] Kiểm thử hồi quy desktop/mobile sau batch sửa mới: đổi làn, nhảy đệm thấp, trượt cổng mây, nhặt sao/khiên/vòng gió và mở Top 30 30 hạng.
+- [x] Ghi lại bằng chứng QA runtime cho từng nhóm vật thể sau batch sửa mới trên desktop và mobile.
+- [x] Kiểm thử runtime mobile: đổi làn, nhảy đệm thấp, trượt cổng mây, nhặt sao, khiên và vòng gió.
+- [x] Ghi lại bằng chứng QA runtime mobile cho từng nhóm vật thể sau batch sửa mới.
+- [x] Kiểm thử trực tiếp thao tác đổi làn trên desktop/mobile thay vì suy ra từ demo tự chạy hoặc số sao tăng.
 - [x] Sửa lỗi minh hoạ thẻ hướng dẫn khiên và vòng gió, bảo đảm asset runtime/tile hiển thị đầy đủ và không méo/cắt.
 - [x] Đặt khoảng spawn tối thiểu, thời gian cảnh báo và quy tắc chống vật thể xuất hiện bất thình lình trong làn đang chạy.
 - [x] Thiết kế lại mục đích sao: phần thưởng tức thời, mốc combo và mối liên hệ rõ với tổng điểm.
 - [x] Viết công thức điểm dễ hiểu, hiển thị trong hướng dẫn và HUD mà không gây rối trong lúc chạy.
 - [x] Bổ sung test cho công thức điểm, mốc sao và quy tắc spawn cảnh báo.
-- [ ] Kiểm thử trực quan power-up/tutorial và nhịp phản ứng sau khi sửa trên desktop/mobile.
+- [x] Kiểm thử trực quan power-up/tutorial và nhịp phản ứng sau khi sửa trên desktop/mobile.
 - [x] Đổi nút hướng dẫn trên menu thành nhãn trực tiếp, dễ nhận biết nội dung bên trong.
 - [x] Bỏ nút “Hồ sơ mới” khỏi menu chính và giữ mô hình một hồ sơ/thiết bị không làm rối người chơi.
 - [x] Tái hiện chướng ngại/vật phẩm ở cự ly gần để xác định nguyên nhân méo hình.
@@ -158,3 +158,12 @@
 - [x] Kiểm thử nhịp spawn, hướng dẫn và Top 30 mới trên desktop/mobile trước phát hành.
 - [x] Kiểm tra lại Top 30 trên desktop và mobile sau batch spawn/sao mới, ghi nhận screenshot hoặc bằng chứng browser rõ ràng.
 - [x] Chạy QA runtime mobile cho nhịp spawn mới ở vài mốc cấp để xác nhận vật thể dày hơn nhưng vẫn có cảnh báo sớm và khoảng phản ứng an toàn.
+
+- [x] Đổi leaderboard để lưu mọi lượt hợp lệ vào Top 30, kể cả nhiều lượt cùng tên/cùng thiết bị; bỏ logic chỉ giữ personal best.
+- [x] Cập nhật mô tả, gửi điểm và logic kỷ lục màn đầu để phản ánh Top 30 theo mọi lượt chơi.
+- [x] Cho chướng ngại/vật phẩm nối tiếp nhau theo nhịp spawn liên tục có giới hạn an toàn, không chia thành từng đợt chờ.
+- [x] Nâng cổng mây cao lên khỏi mặt đường và làm silhouette/khoảng chui dễ nhận biết hơn.
+- [x] Thiết kế lại màn đầu thành luồng hai bước gọn: giới thiệu → chọn nhân vật và đặt tên → chạy.
+- [x] Kiểm thử dữ liệu Top 30 nhiều lượt cùng tên, spawn liên tục, cổng mây và menu hai bước trên desktop/mobile.
+- [x] Kiểm thử trực tiếp mobile runtime đủ sáu hành vi: đổi làn, nhảy, trượt, nhặt sao, khiên và vòng gió; lưu bằng chứng riêng từng hành vi.
+- [x] Cập nhật QA checklist phát hành hợp nhất cho tutorial, vật phẩm, ba làn và Top 30 trên desktop/mobile của bản mới nhất.

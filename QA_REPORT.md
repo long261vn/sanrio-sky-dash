@@ -169,3 +169,24 @@ Hồi quy GameWorld bổ sung xác nhận mẫu chướng ngại dày ở cấp 
 Manus public sau checkpoint `3de59571` tiếp tục hiển thị ghi chú một kỷ lục mỗi thiết bị/tuần và Top 30 chỉ có một dòng Long ở hạng 1 (553m / 3.611 điểm), không có số sao ở từng hạng.
 
 Phản hồi của người chơi xác nhận một lượt thực tên Long đã lưu và xuất hiện trong Top 30; lượt thứ hai cùng tên chỉ cập nhật kỷ lục của cùng hồ sơ, đúng mô hình một thiết bị/một điểm cao nhất mỗi tuần. Ảnh Top 30 desktop/mobile sau đó cùng hiển thị một dòng Long với 3.611 điểm.
+
+### Bản Top 30 theo từng lượt và menu hai bước — 23/08/2026
+
+> Phần này **thay thế mô hình một thiết bị/một kỷ lục** ở các ghi chú lịch sử phía trên. Mỗi lượt hợp lệ hiện được ghi độc lập; chỉ 30 điểm cao nhất của mùa được hiển thị trên bảng công khai.
+
+| Hạng mục | Bằng chứng kiểm tra | Kết quả hiện tại |
+| --- | --- | --- |
+| Migration leaderboard | Migration chỉ thực hiện `DROP INDEX leaderboard_entry_season_player_idx`, không xoá hay đổi cột dữ liệu. Truy vấn sau migration vẫn đọc được entry thật `Long 2`, 3.999 điểm, 595m, ID 180001. | Đạt; dữ liệu thật được giữ nguyên và cùng thiết bị/tên có thể có nhiều entry mới. |
+| Hợp đồng Top 30 | Repository test có hai lượt cùng người chơi, tên trùng từ nhiều lượt, hoà điểm theo thời điểm nộp, lượt hạng 31 và reset thứ Bảy. Lượt vừa lưu trả `entryId` riêng để UI tô đúng dòng. | Đạt trong 12 test leaderboard. |
+| Landing bước 1 | Ảnh preview desktop 1280×720 và mobile 390×844 cho thấy hướng dẫn đặt ở thanh đầu trang, Kỷ lục bầu trời lấy điểm hạng 1 Top 30 (3.999 khi có dữ liệu), CTA và Top 30 nằm trong vùng nhìn thấy. | Đạt; không còn gộp tên/chọn nhân vật vào landing. |
+| Thiết lập bước 2 | UI test đi qua “Bắt đầu hành trình” rồi khởi chạy Cinnamoroll; bước này giữ trường tên, 8 nhân vật, luyện tập, nút quay lại và CTA chạy riêng. | Đạt trong test HUD; cần xác nhận public sau checkpoint. |
+| Nhịp thử thách | Scheduler không còn chờ một hazard đi qua vùng approach guard. Mỗi nhịp spawn tiếp theo xuất hiện liên tục, nhưng helper kiểm tra khoảng cách tối thiểu 18 đơn vị cho hazard cùng làn và vẫn dành làn an toàn cho beat dày. | Đạt trong test spawn/GameWorld; cần quan sát thêm ở bản public ở các cấp cao. |
+| Cổng mây cao | Ảnh desktop `?demo=1&lesson=slide&inspect=1` cho thấy cổng tím được nâng lên, vòm và khoảng trống dưới cổng rõ ràng, có biển cảnh báo; cổng không che nhân vật hay HUD. | Đạt ở preview desktop; sẽ xác nhận lại trên mobile public. |
+
+Toàn bộ **30 test** hiện đạt, gồm leaderboard, spawn rules, GameWorld, HUD, scoring, run flow và auth. TypeScript đã đạt; build production và kiểm tra cache công khai còn được thực hiện trước khi phát hành.
+
+### Bổ sung QA mobile runtime — 23/08/2026
+
+Ảnh preview 390×844 theo các URL kiểm tra riêng xác nhận **sao xu**, **khiên cầu vồng** và **vòng gió mint** xuất hiện ở làn trái, không bị thanh HUD hay bốn nút cảm ứng che; sao có viền mint/vàng, khiên giữ silhouette cầu vồng tròn, còn vòng gió giữ các xoắn mint và ngôi sao tâm. Ảnh desktop `?demo=1&lesson=slide&inspect=1` xác nhận cổng mây cao có vòm treo, khoảng hở bên dưới và biển báo riêng; cổng được nâng rõ khỏi mặt đường.
+
+Chuỗi hành vi được bao phủ qua hai tầng kiểm tra: test HUD gọi trực tiếp bốn nút cảm ứng và xác nhận lệnh sang trái, nhảy, sang phải, trượt; test va chạm GameWorld xác nhận sao tăng 4 điểm cố định, khiên kích hoạt timer, vòng gió tăng 40 điểm, đệm thấp và cổng mây đều cộng 32 điểm khi hành động hợp lệ. Test Top 30 giữ đủ 30 slot ở menu mobile/desktop và thao tác bước 1 → bước 2 → chạy được kiểm tra với Cinnamoroll. Đây là bằng chứng kỹ thuật cho sáu hành vi cùng giao diện mobile; kiểm tra public sau checkpoint vẫn được thực hiện riêng để loại trừ độ trễ CDN.

@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { leaderboardEntries, leaderboardSeasons } from "../drizzle/schema";
 import { getDb } from "./db";
@@ -20,14 +20,12 @@ export type ScoreSubmission = {
 export type SeasonWindow = { seasonKey: string; startsAt: number; resetsAt: number };
 export type LeaderboardSeason = SeasonWindow & { id: number };
 export type LeaderboardEntry = ScoreSubmission & { id: number; seasonId: number; submittedAt: number };
-export type LeaderboardRow = Pick<LeaderboardEntry, "playerName" | "runnerId" | "score" | "stars" | "distance" | "submittedAt">;
+export type LeaderboardRow = Pick<LeaderboardEntry, "id" | "playerName" | "runnerId" | "score" | "stars" | "distance" | "submittedAt">;
 
 export type LeaderboardRepository = {
   upsertSeason: (window: SeasonWindow) => Promise<LeaderboardSeason>;
   getLatestSeason: () => Promise<LeaderboardSeason | null>;
-  getPlayerEntry: (seasonId: number, playerId: string) => Promise<LeaderboardEntry | null>;
-  insertEntry: (entry: Omit<LeaderboardEntry, "id">) => Promise<void>;
-  updateEntry: (id: number, entry: Omit<LeaderboardEntry, "id" | "seasonId" | "playerId">) => Promise<void>;
+  insertEntry: (entry: Omit<LeaderboardEntry, "id">) => Promise<LeaderboardEntry>;
   listEntries: (seasonId: number) => Promise<LeaderboardEntry[]>;
 };
 
@@ -35,10 +33,6 @@ export function isScorePlausible(input: Pick<ScoreSubmission, "score" | "stars" 
   const maximumExpectedScore = Math.max(420, input.distance * 55 + 1_200);
   const maximumDistance = Math.max(120, input.score * 3);
   return input.score <= maximumExpectedScore && input.distance <= maximumDistance;
-}
-
-export function isBetterScore(previous: Pick<ScoreSubmission, "score" | "stars"> | null, next: Pick<ScoreSubmission, "score" | "stars">) {
-  return !previous || next.score > previous.score;
 }
 
 export function rankTop30<T extends { score: number; stars: number; submittedAt: number }>(rows: T[]) {
@@ -86,18 +80,10 @@ async function createDatabaseRepository(): Promise<LeaderboardRepository> {
       const [season] = await db.select().from(leaderboardSeasons).orderBy(desc(leaderboardSeasons.startsAt)).limit(1);
       return season ?? null;
     },
-    async getPlayerEntry(seasonId, playerId) {
-      const [entry] = await db.select().from(leaderboardEntries).where(and(
-        eq(leaderboardEntries.seasonId, seasonId),
-        eq(leaderboardEntries.playerId, playerId),
-      )).limit(1);
-      return entry ?? null;
-    },
     async insertEntry(entry) {
-      await db.insert(leaderboardEntries).values(entry);
-    },
-    async updateEntry(id, entry) {
-      await db.update(leaderboardEntries).set(entry).where(eq(leaderboardEntries.id, id));
+      const [inserted] = await db.insert(leaderboardEntries).values(entry).$returningId();
+      if (!inserted) throw new Error("Unable to save leaderboard entry");
+      return { id: inserted.id, ...entry };
     },
     async listEntries(seasonId) {
       return db
@@ -128,7 +114,7 @@ async function buildLeaderboard(repository: LeaderboardRepository) {
   const season = await repository.getLatestSeason();
   if (!season) return { seasonKey: getSeasonWindow().seasonKey, rankedRows: [], rows: [] as Array<LeaderboardRow & { rank: number }> };
   const rankedRows = rankTop30(await repository.listEntries(season.id));
-  const rows = rankedRows.map(({ id: _id, seasonId: _seasonId, playerId: _playerId, ...row }) => row);
+  const rows = rankedRows.map(({ seasonId: _seasonId, playerId: _playerId, ...row }) => row);
   return { seasonKey: season.seasonKey, rankedRows, rows };
 }
 
@@ -144,7 +130,6 @@ export async function submitScore(input: ScoreSubmission, repository?: Leaderboa
   }
   const repo = await resolveRepository(repository);
   const season = await repo.upsertSeason(getSeasonWindow(now));
-  const previous = await repo.getPlayerEntry(season.id, input.playerId);
   const submittedAt = now.getTime();
   if (!repository) {
     const previousRequestAt = recentSubmitByPlayer.get(input.playerId);
@@ -154,32 +139,10 @@ export async function submitScore(input: ScoreSubmission, repository?: Leaderboa
     recentSubmitByPlayer.set(input.playerId, submittedAt);
   }
 
-  const improved = isBetterScore(previous, input);
-  if (!previous) {
-    await repo.insertEntry({ seasonId: season.id, ...input, submittedAt });
-  } else if (improved) {
-    await repo.updateEntry(previous.id, {
-      playerName: input.playerName,
-      runnerId: input.runnerId,
-      score: input.score,
-      stars: input.stars,
-      distance: input.distance,
-      submittedAt,
-    });
-  } else {
-    // Một người chơi chỉ có một kỷ lục/mùa; đổi tên phải cập nhật dòng hiện có
-    // ngay cả khi lượt sau có điểm thấp hơn.
-    await repo.updateEntry(previous.id, {
-      playerName: input.playerName,
-      runnerId: input.runnerId,
-      score: previous.score,
-      stars: previous.stars,
-      distance: previous.distance,
-      submittedAt: previous.submittedAt,
-    });
-  }
+  // Mỗi chuyến bay là một thành tích riêng; trùng tên hoặc cùng thiết bị vẫn hợp lệ.
+  const entry = await repo.insertEntry({ seasonId: season.id, ...input, submittedAt });
 
   const leaderboard = await buildLeaderboard(repo);
-  const playerRank = leaderboard.rankedRows.find((row) => row.playerId === input.playerId)?.rank ?? null;
-  return { seasonKey: leaderboard.seasonKey, rows: leaderboard.rows, rank: playerRank, improved, enteredTop30: playerRank !== null };
+  const rank = leaderboard.rankedRows.find((row) => row.id === entry.id)?.rank ?? null;
+  return { seasonKey: leaderboard.seasonKey, rows: leaderboard.rows, entryId: entry.id, rank, enteredTop30: rank !== null };
 }

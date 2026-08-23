@@ -1,0 +1,1 @@
+ALTER TABLE `leaderboard_entries` DROP INDEX `leaderboard_entry_season_player_idx`;

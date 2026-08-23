@@ -90,11 +90,11 @@ describe("GameWorld keyboard input", () => {
   it("keeps a safe lane in dense hazard beats and reintroduces star coins", () => {
     const world = Object.create(GameWorld.prototype) as GameWorld & Record<string, unknown>;
     const spawnEntity = vi.fn();
-    Object.assign(world, { spawnEntity });
+    Object.assign(world, { spawnEntity, entities: [] });
 
     const random = vi.fn()
-      .mockReturnValueOnce(0.5) // lane centre
       .mockReturnValueOnce(0.2) // dense hazard beat
+      .mockReturnValueOnce(0.5) // pickup lane (unused for hazard)
       .mockReturnValueOnce(0.5) // safe lane centre
       .mockReturnValueOnce(0.2) // low hurdle
       .mockReturnValueOnce(0.2); // second hazard at level 3
@@ -105,8 +105,8 @@ describe("GameWorld keyboard input", () => {
 
     spawnEntity.mockClear();
     (world as unknown as { random: () => number }).random = vi.fn()
-      .mockReturnValueOnce(0.5) // lane centre
       .mockReturnValueOnce(0.9) // star beat
+      .mockReturnValueOnce(0.5) // lane centre
       .mockReturnValueOnce(0.2); // add a second star at level 3
     (world as unknown as { spawnBeat: (level: number) => void }).spawnBeat(3);
     expect(spawnEntity.mock.calls.map(([kind]) => kind)).toEqual(["star", "star"]);

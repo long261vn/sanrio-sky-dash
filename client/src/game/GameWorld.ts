@@ -10,7 +10,7 @@ import { GameCommand, GameSnapshot, GameStatus, CharacterId, CHARACTERS } from "
 import { AudioManager } from "@/game/AudioManager";
 import { assetUrl } from "@/lib/assets";
 import { nextComboAfterGust, nextComboAfterStar, scoreForClear, scoreForDistance, scoreForGust, scoreForStar } from "@shared/scoring";
-import { SPAWN_RULES, getNextSpawnDelay, getSpawnZ, getWarningZ } from "@shared/spawnRules";
+import { getNextSpawnDelay, getSpawnZ, getWarningZ, hasSafeLaneSpacing } from "@shared/spawnRules";
 
 type EntityKind = "lowHurdle" | "cloudGate" | "star" | "shield" | "gust";
 
@@ -132,7 +132,7 @@ export class GameWorld {
     if (this.status !== "playing") return;
 
     const difficulty = this.getDifficulty();
-    const speed = this.demoDense || (this.demoLesson && !this.demoAction) ? 0 : this.isPractice ? 7.6 : this.demoPickup || this.demoAction ? 1.1 : difficulty.speed;
+    const speed = this.demoDense || (this.demoLesson && !this.demoAction) || (this.demoPickup && this.demoInspect) ? 0 : this.isPractice ? 7.6 : this.demoPickup || this.demoAction ? 1.1 : difficulty.speed;
     if (difficulty.level > this.lastDifficultyLevel) {
       this.lastDifficultyLevel = difficulty.level;
       this.audio.play("shield");
@@ -152,13 +152,8 @@ export class GameWorld {
     if (this.demo && !this.demoLesson) this.runDemoBrain();
     this.updateEntities(delta, speed);
     if (!this.demoLesson && !this.isPractice && this.spawnTimer <= 0) {
-      const hasApproachingHazard = this.entities.some((entity) => (entity.kind === "lowHurdle" || entity.kind === "cloudGate") && entity.node.position.z < SPAWN_RULES.approachGuardZ);
-      if (hasApproachingHazard) {
-        this.spawnTimer = 0.22;
-      } else {
-        this.spawnBeat(difficulty.level);
-        this.spawnTimer = getNextSpawnDelay(difficulty.level, this.distance, this.random() * 0.28);
-      }
+      this.spawnBeat(difficulty.level);
+      this.spawnTimer = getNextSpawnDelay(difficulty.level, this.distance, this.random() * 0.28);
     }
     this.stateTimer -= delta;
     if (this.stateTimer <= 0) {
@@ -269,7 +264,7 @@ export class GameWorld {
       this.spawnTimer = 99;
     }
     if (this.demoPickup) {
-      this.spawnEntity(this.demoPickup, 1, this.demoHit ? 0.3 : this.demoInspect ? 4.2 : 9);
+      this.spawnEntity(this.demoPickup, this.demoInspect ? 0 : 1, this.demoHit ? 0.3 : this.demoInspect ? 4.2 : 9);
       this.spawnTimer = 99;
     }
     if (this.demoDense) {
@@ -496,28 +491,36 @@ export class GameWorld {
   }
 
   private spawnBeat(level: number) {
-    const lane = Math.floor(this.random() * 3);
     const roll = this.random();
     const spawnZ = getSpawnZ(level);
-    if (roll < 0.58) {
+    const currentHazards = this.entities
+      .filter((entity) => entity.kind === "lowHurdle" || entity.kind === "cloudGate")
+      .map((entity) => ({ lane: entity.lane, z: entity.node.position.z }));
+    const openHazardLanes = [0, 1, 2].filter((lane) => hasSafeLaneSpacing(currentHazards, [lane], spawnZ));
+    const lane = Math.floor(this.random() * 3);
+
+    if (roll < 0.62 && openHazardLanes.length > 0) {
       const safeLane = Math.floor(this.random() * 3);
       const occupiedLanes = [0, 1, 2].filter((candidate) => candidate !== safeLane);
       const actionKind: EntityKind = this.random() < 0.56 ? "lowHurdle" : "cloudGate";
-      this.spawnEntity(actionKind, occupiedLanes[0], spawnZ);
-      if (level >= 3 && this.random() < 0.14 + level * 0.055) this.spawnEntity(actionKind, occupiedLanes[1], spawnZ);
+      const canCreateDouble = level >= 3
+        && this.random() < 0.14 + level * 0.055
+        && hasSafeLaneSpacing(currentHazards, occupiedLanes, spawnZ);
+      const hazardLanes = canCreateDouble ? occupiedLanes : [openHazardLanes[Math.floor(this.random() * openHazardLanes.length)]];
+      hazardLanes.forEach((hazardLane) => this.spawnEntity(actionKind, hazardLane, spawnZ));
       return;
     }
-    if (roll < 0.83) {
+    if (roll < 0.82 && openHazardLanes.length > 0) {
       const actionKind: EntityKind = this.random() < 0.5 ? "lowHurdle" : "cloudGate";
-      this.spawnEntity(actionKind, lane, spawnZ);
+      this.spawnEntity(actionKind, openHazardLanes[Math.floor(this.random() * openHazardLanes.length)], spawnZ);
       return;
     }
     if (roll < 0.95) {
-      this.spawnEntity("star", lane, spawnZ + 2);
-      if (level >= 2 && this.random() < 0.44) this.spawnEntity("star", (lane + 1) % 3, spawnZ + 8);
+      this.spawnEntity("star", lane, spawnZ + 3);
+      if (level >= 2 && this.random() < 0.44) this.spawnEntity("star", (lane + 1) % 3, spawnZ + 9);
       return;
     }
-    this.spawnEntity(roll < 0.985 ? "shield" : "gust", lane, spawnZ + 2);
+    this.spawnEntity(roll < 0.985 ? "shield" : "gust", lane, spawnZ + 3);
   }
 
   private spawnEntity(kind: EntityKind, lane: number, z: number) {
@@ -710,7 +713,7 @@ export class GameWorld {
   }
 
   private createCloudGate(root: TransformNode) {
-    this.createStickerProp(root, "highSlideGate", PROP_TEXTURES.cloudGate, 2.18, 2.22, 1.65);
+    this.createStickerProp(root, "highSlideGate", PROP_TEXTURES.cloudGate, 2.66, 2.78, 1.92);
   }
 
   private createStar(root: TransformNode) {

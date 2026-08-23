@@ -34,7 +34,7 @@ export const leaderboardSeasons = mysqlTable("leaderboard_seasons", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
-/** Một thiết bị chỉ giữ lại thành tích cao nhất cho mỗi mùa. */
+/** Mỗi lượt hợp lệ là một bản ghi độc lập trong mùa; Top 30 được tính khi truy vấn. */
 export const leaderboardEntries = mysqlTable("leaderboard_entries", {
   id: int("id").autoincrement().primaryKey(),
   seasonId: int("seasonId").notNull(),
@@ -46,7 +46,6 @@ export const leaderboardEntries = mysqlTable("leaderboard_entries", {
   distance: int("distance").notNull(),
   submittedAt: bigint("submittedAt", { mode: "number" }).notNull(),
 }, (table) => [
-  uniqueIndex("leaderboard_entry_season_player_idx").on(table.seasonId, table.playerId),
   index("leaderboard_rank_idx").on(table.seasonId, table.score, table.submittedAt),
 ]);
 

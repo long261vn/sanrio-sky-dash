@@ -8,6 +8,13 @@
       "when": 1787380412210,
       "tag": "0000_bitter_freak",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1787447826533,
+      "tag": "0001_thin_thaddeus_ross",
+      "breakpoints": true
     }
   ]
 }

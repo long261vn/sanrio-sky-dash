@@ -59,6 +59,7 @@ describe("SkyDashHud run flow", () => {
     window.addEventListener("skydash:command", commandListener);
     render(<SkyDashHud />);
 
+    fireEvent.click(screen.getByRole("button", { name: "Bắt đầu hành trình" }));
     fireEvent.click(screen.getByRole("button", { name: "Chạy cùng Cinnamoroll" }));
 
     expect(commandListener).toHaveBeenCalledOnce();
@@ -81,7 +82,7 @@ describe("SkyDashHud run flow", () => {
   it("renders all 30 ranked slots even when only a few players have submitted scores", () => {
     render(<SkyDashHud />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Top 30 tuần" }));
+    fireEvent.click(screen.getByRole("button", { name: "Xem Top 30" }));
 
     expect(screen.getByRole("list", { name: "30 hạng của tuần" })).toBeTruthy();
     expect(screen.getAllByText("Đang chờ chuyến bay")).toHaveLength(30);
@@ -140,7 +141,7 @@ describe("SkyDashHud run flow", () => {
     expect(mocks.mutate.mock.calls[1][0]).toMatchObject({ playerName: "Hana Test", score: 240, distance: 42 });
 
     await act(async () => {
-      await mocks.mutationOptions.onSuccess({ seasonKey: "2026-08-22", rows: [], rank: 1, improved: true, enteredTop30: true });
+      await mocks.mutationOptions.onSuccess({ seasonKey: "2026-08-22", rows: [], entryId: 101, rank: 1, enteredTop30: true });
     });
     fireEvent.click(screen.getAllByRole("button", { name: "Về màn hình đầu" })[0]);
     expect(commandListener.mock.calls.map(([event]) => (event as CustomEvent).detail)).toContainEqual({ type: "menu" });
