@@ -15,3 +15,9 @@ Nút “Xem Top 30” trên bản public mở panel đầy đủ 30 hạng. Dữ
 ## GitHub Pages
 
 `https://long261vn.github.io/sanrio-sky-dash/?v=9c05ba6a` đã tải landing hai bước mới và các asset từ origin Manus. Ở ảnh đầu, Kỷ lục bầu trời là 0 khi truy vấn Top 30 còn đang tải; lần xem lại sau khi query hoàn tất hiển thị đúng **3.999** cùng nhãn điểm dẫn đầu. Điều này xác nhận bundle tĩnh, CORS/API leaderboard và đồng bộ điểm kỷ lục trên Pages đều hoạt động.
+
+## Checkpoint Top 20 — chờ CDN
+
+Hai lần mở Manus public với `?v=36aac7e8` và `?v=36aac7e8-r2` ngay sau checkpoint vẫn đang trả bundle trước đó có nhãn **Top 30** và điểm kỷ lục 3.999. Preview cục bộ của checkpoint mới đã xác nhận Top 20, hướng dẫn theo hai nhóm, setup mobile và 34 test đạt. Không gửi điểm thử hoặc thay đổi dữ liệu leaderboard trong quá trình xác minh CDN này.
+
+Lần mở `?v=36aac7e8-r3` sau đồng bộ đã nhận đúng bundle mới: landing ghi **Top 20**, nút “Xem Top 20”, điểm dẫn đầu 3.999 cùng nhãn Top 20 và footer xác nhận mỗi lượt vào Top 20 được lưu riêng. Dữ liệu thật vẫn được đọc đúng; không tạo hoặc thay đổi entry nào trong lúc xác minh.
