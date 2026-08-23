@@ -1,4 +1,4 @@
-/** Luật UX: mọi người chơi đều được bắt đầu; tên chỉ cần khi muốn ghi Top 30. */
+/** Luật UX: tên và nhân vật được chọn trước lượt chạy để sẵn sàng ghi Top 20. */
 export function canStartSkyDashRun(playerName: string, hasSelectedCharacter: boolean) {
   return hasSelectedCharacter && !needsLeaderboardName(playerName);
 }

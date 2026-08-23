@@ -174,3 +174,9 @@
 - [x] Đưa nút xem Top 30 cạnh khối Kỷ lục bầu trời, giữ rõ ràng trên desktop và mobile.
 - [x] Nâng cổng mây hoặc hạ tỷ lệ nhân vật để khoảng trượt cao, dễ nhận biết và không tạo va chạm trực quan.
 - [x] Kiểm thử desktop/mobile cho landing, setup, hướng dẫn bỏ qua, điều kiện bắt đầu và cổng mây mới.
+
+- [x] Gộp hướng dẫn thành hai phần: vật phẩm nên lấy kèm công dụng và chướng ngại cần vượt kèm hành động nhảy/trượt.
+- [x] Chuyển toàn bộ quy tắc, API, UI, placeholder và câu chữ từ Top 30 sang Top 20 mà vẫn giữ entry thật đang có.
+- [x] Tối ưu bước nhập tên/chọn nhân vật cho 390×844, ưu tiên form, lựa chọn và CTA không che nhau hoặc tạo cuộn ngang.
+- [x] Thêm lời chào game-over phân bậc theo điểm, khen theo thứ hạng Top 20 và khuyến khích cụ thể khi chưa vào hạng.
+- [x] Kiểm thử Top 20, hướng dẫn nhóm, thông điệp kết quả và setup mobile trên desktop/mobile.

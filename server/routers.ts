@@ -19,7 +19,7 @@ export const appRouter = router({
     }),
   }),
   leaderboard: router({
-    top30: publicProcedure.query(() => listLeaderboard()),
+    top20: publicProcedure.query(() => listLeaderboard()),
     submit: publicProcedure.input(z.object({
       playerId: z.string().uuid(),
       playerName: z.string().trim().min(2).max(20).regex(/^[a-zA-Z0-9À-ỹ _.-]+$/, "Tên chỉ dùng chữ, số, khoảng trắng hoặc - . _"),

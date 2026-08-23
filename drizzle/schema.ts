@@ -34,7 +34,7 @@ export const leaderboardSeasons = mysqlTable("leaderboard_seasons", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
-/** Mỗi lượt hợp lệ là một bản ghi độc lập trong mùa; Top 30 được tính khi truy vấn. */
+/** Mỗi lượt hợp lệ là một bản ghi độc lập trong mùa; Top 20 được tính khi truy vấn. */
 export const leaderboardEntries = mysqlTable("leaderboard_entries", {
   id: int("id").autoincrement().primaryKey(),
   seasonId: int("seasonId").notNull(),

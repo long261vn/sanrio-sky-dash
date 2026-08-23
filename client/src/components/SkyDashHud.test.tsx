@@ -16,10 +16,10 @@ vi.mock("@/lib/assets", () => ({ assetUrl: (filename: string) => filename }));
 vi.mock("@/lib/trpc", () => ({
   trpc: {
     leaderboard: {
-      top30: { useQuery: () => ({ data: mocks.leaderboardData, refetch: mocks.refetch }) },
+      top20: { useQuery: () => ({ data: mocks.leaderboardData, refetch: mocks.refetch }) },
       submit: { useMutation: (options: any) => { mocks.mutationOptions = options; return { mutate: mocks.mutate, isPending: false }; } },
     },
-    useUtils: () => ({ leaderboard: { top30: { setData: (...args: any[]) => { mocks.setData(...args); mocks.leaderboardData = args[1]; } } } }),
+    useUtils: () => ({ leaderboard: { top20: { setData: (...args: any[]) => { mocks.setData(...args); mocks.leaderboardData = args[1]; } } } }),
   },
 }));
 
@@ -93,20 +93,22 @@ describe("SkyDashHud run flow", () => {
     render(<SkyDashHud />);
 
     fireEvent.click(screen.getByRole("button", { name: "Hướng dẫn chơi" }));
-    expect(screen.getByText("BƯỚC 1 / 4 · NHẶT")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Tiếp theo" }));
-    expect(screen.getByText("BƯỚC 2 / 4 · NHẢY")).toBeTruthy();
+    expect(screen.getByText("NHÓM 1 / 2 · VẬT PHẨM NÊN LẤY")).toBeTruthy();
+    expect(screen.getByText("Khiên cầu vồng")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Xem chướng ngại" }));
+    expect(screen.getByText("NHÓM 2 / 2 · CHƯỚNG NGẠI CẦN VƯỢT")).toBeTruthy();
+    expect(screen.getByText("Cổng mây cao")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: /Bỏ qua/ }));
-    expect(screen.queryByText("BƯỚC 2 / 4 · NHẢY")).toBeNull();
+    expect(screen.queryByText("NHÓM 2 / 2 · CHƯỚNG NGẠI CẦN VƯỢT")).toBeNull();
   });
 
-  it("renders all 30 ranked slots even when only a few players have submitted scores", () => {
+  it("renders all 20 ranked slots even when only a few players have submitted scores", () => {
     render(<SkyDashHud />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Xem Top 30" }));
+    fireEvent.click(screen.getByRole("button", { name: "Xem Top 20" }));
 
-    expect(screen.getByRole("list", { name: "30 hạng của tuần" })).toBeTruthy();
-    expect(screen.getAllByText("Đang chờ chuyến bay")).toHaveLength(30);
+    expect(screen.getByRole("list", { name: "20 hạng của tuần" })).toBeTruthy();
+    expect(screen.getAllByText("Đang chờ chuyến bay")).toHaveLength(20);
   });
 
   it("sends lane, jump and slide commands from the touch controls during a run", () => {
@@ -162,14 +164,14 @@ describe("SkyDashHud run flow", () => {
     expect(mocks.mutate.mock.calls[1][0]).toMatchObject({ playerName: "Hana Test", score: 240, distance: 42 });
 
     await act(async () => {
-      await mocks.mutationOptions.onSuccess({ seasonKey: "2026-08-22", rows: [], entryId: 101, rank: 1, enteredTop30: true });
+      await mocks.mutationOptions.onSuccess({ seasonKey: "2026-08-22", rows: [], entryId: 101, rank: 1, enteredTop20: true });
     });
     fireEvent.click(screen.getAllByRole("button", { name: "Về màn hình đầu" })[0]);
     expect(commandListener.mock.calls.map(([event]) => (event as CustomEvent).detail)).toContainEqual({ type: "menu" });
     window.removeEventListener("skydash:command", commandListener);
   });
 
-  it("mô phỏng game-over đến Top 30 với hai lượt trùng tên và tô đúng lượt vừa lưu", async () => {
+  it("mô phỏng game-over đến Top 20 với hai lượt trùng tên, lời khen đúng hạng và tô đúng lượt vừa lưu", async () => {
     window.localStorage.setItem("hanaSkyDashPlayerName", "Long");
     const { container } = render(<SkyDashHud />);
 
@@ -183,7 +185,7 @@ describe("SkyDashHud run flow", () => {
         seasonKey: "2026-08-22",
         entryId: 202,
         rank: 2,
-        enteredTop30: true,
+        enteredTop20: true,
         rows: [
           { id: 201, rank: 1, playerName: "Long", runnerId: "cinnamoroll", score: 480, stars: 0, distance: 75, submittedAt: 1 },
           { id: 202, rank: 2, playerName: "Long", runnerId: "kuromi", score: 420, stars: 0, distance: 68, submittedAt: 2 },
@@ -195,5 +197,21 @@ describe("SkyDashHud run flow", () => {
     expect(screen.getByText("Chuyến bay này đang ở hạng #2.")).toBeTruthy();
     expect(container.querySelector(".just-ranked")?.textContent).toContain("Long");
     expect(container.querySelector(".just-ranked")?.textContent).toContain("420");
+    expect(screen.getByText("Hạng #2: bạn đang ở bục vinh danh Top 3!")).toBeTruthy();
+  });
+
+  it("encourages a low-score run that has not entered Top 20", async () => {
+    window.localStorage.setItem("hanaSkyDashPlayerName", "Mây Nhỏ");
+    render(<SkyDashHud />);
+    act(() => {
+      window.dispatchEvent(new CustomEvent<GameSnapshot>("skydash:state", { detail: { ...gameoverSnapshot, score: 300, distance: 40 } }));
+    });
+    await waitFor(() => expect(mocks.mutate).toHaveBeenCalledOnce());
+    await act(async () => {
+      await mocks.mutationOptions.onSuccess({ seasonKey: "2026-08-22", rows: [], entryId: 401, rank: null, enteredTop20: false });
+    });
+    expect(screen.getByText("Khởi đầu thật đáng yêu!")).toBeTruthy();
+    expect(screen.getByText("Chưa vào Top 20 tuần này.")).toBeTruthy();
+    expect(screen.getByText(/Cố gắng thêm một chuyến bay/)).toBeTruthy();
   });
 });

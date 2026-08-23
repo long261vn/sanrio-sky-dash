@@ -208,3 +208,14 @@ Trên bản public, không tạo điểm thử để bảo vệ bảng hạng đ
 | Cổng mây | Demo cổng mây ở desktop/mobile dùng hình học 2,78 × 3,04 tại y=2,12; tư thế trượt hạ visual xuống và nén còn 65%. Cổng, khoảng hở, biển cảnh báo, nhân vật và HUD cùng thấy rõ. | Đạt. |
 
 Toàn bộ suite hiện có **33 test** đạt, TypeScript đạt và build production hoàn thành. Xác minh CDN/public sẽ thực hiện sau checkpoint, không tạo điểm thử trên bảng xếp hạng thật.
+
+### Hướng dẫn theo nhóm, Top 20 và phản hồi thành tích — 23/08/2026
+
+| Hạng mục | Bằng chứng kiểm tra | Kết quả |
+| --- | --- | --- |
+| Hướng dẫn | Ảnh desktop 1440×900 hiển thị Nhóm 1 với sao xu, khiên và vòng gió cùng công dụng; Nhóm 2 tách riêng đệm thấp/cổng cao cùng thao tác vượt. Ảnh 390×844 xếp các item theo hàng dọc, không cắt nội dung và vẫn có Bỏ qua/Trước/Xem chướng ngại. | Đạt. |
+| Top 20 | Repository giới hạn xếp hạng, query DB, API tRPC, UI modal, CTA, placeholder và phản hồi submit đều dùng 20. Không có migration vì chỉ thay đổi giới hạn truy vấn; các entry thật vẫn nguyên vẹn, chỉ 20 điểm cao nhất được hiển thị. | Đạt trong 12 test leaderboard. |
+| Setup mobile | Ảnh `?setup=1` ở 390×844 xác nhận tên, nhân vật đã chọn, ô nhập, lưới 2 cột tám nhân vật và hai CTA cùng nằm trong panel; CTA dính đáy nội bộ để không bị che khi cuộn. | Đạt. |
+| Kết quả | Test HUD kiểm tra lời chào điểm thấp ngoài Top 20 và lời khen hạng #2 Top 3. Các mức điểm cao/trung bình/thấp cùng phản hồi hạng #1, Top 3, Top 10 hoặc Top 20 được chọn qua helper xác định. | Đạt trong 9 test HUD. |
+
+Toàn bộ suite hiện có **34 test** đạt, TypeScript và build production đạt. Kiểm tra public được thực hiện sau checkpoint để bảo vệ dữ liệu bảng hạng thật.

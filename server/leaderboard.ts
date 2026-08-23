@@ -35,10 +35,10 @@ export function isScorePlausible(input: Pick<ScoreSubmission, "score" | "stars" 
   return input.score <= maximumExpectedScore && input.distance <= maximumDistance;
 }
 
-export function rankTop30<T extends { score: number; stars: number; submittedAt: number }>(rows: T[]) {
+export function rankTop20<T extends { score: number; stars: number; submittedAt: number }>(rows: T[]) {
   return [...rows]
     .sort((a, b) => b.score - a.score || a.submittedAt - b.submittedAt)
-    .slice(0, 30)
+    .slice(0, 20)
     .map((row, index) => ({ ...row, rank: index + 1 }));
 }
 
@@ -101,7 +101,7 @@ async function createDatabaseRepository(): Promise<LeaderboardRepository> {
         .from(leaderboardEntries)
         .where(eq(leaderboardEntries.seasonId, seasonId))
         .orderBy(desc(leaderboardEntries.score), leaderboardEntries.submittedAt)
-        .limit(30);
+        .limit(20);
     },
   };
 }
@@ -113,7 +113,7 @@ async function resolveRepository(repository?: LeaderboardRepository) {
 async function buildLeaderboard(repository: LeaderboardRepository) {
   const season = await repository.getLatestSeason();
   if (!season) return { seasonKey: getSeasonWindow().seasonKey, rankedRows: [], rows: [] as Array<LeaderboardRow & { rank: number }> };
-  const rankedRows = rankTop30(await repository.listEntries(season.id));
+  const rankedRows = rankTop20(await repository.listEntries(season.id));
   const rows = rankedRows.map(({ seasonId: _seasonId, playerId: _playerId, ...row }) => row);
   return { seasonKey: season.seasonKey, rankedRows, rows };
 }
@@ -144,5 +144,5 @@ export async function submitScore(input: ScoreSubmission, repository?: Leaderboa
 
   const leaderboard = await buildLeaderboard(repo);
   const rank = leaderboard.rankedRows.find((row) => row.id === entry.id)?.rank ?? null;
-  return { seasonKey: leaderboard.seasonKey, rows: leaderboard.rows, entryId: entry.id, rank, enteredTop30: rank !== null };
+  return { seasonKey: leaderboard.seasonKey, rows: leaderboard.rows, entryId: entry.id, rank, enteredTop20: rank !== null };
 }
