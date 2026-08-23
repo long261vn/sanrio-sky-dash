@@ -75,9 +75,13 @@ function getOutsideTop20Message(score: number) {
   return "Cố gắng thêm một chuyến bay; đổi làn lấy vật phẩm và vượt cổng đúng lúc sẽ giúp điểm tăng nhanh hơn.";
 }
 
+function portraitUrl(portrait: string) {
+  return assetUrl(portrait.split("/").pop() ?? portrait);
+}
+
 function CharacterPortrait({ character, className }: { character: (typeof CHARACTERS)[number]; className: string }) {
   const [failed, setFailed] = useState(false);
-  return <span className={`character-portrait ${className} ${failed ? "fallback" : ""}`} style={{ "--character": character.body, "--accent": character.accent } as React.CSSProperties}><img src={character.portrait} alt="" onError={() => setFailed(true)} /><b aria-hidden="true">{character.icon}</b></span>;
+  return <span className={`character-portrait ${className} ${failed ? "fallback" : ""}`} style={{ "--character": character.body, "--accent": character.accent } as React.CSSProperties}><img src={portraitUrl(character.portrait)} alt="" onError={() => setFailed(true)} /><b aria-hidden="true">{character.icon}</b></span>;
 }
 
 export default function SkyDashHud() {

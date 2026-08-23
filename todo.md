@@ -201,3 +201,5 @@
 - [x] Tự cuộn Top 20 tới đúng hàng điểm vừa nộp, tô nổi bật hạng đó và hiển thị lời chúc mừng theo hạng.
 - [x] Giữ lời động viên rõ ràng khi lượt chơi không lọt Top 20.
 - [x] Kiểm thử desktop/mobile cho fallback mascot, HUD điểm/quãng đường và cuộn hạng tự động Top 20.
+- [x] Sửa resolver URL chân dung mascot để GitHub Pages tải ảnh chi tiết từ origin công khai thay vì chỉ dùng fallback biểu tượng.
+- [ ] Kiểm thử lại Manus public và GitHub Pages cho đủ tám chân dung sau khi phát hành.
