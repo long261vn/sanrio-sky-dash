@@ -452,3 +452,18 @@ Camera nay ngắm về phía trước và cao hơn (`z=3.6`, `y=1.4`) thay vì b
 Sau kiểm tra public, điểm nhìn được đẩy sâu hơn tới `z=6.4`, `y=1.5` để hạ thêm mascot. Ảnh mobile 390×844 cuối cho thấy đầu mascot ở vùng dưới trung tâm, còn khoảng đệm rõ trước cụm điều khiển và mở rộng vùng đọc ba lane/cổng/vật phẩm phía xa. Đây là thay đổi framing camera duy nhất, không thay toạ độ runner hay collision.
 
 GitHub Pages tại cache-buster `framing-deep-f5fdc5e9` đã render framing sâu cuối: mascot nằm thấp trong nửa dưới, đường kem mở dài về chân trời và các vật phẩm/chướng ngại có khoảng nhìn trước khi tới runner. URL demo không nhập tên hoặc gọi API lưu điểm, nên Top 20 không đổi.
+
+### QA toàn diện giao diện và làn giữa — 24/08/2026
+
+| Khu vực | Desktop 1280×720 | Mobile 390×844 | Kết quả / xử lý |
+|---|---|---|---|
+| Landing | Bố cục hai cột, CTA và minh hoạ tách rõ | Thẻ, CTA và minh hoạ xếp dọc; không cắt chữ | Pass |
+| Setup cổng tên | Ô bắt buộc nổi bật, mascot khóa đúng | Không overlap; panel mascot mở sau tên hợp lệ | Pass |
+| Hướng dẫn | Ba vật phẩm thẳng hàng và có CTA | Card xếp dọc, điều hướng và nút bỏ qua rõ | Pass |
+| Top 20 | Dòng điểm, tên và thứ hạng đủ chỗ | Tên dài ellipsis có chủ ý, không tràn thẻ | Pass |
+| Gameplay | Phát hiện lane giữa kem sáng hơn hai lane ngoài | Đã đổi sang hồng phấn đậm hơn nhẹ (`#D68EA5`), vẫn tách sao/cổng/đệm | Fixed |
+| Kết quả kỷ lục | Rainbow nằm sau chữ/nút, stats rõ | Nút xếp dọc, không che thao tác | Pass |
+
+Không còn lỗi overlap, clipping hay CTA bị che trong sáu trạng thái kiểm tra. Các hướng nâng chất lượng tiếp theo không phải lỗi: có thể tăng nhận diện thương hiệu bằng biểu tượng sao–mây lớn hơn ở HUD/kết quả, và phát triển thẻ Top 20 thành sticker sưu tầm hơn; các thay đổi này không cần để luồng hiện tại ổn định.
+
+Lượt regression 360×780 phát hiện cầu vồng kỷ lục chồng nền màu vào tiêu đề kết quả, dù chữ còn đọc được. Đã dời burst lên mép trên panel và nâng dải cầu vồng; ảnh kiểm tra lại cho thấy chỉ còn những vòng cung trang trí ở đầu thẻ, tiêu đề, chỉ số, ô tên và bốn CTA đều không còn bị overlap.

@@ -24,6 +24,7 @@ interface WorldEntity {
 }
 
 export const GAMEPLAY_LANES = [-2.6, 0, 2.6] as const;
+export const GAMEPLAY_LANE_COLORS = ["#DFA7B4", "#D68EA5", "#DCA3B1"] as const;
 const LANES = GAMEPLAY_LANES;
 const PLAYER_Z = 0;
 const PROP_TEXTURES = {
@@ -566,9 +567,9 @@ export class GameWorld {
     const cloudUnderside = this.material("cloudRunwayUnderside", "#B77C8C", 0.065);
     const cloudRunway = this.material("cloudRunwayWhite", "#D9A58F", 0.02);
     const laneMaterials = [
-      this.material("cloudLaneLeft", "#DFA7B4", 0.04),
-      this.material("cloudLaneCentre", "#E6B99E", 0.03),
-      this.material("cloudLaneRight", "#DCA3B1", 0.04),
+      this.material("cloudLaneLeft", GAMEPLAY_LANE_COLORS[0], 0.04),
+      this.material("cloudLaneCentre", GAMEPLAY_LANE_COLORS[1], 0.025),
+      this.material("cloudLaneRight", GAMEPLAY_LANE_COLORS[2], 0.04),
     ];
     const seamMaterial = this.material("cloudLaneWhisper", "#A95E78", 0.16);
     const edgeLineMaterial = this.material("cloudRunwayEdgeLine", "#D58FA2", 0.09);

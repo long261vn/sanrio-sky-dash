@@ -267,3 +267,7 @@
 - [x] Rà soát camera, điểm neo mascot và bố cục đường kem hiện tại trên desktop/mobile.
 - [x] Hạ framing mascot và dải đường kem để tăng vùng quan sát phía trước, giữ hitbox/ba làn/điều khiển.
 - [x] Kiểm thử responsive, regression/build, phát hành và không tạo điểm QA trong Top 20.
+- [x] Lập ma trận QA cho landing, setup, hướng dẫn, gameplay, kết quả và Top 20 trên desktop/mobile.
+- [x] Đổi làn giữa sang hồng đậm hơn hai làn ngoài để giảm chói mà vẫn giữ rõ ba làn.
+- [x] Sửa các lỗi overlap, clipping, tương phản hoặc phân cấp hiển thị được xác minh trong QA.
+- [ ] Chạy regression/build, kiểm thử lại mọi màn hình, phát hành và không tạo điểm QA trong Top 20.

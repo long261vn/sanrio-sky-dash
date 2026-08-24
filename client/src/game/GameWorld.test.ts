@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { GAMEPLAY_LANES, GameWorld } from "./GameWorld";
+import { GAMEPLAY_LANE_COLORS, GAMEPLAY_LANES, GameWorld } from "./GameWorld";
 
 type TestEntityKind = "lowHurdle" | "cloudGate" | "star" | "shield" | "gust";
 
@@ -30,6 +30,10 @@ describe("GameWorld keyboard input", () => {
   it("keeps the three gameplay lane centers unchanged when road art is refreshed", () => {
     expect(GAMEPLAY_LANES).toEqual([-2.6, 0, 2.6]);
     expect(GAMEPLAY_LANES[1]).toBe(0);
+  });
+
+  it("keeps the centre lane a slightly deeper pink than the two outer lanes", () => {
+    expect(GAMEPLAY_LANE_COLORS).toEqual(["#DFA7B4", "#D68EA5", "#DCA3B1"]);
   });
 
   it("builds a raised cloud gate with a taller clear slide silhouette", () => {

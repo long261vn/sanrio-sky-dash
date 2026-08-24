@@ -198,13 +198,13 @@ button { font: inherit; } button:not(:disabled) { cursor: pointer; } button:focu
 /* Kỷ lục mới: một burst ngắn, nằm sau nội dung để không che điểm và các thao tác. */
 .results-panel { position: relative; isolation: isolate; overflow: hidden; }
 .results-panel > :not(.record-rainbow-burst) { position: relative; z-index: 1; }
-.record-rainbow-burst { position: absolute; top: -48px; right: -34px; left: -34px; z-index: 0; height: 190px; overflow: hidden; pointer-events: none; }
-.record-rainbow { position: absolute; right: 50%; bottom: 13px; width: 260px; height: 132px; border: 15px solid; border-bottom: 0; border-radius: 260px 260px 0 0; opacity: .92; transform: translateX(50%) scale(.95); transform-origin: bottom center; animation: record-rainbow-rise 760ms cubic-bezier(.23,1,.32,1) both; }
-.record-rainbow--pink { border-color: #ff83ad; }.record-rainbow--yellow { bottom: 9px; width: 226px; height: 113px; border-color: #ffd45e; animation-delay: 80ms; }.record-rainbow--mint { bottom: 5px; width: 192px; height: 94px; border-color: #75d7bf; animation-delay: 150ms; }
+.record-rainbow-burst { position: absolute; top: -76px; right: -34px; left: -34px; z-index: 0; height: 172px; overflow: hidden; pointer-events: none; }
+.record-rainbow { position: absolute; right: 50%; bottom: 50px; width: 260px; height: 132px; border: 15px solid; border-bottom: 0; border-radius: 260px 260px 0 0; opacity: .92; transform: translateX(50%) scale(.95); transform-origin: bottom center; animation: record-rainbow-rise 760ms cubic-bezier(.23,1,.32,1) both; }
+.record-rainbow--pink { border-color: #ff83ad; }.record-rainbow--yellow { bottom: 45px; width: 226px; height: 113px; border-color: #ffd45e; animation-delay: 80ms; }.record-rainbow--mint { bottom: 40px; width: 192px; height: 94px; border-color: #75d7bf; animation-delay: 150ms; }
 .record-sparkle { position: absolute; color: #ffd45e; font-size: 28px; font-style: normal; line-height: 1; text-shadow: 0 2px 0 rgba(94, 66, 137, .16); animation: record-sparkle-pop 900ms cubic-bezier(.23,1,.32,1) both; }.record-sparkle--one { top: 37px; left: 19%; }.record-sparkle--two { top: 63px; right: 18%; color: #ff83ad; animation-delay: 130ms; }.record-sparkle--three { top: 16px; right: 33%; color: #75d7bf; animation-delay: 220ms; }
 @keyframes record-rainbow-rise { from { opacity: 0; transform: translateX(50%) translateY(24px) scale(.7); } to { opacity: .92; transform: translateX(50%) translateY(0) scale(.95); } }
 @keyframes record-sparkle-pop { from { opacity: 0; transform: scale(.45) rotate(-20deg); } 55% { opacity: 1; transform: scale(1.14) rotate(12deg); } to { opacity: .9; transform: scale(1) rotate(0); } }
-@media (max-width: 560px) { .record-rainbow-burst { top: -60px; height: 164px; }.record-rainbow { width: 224px; height: 115px; border-width: 12px; }.record-rainbow--yellow { width: 194px; height: 99px; }.record-rainbow--mint { width: 164px; height: 83px; }.record-sparkle { font-size: 22px; } }
+@media (max-width: 560px) { .record-rainbow-burst { top: -88px; height: 154px; }.record-rainbow { bottom: 40px; width: 224px; height: 115px; border-width: 12px; }.record-rainbow--yellow { bottom: 36px; width: 194px; height: 99px; }.record-rainbow--mint { bottom: 32px; width: 164px; height: 83px; }.record-sparkle { font-size: 22px; } }
 
 /* Setup v4: tên là cổng duy nhất trước khi bộ sưu tập mascot xuất hiện. */
 .setup-main { position: relative; }
