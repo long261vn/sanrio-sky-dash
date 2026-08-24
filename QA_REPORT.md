@@ -420,3 +420,11 @@ Sau retry `8e3fd6ca`, Manus vẫn trả ribbon vàng cũ ở lượt kiểm tra 
 Lượt Manus sau thời gian chờ vẫn render ribbon vàng. Fingerprint console của tab xác nhận entry `assets/index-Bjt9yEh4.js`, khác bundle mới đã build cục bộ; đây là CDN stale được xác nhận độc lập với URL cache-buster. GitHub Pages vẫn là bằng chứng public pass cho cloud runway, còn Manus cần một retry publish nữa; các URL demo không gọi API submit.
 
 Sau retry `f7c68d87`, lượt view Manus hoàn tất khởi tạo và đã render đúng cloud runway trắng: đường sâu tới chân trời, rìa puff chồng mềm, seam cyan ba làn và bóng cyan dưới Cinnamoroll; đệm thấp, cổng mây và vật phẩm vẫn đọc rõ. GitHub Pages đã xác minh cùng tạo hình ở lượt trước. Toàn bộ QA public dùng `?demo=1&qaDense=1`, không nhập tên hoặc gọi API submit nên Top 20 không đổi.
+
+### Thiết kế lại đường mây và hiệu ứng thành tích — 24/08/2026
+
+Rà soát lại ảnh gameplay xác nhận bản trước có nền trắng chói và dải puff lặp đều, làm đường trông như các hạt xếp hàng. Bản dựng mới chuyển thành lõi đường cyan–trắng liền khối, trung tâm sáng hơn để định vị lane, hai lane ngoài xanh dịu, seam cyan đậm và bank mây theo cụm thưa tự nhiên. Ảnh desktop 1280×720/mobile 390×844 cho thấy Cinnamoroll có bóng cyan rõ, sao/cổng/đệm giữ silhouette và màu riêng trên nền; mây nhỏ dọc hai bên chuyển động rất chậm ngoài vùng va chạm. Không thay hitbox, tâm ba làn hoặc spawn.
+
+Ảnh `?result=1&qaNewRecord=1` dùng cờ cục bộ không ghi điểm xác nhận khi điểm vượt kỷ lục, panel kết quả có ba dải cầu vồng hồng–vàng–mint và sparkle xuất hiện phía sau lớp chữ/nút, nên không chặn thao tác lưu/chia sẻ/quay lại. Cờ chỉ ép `highScore` trong runtime QA trước `endRun()`, không gọi API leaderboard và không ảnh hưởng lượt người chơi thật.
+
+Ảnh mobile 390×844 xác nhận cầu vồng thu gọn theo panel, tiêu đề/chỉ số vẫn đọc được và bốn thao tác kết quả xếp dọc, không bị effect che. Full suite 65/65, TypeScript và build production đạt; cảnh báo bundle Babylon vẫn là cảnh báo kích thước lazy-load đã biết.

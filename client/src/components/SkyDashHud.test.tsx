@@ -301,6 +301,17 @@ describe("SkyDashHud run flow", () => {
     expect(screen.getByText(/Cố gắng thêm một chuyến bay/)).toBeTruthy();
   });
 
+  it("celebrates a new record with a rainbow burst without changing the result flow", () => {
+    render(<SkyDashHud />);
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent<GameSnapshot>("skydash:state", { detail: { ...gameoverSnapshot, score: 2_050, isNewRecord: true } }));
+    });
+
+    expect(screen.getByLabelText("Hiệu ứng cầu vồng chúc mừng kỷ lục mới")).toBeTruthy();
+    expect(screen.getByText("★ KỶ LỤC MỚI")).toBeTruthy();
+  });
+
   it("shares a completed result through the native share sheet", async () => {
     const share = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, "share", { configurable: true, value: share });

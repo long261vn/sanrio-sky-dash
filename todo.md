@@ -257,3 +257,7 @@
 - [x] Thiết kế lại mặt đường mây, rìa mây và chiều sâu pastel để đồng bộ minh hoạ màn hình đầu.
 - [x] Giữ nguyên hitbox/ba làn/spawn và bổ sung regression cho hợp đồng đường chạy.
 - [x] Kiểm thử trực quan gameplay desktop/mobile, phát hành Manus/GitHub Pages và không tạo điểm QA.
+- [x] Rà soát điểm yếu thị giác của cloud runway hiện tại và xác định tiêu chí tương phản cho mascot/vật phẩm/chướng ngại.
+- [x] Thiết kế lại đường mây liền khối với mặt đường có chiều sâu, rìa mềm và ba làn dễ đọc thay vì chuỗi puff rời.
+- [x] Thêm mây trôi nhẹ dọc hai rìa và hiệu ứng cầu vồng đặc biệt khi người chơi phá kỷ lục.
+- [ ] Bổ sung regression, kiểm thử desktop/mobile/public và không tạo điểm QA trong Top 20.

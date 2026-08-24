@@ -48,6 +48,7 @@ export class GameWorld {
   private readonly canvas: HTMLCanvasElement;
   private readonly entities: WorldEntity[] = [];
   private readonly decorations: TransformNode[] = [];
+  private readonly edgeDriftClouds: Array<{ node: TransformNode; speed: number; side: number }> = [];
   private readonly audio: AudioManager;
   private readonly ownsAudio: boolean;
   private readonly rngSeed = 9711;
@@ -98,6 +99,7 @@ export class GameWorld {
   private readonly demoInspect = new URLSearchParams(window.location.search).has("inspect");
   private readonly demoHit = new URLSearchParams(window.location.search).has("hit");
   private readonly demoResult = new URLSearchParams(window.location.search).has("result");
+  private readonly demoNewRecord = new URLSearchParams(window.location.search).has("qaNewRecord");
   private readonly demoDense = new URLSearchParams(window.location.search).has("qaDense");
   private readonly demoDistance = (() => {
     const value = Number(new URLSearchParams(window.location.search).get("qaDistance"));
@@ -135,6 +137,7 @@ export class GameWorld {
         this.score = 1_760;
         this.distance = 214;
         this.lastDifficultyLevel = this.getDifficulty().level;
+        if (this.demoNewRecord) this.highScore = 0;
         this.endRun();
       }, 250);
     } else if (this.demo || this.demoPractice) window.setTimeout(() => this.start(this.demoCharacter, this.demoPractice), 250);
@@ -184,6 +187,7 @@ export class GameWorld {
     this.canvas.removeEventListener("pointercancel", this.onPointerCancel);
     this.entities.forEach((entity) => entity.node.dispose(false, true));
     this.decorations.forEach((node) => node.dispose(false, true));
+    this.edgeDriftClouds.forEach(({ node }) => node.dispose(false, true));
     this.player?.dispose(false, true);
     if (this.ownsAudio) this.audio.dispose();
   }
@@ -559,53 +563,55 @@ export class GameWorld {
   }
 
   private buildTrack() {
-    const cloudUnderside = this.material("cloudRunwayUnderside", "#D6EEF8", 0.07);
-    const cloudRunway = this.material("cloudRunwayWhite", "#FBFEFF", 0.025);
+    const cloudUnderside = this.material("cloudRunwayUnderside", "#86BDD6", 0.09);
+    const cloudRunway = this.material("cloudRunwayWhite", "#BFE4F3", 0.04);
     const laneMaterials = [
-      this.material("cloudLaneLeft", "#F4FBFF", 0.04),
-      this.material("cloudLaneCentre", "#EAF8FF", 0.07),
-      this.material("cloudLaneRight", "#F8FCFF", 0.04),
+      this.material("cloudLaneLeft", "#9ED4E9", 0.07),
+      this.material("cloudLaneCentre", "#D5EFF9", 0.06),
+      this.material("cloudLaneRight", "#9AD2E8", 0.07),
     ];
-    const seamMaterial = this.material("cloudLaneWhisper", "#8BC8E1", 0.13);
-    const edgeCloudMaterial = this.material("cloudRunwayEdge", "#FFFFFF", 0.03);
-    const edgeShadowMaterial = this.material("cloudRunwayEdgeShadow", "#D4EEF8", 0.06);
-    const horizonMistMaterial = this.material("cloudRunwayHorizonMist", "#E3F5FB", 0.1);
+    const seamMaterial = this.material("cloudLaneWhisper", "#247FA8", 0.24);
+    const edgeLineMaterial = this.material("cloudRunwayEdgeLine", "#5CAFD1", 0.14);
+    const edgeCloudMaterial = this.material("cloudRunwayBank", "#F7FDFF", 0.025);
+    const driftCloudMaterial = this.material("cloudRunwayDrift", "#FFFFFF", 0.04);
+    const horizonMistMaterial = this.material("cloudRunwayHorizonMist", "#D0EDF8", 0.12);
 
-    const underside = MeshBuilder.CreateGround("cloudRunwayUndersideMesh", { width: 11.6, height: 124, subdivisions: 2 }, this.scene);
+    const underside = MeshBuilder.CreateGround("cloudRunwayUndersideMesh", { width: 11.8, height: 124, subdivisions: 2 }, this.scene);
     underside.position = new Vector3(0, -0.22, 50);
     underside.material = cloudUnderside;
 
-    const track = MeshBuilder.CreateGround("cloudRibbonTrack", { width: 9.15, height: 120, subdivisions: 2 }, this.scene);
+    const track = MeshBuilder.CreateGround("cloudRibbonTrack", { width: 9.1, height: 120, subdivisions: 2 }, this.scene);
     track.position = new Vector3(0, 0, 48);
     track.material = cloudRunway;
 
     LANES.forEach((x, index) => {
-      const lane = MeshBuilder.CreateGround(`cloudLane${index}`, { width: 2.47, height: 120, subdivisions: 1 }, this.scene);
+      const lane = MeshBuilder.CreateGround(`cloudLane${index}`, { width: 2.42, height: 120, subdivisions: 1 }, this.scene);
       lane.position = new Vector3(x, 0.014 + index * 0.001, 48);
       lane.material = laneMaterials[index];
     });
 
     for (const x of [-1.3, 1.3]) {
-      for (let segment = 0; segment < 27; segment += 1) {
-        const seam = MeshBuilder.CreateBox(`cloudLaneWhisper${x}-${segment}`, { width: 0.11, height: 0.045, depth: 2.2 }, this.scene);
-        seam.position = new Vector3(x, 0.055, -9 + segment * 4.7);
+      for (let segment = 0; segment < 35; segment += 1) {
+        const seam = MeshBuilder.CreateBox(`cloudLaneWhisper${x}-${segment}`, { width: 0.08, height: 0.04, depth: 1.35 }, this.scene);
+        seam.position = new Vector3(x, 0.058, -8 + segment * 3.45);
         seam.material = seamMaterial;
       }
     }
 
-    for (let row = 0; row < 49; row += 1) {
-      const z = -8 + row * 2.5;
-      for (const side of [-1, 1]) {
-        const sideOffset = (row % 2 === 0 ? 0.16 : -0.12) * side;
-        const edgePuff = MeshBuilder.CreateSphere(`cloudRunwayEdgePuff${side}-${row}`, { diameter: 1.3, segments: 10 }, this.scene);
-        edgePuff.position = new Vector3(side * 4.34 + sideOffset, 0.2 + (row % 3) * 0.025, z);
-        edgePuff.scaling = new Vector3(1.34, 0.52, 1.2);
-        edgePuff.material = edgeCloudMaterial;
-
-        const outerPuff = MeshBuilder.CreateSphere(`cloudRunwayOuterPuff${side}-${row}`, { diameter: 1.42, segments: 10 }, this.scene);
-        outerPuff.position = new Vector3(side * 4.94 - sideOffset * 0.4, 0.06, z + 1.05);
-        outerPuff.scaling = new Vector3(1.28, 0.42, 1.08);
-        outerPuff.material = edgeShadowMaterial;
+    for (const side of [-1, 1]) {
+      const edgeLine = MeshBuilder.CreateBox(`cloudRunwayEdgeLine${side}`, { width: 0.24, height: 0.1, depth: 120 }, this.scene);
+      edgeLine.position = new Vector3(side * 4.46, 0.08, 48);
+      edgeLine.material = edgeLineMaterial;
+      for (let bankIndex = 0; bankIndex < 13; bankIndex += 1) {
+        const bank = new TransformNode(`cloudRunwayBank${side}-${bankIndex}`, this.scene);
+        bank.position = new Vector3(side * (5.05 + (bankIndex % 3) * 0.18), 0.14, -3 + bankIndex * 9.6);
+        this.createCloud(bank, edgeCloudMaterial, 0.72 + (bankIndex % 2) * 0.14);
+      }
+      for (let driftIndex = 0; driftIndex < 4; driftIndex += 1) {
+        const drift = new TransformNode(`cloudRunwayDrift${side}-${driftIndex}`, this.scene);
+        drift.position = new Vector3(side * (5.6 + driftIndex * 0.3), 0.74 + (driftIndex % 2) * 0.35, 13 + driftIndex * 27 + (side < 0 ? 5 : 0));
+        this.createCloud(drift, driftCloudMaterial, 0.54 + (driftIndex % 2) * 0.16);
+        this.edgeDriftClouds.push({ node: drift, speed: 0.48 + driftIndex * 0.06, side });
       }
     }
 
@@ -642,6 +648,11 @@ export class GameWorld {
       node.position.x += Math.sin(this.elapsed * 0.12 + index) * delta * 0.035;
       node.rotation.z = Math.sin(this.elapsed * 0.34 + index) * 0.025;
     });
+    this.edgeDriftClouds.forEach(({ node, speed, side }, index) => {
+      node.position.z -= speed * delta;
+      node.position.x += Math.sin(this.elapsed * 0.32 + index) * side * delta * 0.035;
+      if (node.position.z < -12) node.position.z = 116 + index * 5;
+    });
   }
 
   private buildPlayer() {
@@ -654,7 +665,7 @@ export class GameWorld {
     runwayShadow.parent = canonical.root;
     runwayShadow.position = new Vector3(0, 0.028, 0);
     runwayShadow.scaling = new Vector3(1.12, 0.06, 0.66);
-    runwayShadow.material = this.material(`runnerCloudShadow-${canonicalCharacter.id}`, "#87BED5", 0.04);
+    runwayShadow.material = this.material(`runnerCloudShadow-${canonicalCharacter.id}`, "#4B96B9", 0.07);
     this.player = canonical.root;
     this.playerVisual = canonical.visual;
     return;
