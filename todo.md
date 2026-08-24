@@ -274,4 +274,4 @@
 - [x] Tái tạo setup đã nhập tên trên 360×800, 360×780, 390×844 và xác định vùng overlap cụ thể.
 - [x] Sửa dòng chảy bố cục ô tên, preview 360°, lưới mascot và CTA sau khi tên hợp lệ trên màn hẹp.
 - [x] Bổ sung regression sau khi tên hợp lệ; kiểm tra keyboard/chạm và không che input khi bàn phím mở.
-- [ ] Kiểm thử Galaxy S20 và các breakpoint lân cận, phát hành, không tạo điểm QA Top 20.
+- [x] Kiểm thử Galaxy S20 và các breakpoint lân cận, phát hành, không tạo điểm QA Top 20.

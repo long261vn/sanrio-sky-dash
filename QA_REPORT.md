@@ -477,3 +477,5 @@ Sau retry `1f1d3655`, GitHub Pages đã nhận lane giữa hồng phấn nhẹ �
 Đã tái tạo trạng thái tên hợp lệ qua cờ QA không ghi dữ liệu. Nguyên nhân là CTA `sticky` với `bottom` âm và các override mobile chồng nhau khiến khi preview/lưới được reveal đồng thời có thể phủ lại ô tên hoặc khối mascot. Trạng thái mở khóa nay ép toàn bộ khối vào dòng cuộn tuần tự, bỏ sticky CTA, giảm preview còn 68–76px ở màn hẹp và có padding đáy an toàn. Ảnh 360×800 (mốc Galaxy S20) và 360×780 đều hiển thị ô tên, banner Bước 2, preview, chỉ số, 8 mascot và 2 CTA theo thứ tự, không overlap/cắt chữ.
 
 Lượt GitHub Pages cache-buster đầu tiên sau checkpoint `e2a38791` vẫn hiển thị setup cũ (không nhận cờ `qaSetupReady` và vẫn khóa mascot). Đây là CDN stale, nên chưa ghi public pass; cần retry phát hành. URL QA không nhập tên hoặc gửi điểm.
+
+Sau retry `6896c532`, GitHub Pages đã nhận cờ `qaSetupReady`: tên Mây QA, preview 360°, đủ 8 mascot và cả hai CTA xuất hiện theo luồng setup mở khóa mới. QA mobile 360×800/360×780/390×844 trước đó xác minh các khối cùng bundle xếp tuần tự trong panel cuộn, không overlap. Cờ QA chỉ khởi tạo state cục bộ, không ghi tên hoặc điểm vào Top 20.
