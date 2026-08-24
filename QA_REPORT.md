@@ -428,3 +428,5 @@ Rà soát lại ảnh gameplay xác nhận bản trước có nền trắng chó
 Ảnh `?result=1&qaNewRecord=1` dùng cờ cục bộ không ghi điểm xác nhận khi điểm vượt kỷ lục, panel kết quả có ba dải cầu vồng hồng–vàng–mint và sparkle xuất hiện phía sau lớp chữ/nút, nên không chặn thao tác lưu/chia sẻ/quay lại. Cờ chỉ ép `highScore` trong runtime QA trước `endRun()`, không gọi API leaderboard và không ảnh hưởng lượt người chơi thật.
 
 Ảnh mobile 390×844 xác nhận cầu vồng thu gọn theo panel, tiêu đề/chỉ số vẫn đọc được và bốn thao tác kết quả xếp dọc, không bị effect che. Full suite 65/65, TypeScript và build production đạt; cảnh báo bundle Babylon vẫn là cảnh báo kích thước lazy-load đã biết.
+
+Lượt public `f08ac9c6`: GitHub Pages đã nhận road cyan–trắng tương phản mới, bank mây theo cụm thưa và seam cyan đậm; Cinnamoroll, sao, đệm đỏ và cổng tím vẫn tách nền. Manus còn trả đường white/puff dense của bundle cũ dù dùng cache-buster, nên cần retry CDN trước khi kết luận hai domain. Không nhập tên hay gửi điểm ở cả hai lượt demo.
