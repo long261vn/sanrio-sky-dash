@@ -355,3 +355,19 @@ Trong lượt xuất PNG public, browser kiểm thử từng chuyển sang trang
 Manus public đã hoàn tất xuất PNG: nút chuyển trạng thái thành “Đã tải thẻ PNG” mà không nhập tên hoặc tạo entry Top 20. GitHub Pages cũng trả cùng màn kết quả và sẵn sàng kiểm tra thao tác tải bằng cùng URL QA.
 
 GitHub Pages cũng hoàn tất xuất PNG và chuyển nút thành “Đã tải thẻ PNG”. Hai bản public đã xác minh hành vi tải thẻ; các lần QA đều không điền tên và không gọi Lưu & xem hạng, nên dữ liệu Top 20 thực được giữ nguyên.
+
+### QA setup mới — 23/08/2026
+
+Tái hiện setup tại 360×780 và 390×844 trước khi chỉnh. Màn 360×780 không chồng khối nhưng lưới rất dày; tại 390×844, tên Cinnamoroll/Pompompurin/My Melody/Kuromi/Badtz-Maru/Keroppi/Gudetama/Hello Kitty bị cắt bởi bố cục icon–copy trong thẻ hai cột. Đây là lỗi responsive cần sửa bằng thẻ dạng hàng có cột icon cố định, tên được wrap hợp lệ và không dùng text clipping trên desktop/mobile.
+
+Sau sửa, setup 360×780 và 390×844 đều dùng tên trước, khu mascot tùy chọn và card hai cột có tên wrap. Tám mascot hiển thị trong khung riêng, không cắt chữ hoặc đè lên icon/chip; CTA vẫn nhìn thấy ở cuối panel. Cinnamoroll được ghi rõ là mascot mặc định và chỉ tên hợp lệ mới mở khóa chạy/luyện tập.
+
+Kiểm tra bổ sung 412×915 và desktop 1280×720: trường tên có hàng riêng trước mascot; preview, tên/tagline/orientation và ba chip chỉ số đã tách thành vùng grid độc lập; card chọn mascot không chồng với phần tóm tắt. Panel setup cuộn nội bộ trên chiều cao desktop thấp để không cắt nội dung ra ngoài viewport.
+
+Lượt setup cục bộ chọn My Melody cho thấy preview runtime đổi ngay sang đúng character và CTA chuyển thành “Chạy cùng My Melody”; phần kiểm tra mặt trước–mặt lưng/đuôi đang được tiếp tục qua turntable cùng factory trước khi phát hành.
+
+Turntable My Melody đã được xoay qua góc cạnh và mặt lưng trong cùng canvas runtime. Mặt/ thân giữ trắng, hood hồng nằm trên đầu; QA tiếp tục dùng camera gameplay từ sau để xác nhận đuôi trắng tròn đọc rõ ở góc chơi thật.
+
+Gameplay desktop và 360×780 xác nhận camera phía sau nhìn rõ hood hồng phía sau đầu đến cổ, hai tai hồng, thân trắng và đuôi tròn trắng. Setup 360×780 đồng thời vẫn giữ lưới hai cột không overlap. My Melody preview/gameplay dùng chung factory `melody-hood-v5`; test factory kiểm tra hood nông theo trục Y, phần hood lùi ra sau theo trục Z và đuôi trắng ở local +Z.
+
+Setup tablet 768×1024 hoàn tất ma trận responsive: hàng tên đi trước, thông báo mascot tùy chọn, preview/chỉ số và đủ tám card đều nằm trong panel không tràn hoặc overlap. Regression cục bộ đạt 63/63 test, TypeScript và build production; cảnh báo chunk Babylon vẫn là cảnh báo kích thước lazy-load đã biết.

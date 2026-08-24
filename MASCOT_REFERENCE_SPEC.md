@@ -23,7 +23,7 @@ Mascot Cinnamoroll phải có **thân và đầu trắng kem**, **hai tai dài r
 
 ## Yêu cầu đã chốt cho My Melody
 
-Mascot My Melody phải có **hood hồng phủ trọn đầu**, **hai tai thỏ dài rủ từ hood**, **mặt trắng/kem mở khung bởi hood**, cùng **nơ hoa trắng–hồng lớn lệch về một bên**. Hood và đôi tai phải tạo silhouette rõ từ phía sau; không dùng tai ngắn/dựng rời khỏi hood.
+Mascot My Melody phải có **mặt và thân trắng**, **đuôi tròn trắng ở phía sau**, **hood hồng ôm đầu và dừng ở cổ**, hai tai thỏ hồng dài mọc từ hood, cùng hoa trắng–hồng lệch về một bên. Mặt trước phải giữ trắng, còn camera gameplay phía sau phải đọc được hood hồng đến cổ và đuôi trắng tròn; không kéo hood xuống phủ thân hoặc dùng tai ngắn/dựng rời khỏi hood. Đặc tả này do người chơi xác nhận trực tiếp ngày 24/08/2026 và được ưu tiên khi diễn giải runtime model.
 
 ## Yêu cầu đã chốt cho Pompompurin
 
@@ -55,7 +55,7 @@ Mascot Hello Kitty phải có **đầu mèo trắng rộng**, **hai tai tam giá
 |---|---|---|
 | Cinnamoroll | Chó con tai rủ ngang | Tai dài xanh nhạt, đuôi cuộn |
 | Pompompurin | Golden retriever tròn | Tai cụp nâu, beret nâu |
-| My Melody | Bunny hood hồng | Tai rủ từ hood, hoa/nơ lớn |
+| My Melody | Bunny trắng, hood hồng tới cổ | Tai rủ từ hood, hoa/nơ lớn, đuôi tròn trắng phía sau |
 | Kuromi | Jester tối màu | Skull hồng, hai chóp mũ, đuôi quỷ |
 | Badtz-Maru | Penguin đen gai | Mào bốn gai, bụng trắng, mỏ/chân vàng |
 | Keroppi | Ếch mắt khổng lồ | Hai mắt trắng nhô cao, áo sọc hồng |

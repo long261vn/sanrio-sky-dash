@@ -1,6 +1,6 @@
-/** Luật UX: tên và nhân vật được chọn trước lượt chạy để sẵn sàng ghi Top 20. */
-export function canStartSkyDashRun(playerName: string, hasSelectedCharacter: boolean) {
-  return hasSelectedCharacter && !needsLeaderboardName(playerName);
+/** Luật UX: tên hợp lệ là điều kiện bắt đầu; Cinnamoroll luôn là mascot mặc định nếu người chơi không đổi. */
+export function canStartSkyDashRun(playerName: string) {
+  return !needsLeaderboardName(playerName);
 }
 
 export function needsLeaderboardName(playerName: string) {

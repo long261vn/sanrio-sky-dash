@@ -115,7 +115,7 @@ describe("SkyDashHud run flow", () => {
     window.removeEventListener("skydash:menu-interact", menuAudioListener);
   });
 
-  it("requires a name and an explicit character choice before sending Start", () => {
+  it("requires a name but lets the player start with default Cinnamoroll without reselection", () => {
     const commandListener = vi.fn();
     const prepareListener = vi.fn();
     window.addEventListener("skydash:command", commandListener);
@@ -132,15 +132,13 @@ describe("SkyDashHud run flow", () => {
     expect(screen.getByLabelText("Ảnh mặt trước Cinnamoroll")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Chọn Cinnamoroll; ảnh mặt trước" })).toBeTruthy();
 
+    expect(screen.getByText("MASCOT MẶC ĐỊNH")).toBeTruthy();
+    expect(screen.getByText(/Giữ Cinnamoroll mặc định hoặc chạm một nhân vật để đổi/)).toBeTruthy();
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "Mây Nhỏ" } });
-    const cinnamorollCard = screen.getAllByRole("button").find((button) => button.classList.contains("character-card") && button.textContent?.includes("Cinnamoroll"));
-    expect(cinnamorollCard).toBeTruthy();
-    fireEvent.click(cinnamorollCard!);
     expect((runButton as HTMLButtonElement).disabled).toBe(false);
     fireEvent.click(runButton);
 
     expect(commandListener.mock.calls.map(([event]) => (event as CustomEvent).detail)).toEqual([
-      { type: "select", characterId: "cinnamoroll" },
       { type: "start", characterId: "cinnamoroll" },
     ]);
     expect(prepareListener).toHaveBeenCalledOnce();
@@ -165,7 +163,7 @@ describe("SkyDashHud run flow", () => {
 
     expect(screen.getByText("BƯỚC 1 · TÊN NGƯỜI CHƠI")).toBeTruthy();
     expect(screen.getByText("BẮT BUỘC")).toBeTruthy();
-    expect(screen.getByText(/Cần: nhập tên/)).toBeTruthy();
+    expect(screen.getByText(/Cần nhập tên/)).toBeTruthy();
   });
 
   it("opens a short paged tutorial and lets the player skip it at any step", () => {

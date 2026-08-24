@@ -2,11 +2,11 @@ import { describe, expect, it } from "vitest";
 import { canStartSkyDashRun, needsLeaderboardName } from "../shared/runFlow";
 
 describe("run flow", () => {
-  it("requires both a valid player name and an explicit character selection before a run", () => {
-    expect(canStartSkyDashRun("", false)).toBe(false);
-    expect(canStartSkyDashRun("Hana", false)).toBe(false);
-    expect(canStartSkyDashRun("", true)).toBe(false);
-    expect(canStartSkyDashRun("Mây Nhỏ", true)).toBe(true);
+  it("requires a valid player name while allowing the default mascot without reselection", () => {
+    expect(canStartSkyDashRun("")).toBe(false);
+    expect(canStartSkyDashRun("H")).toBe(false);
+    expect(canStartSkyDashRun("Hana")).toBe(true);
+    expect(canStartSkyDashRun("Mây Nhỏ")).toBe(true);
     expect(needsLeaderboardName("")).toBe(true);
   });
 

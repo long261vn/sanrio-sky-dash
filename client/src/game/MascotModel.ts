@@ -8,7 +8,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import type { CharacterDefinition } from "@/game/types";
 
 export type MascotModel = { root: TransformNode; visual: TransformNode; shieldRing: Mesh };
-export const MASCOT_MODEL_VERSION = "orientation-v4";
+export const MASCOT_MODEL_VERSION = "melody-hood-v5";
 export const GAMEPLAY_MASCOT_FACING_Y = Math.PI;
 export const PREVIEW_MASCOT_FACING_Y = 0;
 
@@ -45,6 +45,7 @@ export function animateMascotAccessories(visual: TransformNode, silhouette: Char
   if (silhouette === "bunny") {
     swayPairs(["melodyHoodEar", "melodyInnerEar"], 0.28, 0.12);
     matching("melodyFlowerPetal").forEach((petal, index) => { petal.rotation.z = wave * 0.055 * (index % 2 ? -1 : 1); });
+    matching("melodyRoundTail").forEach((tail) => { tail.position.y = 0.64 + wave * 0.04; tail.rotation.z = wave * 0.08; });
   }
   if (silhouette === "imp") {
     swayPairs(["kuromiJesterPoint"], 0.46, 0.12);
@@ -141,8 +142,7 @@ export function createMascotModel(scene: Scene, character: CharacterDefinition, 
   const visual = new TransformNode(`${rootName}-visual`, scene);
   visual.parent = root;
   visual.position = new Vector3(0, 0.2, -0.12);
-  const backShell = character.silhouette === "bunny" ? accent
-    : character.silhouette === "imp" ? darkHood
+  const backShell = character.silhouette === "imp" ? darkHood
       : body;
 
   const bodyMesh = sphere(scene, visual, `${rootName}-avatarBody`, new Vector3(0, 0.72, 0), 1.18, body, new Vector3(0.82, 1.05, 0.72));
@@ -208,12 +208,13 @@ export function createMascotModel(scene: Scene, character: CharacterDefinition, 
   }
 
   if (character.silhouette === "bunny") {
-    const hood = sphere(scene, visual, `${rootName}-melodyHood`, new Vector3(0, 1.58, 0.22), 1.5, accent, new Vector3(1.02, 1, 0.58));
-    head.scaling = new Vector3(0.84, 0.8, 0.76);
+    // My Melody: mặt/thân trắng; hood hồng chỉ ôm đầu đến cổ, không phủ xuống thân.
+    const hood = sphere(scene, visual, `${rootName}-melodyHood`, new Vector3(0, 1.64, 0.25), 1.42, accent, new Vector3(1.03, 0.88, 0.8));
+    head.scaling = new Vector3(0.88, 0.82, 0.76);
     for (const x of [-0.42, 0.42]) {
-      const ear = sphere(scene, visual, `${rootName}-melodyHoodEar${x}`, new Vector3(x, 2.15, -0.02), 0.54, accent, new Vector3(0.72, 1.9, 0.62));
+      const ear = sphere(scene, visual, `${rootName}-melodyHoodEar${x}`, new Vector3(x, 2.1, -0.02), 0.5, accent, new Vector3(0.7, 1.7, 0.6));
       ear.rotation.z = x * -0.28;
-      sphere(scene, visual, `${rootName}-melodyInnerEar${x}`, new Vector3(x, 2.15, -0.35), 0.34, softAccent, new Vector3(0.45, 1.24, 0.2)).rotation.z = x * -0.28;
+      sphere(scene, visual, `${rootName}-melodyInnerEar${x}`, new Vector3(x, 2.1, -0.35), 0.31, softAccent, new Vector3(0.43, 1.08, 0.2)).rotation.z = x * -0.28;
     }
     for (let index = 0; index < 5; index += 1) {
       sphere(
@@ -226,6 +227,8 @@ export function createMascotModel(scene: Scene, character: CharacterDefinition, 
       );
     }
     sphere(scene, visual, `${rootName}-melodyFlowerCenter`, new Vector3(0.5, 2.03, -0.66), 0.11, golden);
+    sphere(scene, visual, `${rootName}-melodyHoodCollar`, new Vector3(0, 1.16, 0.28), 1.03, accent, new Vector3(0.9, 0.42, 0.64));
+    sphere(scene, visual, `${rootName}-melodyRoundTail`, new Vector3(0, 0.64, 0.5), 0.48, body, new Vector3(0.92, 0.92, 0.72));
   }
 
   if (character.silhouette === "imp") {

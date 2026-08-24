@@ -16,7 +16,7 @@ import { CHARACTERS } from "./types";
 const expectedRecognitionMeshes: Record<string, string[]> = {
   cinnamoroll: ["cloudDropEar", "cloudInnerEar", "cloudTailCurl"],
   pompompurin: ["puddingBeret", "puddingDropEar", "puddingBelly"],
-  mymelody: ["melodyHood", "melodyHoodEar", "melodyFlower"],
+  mymelody: ["melodyHood", "melodyHoodEar", "melodyFlower", "melodyRoundTail"],
   kuromi: ["kuromiJesterPoint", "kuromiSkull", "kuromiDevilTail"],
   badtzmaru: ["penguinBelly", "penguinBeak", "penguinTuft3"],
   keroppi: ["frogEyeWhite", "frogPinkCollar", "frogWhiteStripe"],
@@ -84,6 +84,22 @@ describe("createMascotModel", () => {
     orientMascotForPreview(model);
     expect(model.root.rotation.y).toBe(PREVIEW_MASCOT_FACING_Y);
     expect(model.root.metadata).toMatchObject({ presentation: "preview-front" });
+  });
+
+  it("keeps My Melody white with a head-to-neck pink hood and a round white back tail", () => {
+    const scene = new Scene(new NullEngine());
+    scenes.push(scene);
+    const melody = CHARACTERS.find((character) => character.id === "mymelody")!;
+    const model = createMascotModel(scene, melody, "melodySpec");
+    const hood = model.visual.getChildMeshes().find((mesh) => mesh.name.includes("melodyHood"));
+    const tail = model.visual.getChildMeshes().find((mesh) => mesh.name.includes("melodyRoundTail"));
+    const bodyRim = model.visual.getChildMeshes().find((mesh) => mesh.name.endsWith("bodyRim"));
+
+    expect(hood?.scaling.y).toBeLessThan(0.9);
+    expect(hood?.scaling.z).toBeGreaterThan(0.7);
+    expect(tail?.position.z).toBeGreaterThan(0.3);
+    expect(tail?.material?.name).toContain("body-mymelody");
+    expect(bodyRim?.material?.name).toContain("body-mymelody");
   });
 
   it.each(CHARACTERS)("animates visual-only accessory motion for $name", (character) => {

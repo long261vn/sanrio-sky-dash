@@ -243,3 +243,8 @@
 - [x] Thêm animation nhẹ tai, đuôi, hood hoặc gai theo từng mascot khi chạy, không ảnh hưởng hitbox hay hướng chạy.
 - [x] Bổ sung regression cho dữ liệu thẻ và transform animation mascot; kiểm thử xuất PNG/gameplay trên desktop và mobile.
 - [x] Xác minh Manus public và GitHub Pages sau phát hành, không tạo dữ liệu thử trong Top 20.
+- [x] Rà soát setup và lưới chọn mascot ở desktop, 360×780, 390×844, 412×915 và tablet để xác định mọi nguy cơ overlap.
+- [x] Đưa bước nhập tên lên trước lựa chọn mascot; giữ Cinnamoroll mặc định khi người chơi không đổi nhân vật và hướng dẫn rõ ràng.
+- [x] Chỉnh factory My Melody thành mặt/thân trắng, đuôi tròn trắng phía sau và hood hồng chỉ từ đầu đến cổ, đồng bộ gameplay/preview 360°.
+- [x] Bổ sung regression luồng setup và silhouette My Melody; kiểm thử responsive, gameplay và preview trên các viewport mục tiêu.
+- [ ] Phát hành và xác minh Manus public/GitHub Pages, không tạo dữ liệu thử trong Top 20.
