@@ -396,3 +396,5 @@ Regression HUD xác nhận khi tên trống, vùng mascot/CTA có `inert` và `a
 Ảnh bổ sung tại **390×844** và **412×915** giữ cùng thứ bậc: tiêu đề, ô tên có viền hồng, lời nhắc mở khóa và khung Bước 2. Không xuất hiện thanh cuộn ngang, chồng nhãn hoặc cắt text; khoảng cách theo chiều dọc vẫn đủ cho thao tác chạm.
 
 Ảnh **768×1024** giữ form tên rộng, lời nhắc Bước 2 căn giữa và header không chồng lấn. Build production hoàn tất; cảnh báo duy nhất là chunk Babylon đã biết (khoảng 1,77 MB raw / 416 KB gzip), không phải lỗi build.
+
+Sau checkpoint `652e0eab`, cả Manus public và GitHub Pages với cache-buster `name-gate-652e0eab` ban đầu vẫn hiển thị setup cũ có preview, 8 card mascot và CTA trước khi tên hợp lệ. Đây là bundle CDN stale, không khớp bản preview/regression mới; không ghi dữ liệu Top 20 trong lần kiểm tra này. Cần retry phát hành rồi xác minh fingerprint/UI mới trước khi đóng checklist.
