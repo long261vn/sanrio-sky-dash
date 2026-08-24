@@ -442,3 +442,5 @@ Palette cyan đã được thay bằng lõi kem ấm, lane ngoài hồng phấn,
 Lượt tinh chỉnh cuối hạ albedo lõi kem thêm một nấc để ánh sáng scene không thổi trắng đường chạy. Ảnh desktop và mobile hiện có lane giữa kem ấm, hai bên hồng phấn nhạt, viền/seam berry; Cinnamoroll trắng được tách bằng shadow hồng và vật phẩm/chướng ngại vẫn đọc rõ ngay khi xuất hiện từ xa. Kết quả đáp ứng yêu cầu dịu mắt hơn mà không đổi giao diện điều khiển hoặc luật chơi.
 
 Sau checkpoint `046ef647`, GitHub Pages với cache-buster còn trả scene cyan cũ, nên chưa ghi nhận public pass. Lượt Manus cùng cache-buster bị timeout khi tải screenshot, không có ảnh để kết luận; không suy diễn kết quả từ tab trống. Hai URL đều là demo, không nhập tên hay gửi điểm. Cần retry phát hành rồi kiểm tra lại.
+
+Sau retry `df6f8e64`, GitHub Pages đã render đúng palette kem–hồng phấn: lane giữa kem ấm, hai lane hồng phấn, seam berry, shadow hồng dưới Cinnamoroll; sao vàng, đệm đỏ và cổng tím tiếp tục tách nền. URL `?demo=1&qaDense=1` không nhập tên hoặc gọi API lưu điểm, nên Top 20 không thay đổi.

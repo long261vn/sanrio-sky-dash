@@ -263,4 +263,4 @@
 - [x] Bổ sung regression, kiểm thử desktop/mobile/public và không tạo điểm QA trong Top 20.
 - [x] Rà soát độ chói hiện tại và xác định palette kem–hồng phấn đủ tương phản cho gameplay.
 - [x] Đổi mặt đường, mây rìa, lane/seam và bóng mascot sang palette kem–hồng phấn dịu mắt.
-- [ ] Kiểm thử desktop/mobile, regression/build, phát hành và không tạo điểm QA trong Top 20.
+- [x] Kiểm thử desktop/mobile, regression/build, phát hành và không tạo điểm QA trong Top 20.
