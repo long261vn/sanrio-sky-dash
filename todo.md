@@ -266,4 +266,4 @@
 - [x] Kiểm thử desktop/mobile, regression/build, phát hành và không tạo điểm QA trong Top 20.
 - [x] Rà soát camera, điểm neo mascot và bố cục đường kem hiện tại trên desktop/mobile.
 - [x] Hạ framing mascot và dải đường kem để tăng vùng quan sát phía trước, giữ hitbox/ba làn/điều khiển.
-- [ ] Kiểm thử responsive, regression/build, phát hành và không tạo điểm QA trong Top 20.
+- [x] Kiểm thử responsive, regression/build, phát hành và không tạo điểm QA trong Top 20.

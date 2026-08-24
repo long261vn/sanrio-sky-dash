@@ -450,3 +450,5 @@ Sau retry `df6f8e64`, GitHub Pages đã render đúng palette kem–hồng phấ
 Camera nay ngắm về phía trước và cao hơn (`z=3.6`, `y=1.4`) thay vì bám vào chân mascot. Ảnh desktop 1280×720 cho thấy mascot và dải kem lùi xuống nửa dưới, mở rộng vùng đọc cổng, đệm và vật phẩm ở xa; ảnh mobile 390×844 đặt mascot thấp hơn rõ rệt nhưng vẫn cách cụm điều khiển. Gốc mascot, `PLAYER_Z=0`, hitbox, ba làn, nhảy và trượt không thay đổi.
 
 Sau kiểm tra public, điểm nhìn được đẩy sâu hơn tới `z=6.4`, `y=1.5` để hạ thêm mascot. Ảnh mobile 390×844 cuối cho thấy đầu mascot ở vùng dưới trung tâm, còn khoảng đệm rõ trước cụm điều khiển và mở rộng vùng đọc ba lane/cổng/vật phẩm phía xa. Đây là thay đổi framing camera duy nhất, không thay toạ độ runner hay collision.
+
+GitHub Pages tại cache-buster `framing-deep-f5fdc5e9` đã render framing sâu cuối: mascot nằm thấp trong nửa dưới, đường kem mở dài về chân trời và các vật phẩm/chướng ngại có khoảng nhìn trước khi tới runner. URL demo không nhập tên hoặc gọi API lưu điểm, nên Top 20 không đổi.
