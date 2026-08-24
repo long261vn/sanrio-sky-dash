@@ -444,3 +444,7 @@ Lượt tinh chỉnh cuối hạ albedo lõi kem thêm một nấc để ánh s�
 Sau checkpoint `046ef647`, GitHub Pages với cache-buster còn trả scene cyan cũ, nên chưa ghi nhận public pass. Lượt Manus cùng cache-buster bị timeout khi tải screenshot, không có ảnh để kết luận; không suy diễn kết quả từ tab trống. Hai URL đều là demo, không nhập tên hay gửi điểm. Cần retry phát hành rồi kiểm tra lại.
 
 Sau retry `df6f8e64`, GitHub Pages đã render đúng palette kem–hồng phấn: lane giữa kem ấm, hai lane hồng phấn, seam berry, shadow hồng dưới Cinnamoroll; sao vàng, đệm đỏ và cổng tím tiếp tục tách nền. URL `?demo=1&qaDense=1` không nhập tên hoặc gọi API lưu điểm, nên Top 20 không thay đổi.
+
+### Framing gameplay hạ thấp — 24/08/2026
+
+Camera nay ngắm về phía trước và cao hơn (`z=3.6`, `y=1.4`) thay vì bám vào chân mascot. Ảnh desktop 1280×720 cho thấy mascot và dải kem lùi xuống nửa dưới, mở rộng vùng đọc cổng, đệm và vật phẩm ở xa; ảnh mobile 390×844 đặt mascot thấp hơn rõ rệt nhưng vẫn cách cụm điều khiển. Gốc mascot, `PLAYER_Z=0`, hitbox, ba làn, nhảy và trượt không thay đổi.

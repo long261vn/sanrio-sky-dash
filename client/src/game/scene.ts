@@ -17,12 +17,17 @@ export type GameHandle = {
   dispose: () => void;
 };
 
+export const GAMEPLAY_CAMERA_POSITION = new Vector3(0, 5.7, -12.8);
+export const GAMEPLAY_CAMERA_TARGET = new Vector3(0, 1.4, 3.6);
+
 export async function createGameScene(engine: Engine, canvas: HTMLCanvasElement, audio?: AudioManager): Promise<GameHandle> {
   const scene = new Scene(engine);
   scene.clearColor = new Color4(0, 0, 0, 0);
 
-  const camera = new UniversalCamera("skyDashCamera", new Vector3(0, 5.7, -12.8), scene);
-  camera.setTarget(new Vector3(0, 0.9, 0));
+  const camera = new UniversalCamera("skyDashCamera", GAMEPLAY_CAMERA_POSITION, scene);
+  // Aim beyond the runner rather than at its feet: this places the mascot and
+  // cream runway lower in frame, preserving a larger reading window ahead.
+  camera.setTarget(GAMEPLAY_CAMERA_TARGET);
   camera.fov = 0.86;
   camera.fovMode = Camera.FOVMODE_VERTICAL_FIXED;
   camera.minZ = 0.1;
