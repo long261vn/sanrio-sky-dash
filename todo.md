@@ -247,4 +247,4 @@
 - [x] Đưa bước nhập tên lên trước lựa chọn mascot; giữ Cinnamoroll mặc định khi người chơi không đổi nhân vật và hướng dẫn rõ ràng.
 - [x] Chỉnh factory My Melody thành mặt/thân trắng, đuôi tròn trắng phía sau và hood hồng chỉ từ đầu đến cổ, đồng bộ gameplay/preview 360°.
 - [x] Bổ sung regression luồng setup và silhouette My Melody; kiểm thử responsive, gameplay và preview trên các viewport mục tiêu.
-- [ ] Phát hành và xác minh Manus public/GitHub Pages, không tạo dữ liệu thử trong Top 20.
+- [x] Phát hành và xác minh Manus public/GitHub Pages, không tạo dữ liệu thử trong Top 20.

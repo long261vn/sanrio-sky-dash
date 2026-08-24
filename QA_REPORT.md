@@ -377,3 +377,9 @@ Lượt Manus public đầu tiên của checkpoint `bed10d05` vẫn trả setup 
 GitHub Pages ở cùng checkpoint cũng đang trả bundle setup cũ và chưa tải portrait đầy đủ ở lượt đầu. Cả hai kênh public vẫn mở xác minh; không đánh dấu phát hành hoàn tất cho đến khi cùng thấy copy tên trước, mascot tùy chọn và lưới responsive mới.
 
 Retry Manus đang tải `assets/index-Wvpi-IFy.js`; bundle này không chứa marker `melody-hood-v5`, `MASCOT TÙY CHỌN` hay `melodyRoundTail`. Vì vậy CDN vẫn phục vụ asset cũ đã xác minh bằng fingerprint, không phải lỗi quan sát UI. Cần phát hành một checkpoint bundle mới rồi kiểm tra lại bằng marker.
+
+Sau checkpoint phát hành lại `c49df66a`, CDN đã trả entry mới: Manus `index-CrfWLHJS.js` và GitHub Pages `index-BqAjhxCK.js`. Hai bundle đều có `melody-hood-v5` và `melodyRoundTail`; tải HTML Manus bằng `cache: reload` cũng xác nhận copy “Nhập tên trước để chuyến bay” nằm trong bundle mới. Tab browser ban đầu vẫn giữ DOM cũ, nên cần hard-refresh tab trước khi kết luận kiểm tra UI public.
+
+Sau khi xóa cache tab, Manus public đã render đúng UI mới: “BƯỚC 1 / 2 · TÊN NGƯỜI CHƠI”, “MASCOT TÙY CHỌN”, “MASCOT MẶC ĐỊNH” và điều kiện chỉ yêu cầu nhập tên. Lưới card hai cột không overlap ở viewport browser; không có tên/điểm được gửi. GitHub Pages vẫn cần lượt UI xác minh độc lập sau cache-buster.
+
+GitHub Pages với cache-buster mới cũng render UI tên trước/mascot tùy chọn/Cinnamoroll mặc định. Manus demo My Melody xác nhận gameplay có hood hồng đến cổ, tai hồng, thân trắng và đuôi tròn trắng nhìn từ camera sau. Hai bản public đã dùng bundle mới; URL QA không nhập tên hoặc gửi điểm nên Top 20 giữ nguyên.
