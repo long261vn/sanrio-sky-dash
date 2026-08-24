@@ -414,3 +414,7 @@ Capture gameplay mới tại desktop 1280×720 và mobile 390×844 đã hiển t
 Sau tinh chỉnh, ảnh desktop 1280×720 và mobile 390×844 cho thấy rìa đường là các puff chồng liền thành dải mây, thu nhỏ đều về chân trời; mặt đường trắng và cụm mây pastel đọc cùng ngôn ngữ với minh hoạ landing. Seam xanh nhạt giữ ba làn có thể phân biệt, còn bóng cyan dưới mascot trắng giữ độ tách nền. Demo `qaDense` vẫn hiển thị đệm thấp, cổng mây và vật phẩm ở ba làn; regression 64/64 và TypeScript đạt, không thay đổi hitbox/spawn.
 
 Sau checkpoint `f1ca502a`, Manus public và GitHub Pages với cache-buster đầu tiên vẫn cho đường ribbon vàng/kem cũ, không phải cloud runway trắng/rìa puff mới đã thấy tại local. Đây là CDN stale ở cả hai domain; URL QA chỉ dùng demo nên không nhập tên hoặc gửi điểm. Cần retry phát hành rồi xác minh lại screenshot public trước khi đóng checklist.
+
+Sau retry `8e3fd6ca`, Manus vẫn trả ribbon vàng cũ ở lượt kiểm tra đầu; GitHub Pages đã nhận đúng cloud runway trắng với rìa puff chồng mềm, seam xanh nhạt và silhouette Cinnamoroll/tất cả vật thể vẫn rõ. Không có thao tác ghi điểm. Cần kiểm tra lại Manus sau thêm một chu kỳ CDN trước khi đóng phát hành hai domain.
+
+Lượt Manus sau thời gian chờ vẫn render ribbon vàng. Fingerprint console của tab xác nhận entry `assets/index-Bjt9yEh4.js`, khác bundle mới đã build cục bộ; đây là CDN stale được xác nhận độc lập với URL cache-buster. GitHub Pages vẫn là bằng chứng public pass cho cloud runway, còn Manus cần một retry publish nữa; các URL demo không gọi API submit.
