@@ -467,3 +467,5 @@ GitHub Pages tại cache-buster `framing-deep-f5fdc5e9` đã render framing sâu
 Không còn lỗi overlap, clipping hay CTA bị che trong sáu trạng thái kiểm tra. Các hướng nâng chất lượng tiếp theo không phải lỗi: có thể tăng nhận diện thương hiệu bằng biểu tượng sao–mây lớn hơn ở HUD/kết quả, và phát triển thẻ Top 20 thành sticker sưu tầm hơn; các thay đổi này không cần để luồng hiện tại ổn định.
 
 Lượt regression 360×780 phát hiện cầu vồng kỷ lục chồng nền màu vào tiêu đề kết quả, dù chữ còn đọc được. Đã dời burst lên mép trên panel và nâng dải cầu vồng; ảnh kiểm tra lại cho thấy chỉ còn những vòng cung trang trí ở đầu thẻ, tiêu đề, chỉ số, ô tên và bốn CTA đều không còn bị overlap.
+
+Lượt GitHub Pages sau checkpoint `4e2bdb51` vẫn trả bundle gameplay có lane giữa vàng/kem cũ, khác ảnh QA cục bộ hồng phấn. Đây là CDN stale được xác minh bằng ảnh cache-buster, nên không kết luận public pass và sẽ retry phát hành; URL demo không ghi dữ liệu Top 20.
