@@ -371,3 +371,9 @@ Turntable My Melody đã được xoay qua góc cạnh và mặt lưng trong cù
 Gameplay desktop và 360×780 xác nhận camera phía sau nhìn rõ hood hồng phía sau đầu đến cổ, hai tai hồng, thân trắng và đuôi tròn trắng. Setup 360×780 đồng thời vẫn giữ lưới hai cột không overlap. My Melody preview/gameplay dùng chung factory `melody-hood-v5`; test factory kiểm tra hood nông theo trục Y, phần hood lùi ra sau theo trục Z và đuôi trắng ở local +Z.
 
 Setup tablet 768×1024 hoàn tất ma trận responsive: hàng tên đi trước, thông báo mascot tùy chọn, preview/chỉ số và đủ tám card đều nằm trong panel không tràn hoặc overlap. Regression cục bộ đạt 63/63 test, TypeScript và build production; cảnh báo chunk Babylon vẫn là cảnh báo kích thước lazy-load đã biết.
+
+Lượt Manus public đầu tiên của checkpoint `bed10d05` vẫn trả setup bundle cũ: copy “BƯỚC 2 / 2”, yêu cầu chạm chọn mascot và lưới 8 cột. Đây là stale CDN, không phải bằng chứng pass; cần retry cache-buster sau khi CDN đồng bộ. URL kiểm tra không nhập tên hoặc lưu điểm nên Top 20 không đổi.
+
+GitHub Pages ở cùng checkpoint cũng đang trả bundle setup cũ và chưa tải portrait đầy đủ ở lượt đầu. Cả hai kênh public vẫn mở xác minh; không đánh dấu phát hành hoàn tất cho đến khi cùng thấy copy tên trước, mascot tùy chọn và lưới responsive mới.
+
+Retry Manus đang tải `assets/index-Wvpi-IFy.js`; bundle này không chứa marker `melody-hood-v5`, `MASCOT TÙY CHỌN` hay `melodyRoundTail`. Vì vậy CDN vẫn phục vụ asset cũ đã xác minh bằng fingerprint, không phải lỗi quan sát UI. Cần phát hành một checkpoint bundle mới rồi kiểm tra lại bằng marker.
