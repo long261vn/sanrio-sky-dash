@@ -434,3 +434,9 @@ Lượt public `f08ac9c6`: GitHub Pages đã nhận road cyan–trắng tương 
 Sau retry `9c439ea5`, Manus vẫn hiển thị version road trắng/puff dense cũ ở lượt kiểm tra đầu. Lệnh xem danh sách `document.scripts` trong tab canvas không trả entry asset để fingerprint độc lập, nên chỉ ghi nhận bằng ảnh, không suy đoán tên bundle. GitHub Pages tiếp tục là kênh public đã pass; cần thêm một lượt retry/đồng bộ Manus, các URL demo không ghi leaderboard.
 
 Sau retry `54b6918c`, ảnh Manus vẫn là scene puff dense cũ. Thử lấy HTML cùng URL bằng `fetch(..., { cache: "reload" })` trong console bị chặn với `TypeError: Failed to fetch`, nên không lặp lại hoặc suy diễn fingerprint. GitHub Pages vẫn là bản public đã xác minh scene mới; cần dùng retry phát hành thay vì kết luận cache-buster đã đủ.
+
+### Palette kem–hồng phấn dịu mắt — 24/08/2026
+
+Palette cyan đã được thay bằng lõi kem ấm, lane ngoài hồng phấn, rìa/đám mây kem hồng và seam berry hồng. Ảnh desktop 1280×720 xác nhận màu mới đã bớt ánh trắng chói; sau tăng độ ấm vật liệu, ảnh mobile 390×844 cho thấy đường chạy kem rõ hơn, seam hồng vẫn định vị ba làn, Cinnamoroll trắng có bóng hồng tách nền, còn sao vàng/đệm đỏ/cổng tím giữ silhouette riêng. Mây trôi và cầu vồng kỷ lục không đổi, hitbox/spawn không đổi.
+
+Lượt tinh chỉnh cuối hạ albedo lõi kem thêm một nấc để ánh sáng scene không thổi trắng đường chạy. Ảnh desktop và mobile hiện có lane giữa kem ấm, hai bên hồng phấn nhạt, viền/seam berry; Cinnamoroll trắng được tách bằng shadow hồng và vật phẩm/chướng ngại vẫn đọc rõ ngay khi xuất hiện từ xa. Kết quả đáp ứng yêu cầu dịu mắt hơn mà không đổi giao diện điều khiển hoặc luật chơi.

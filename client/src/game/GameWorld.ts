@@ -563,18 +563,18 @@ export class GameWorld {
   }
 
   private buildTrack() {
-    const cloudUnderside = this.material("cloudRunwayUnderside", "#86BDD6", 0.09);
-    const cloudRunway = this.material("cloudRunwayWhite", "#BFE4F3", 0.04);
+    const cloudUnderside = this.material("cloudRunwayUnderside", "#B77C8C", 0.065);
+    const cloudRunway = this.material("cloudRunwayWhite", "#D9A58F", 0.02);
     const laneMaterials = [
-      this.material("cloudLaneLeft", "#9ED4E9", 0.07),
-      this.material("cloudLaneCentre", "#D5EFF9", 0.06),
-      this.material("cloudLaneRight", "#9AD2E8", 0.07),
+      this.material("cloudLaneLeft", "#DFA7B4", 0.04),
+      this.material("cloudLaneCentre", "#E6B99E", 0.03),
+      this.material("cloudLaneRight", "#DCA3B1", 0.04),
     ];
-    const seamMaterial = this.material("cloudLaneWhisper", "#247FA8", 0.24);
-    const edgeLineMaterial = this.material("cloudRunwayEdgeLine", "#5CAFD1", 0.14);
-    const edgeCloudMaterial = this.material("cloudRunwayBank", "#F7FDFF", 0.025);
-    const driftCloudMaterial = this.material("cloudRunwayDrift", "#FFFFFF", 0.04);
-    const horizonMistMaterial = this.material("cloudRunwayHorizonMist", "#D0EDF8", 0.12);
+    const seamMaterial = this.material("cloudLaneWhisper", "#A95E78", 0.16);
+    const edgeLineMaterial = this.material("cloudRunwayEdgeLine", "#D58FA2", 0.09);
+    const edgeCloudMaterial = this.material("cloudRunwayBank", "#F9DDCF", 0.02);
+    const driftCloudMaterial = this.material("cloudRunwayDrift", "#FBE0DE", 0.03);
+    const horizonMistMaterial = this.material("cloudRunwayHorizonMist", "#EABFBE", 0.08);
 
     const underside = MeshBuilder.CreateGround("cloudRunwayUndersideMesh", { width: 11.8, height: 124, subdivisions: 2 }, this.scene);
     underside.position = new Vector3(0, -0.22, 50);
@@ -665,7 +665,7 @@ export class GameWorld {
     runwayShadow.parent = canonical.root;
     runwayShadow.position = new Vector3(0, 0.028, 0);
     runwayShadow.scaling = new Vector3(1.12, 0.06, 0.66);
-    runwayShadow.material = this.material(`runnerCloudShadow-${canonicalCharacter.id}`, "#4B96B9", 0.07);
+    runwayShadow.material = this.material(`runnerCloudShadow-${canonicalCharacter.id}`, "#B9788D", 0.055);
     this.player = canonical.root;
     this.playerVisual = canonical.visual;
     return;
