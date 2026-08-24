@@ -109,7 +109,7 @@ export default function SkyDashHud() {
   const [tutorialOpen, setTutorialOpen] = useState(() => new URLSearchParams(window.location.search).has("guide"));
   const [tutorialStep, setTutorialStep] = useState(0);
   const [leaderboardOpen, setLeaderboardOpen] = useState(() => new URLSearchParams(window.location.search).has("leaderboard"));
-  const [playerName, setPlayerName] = useState(() => window.localStorage.getItem(PLAYER_NAME_KEY) ?? "");
+  const [playerName, setPlayerName] = useState(() => new URLSearchParams(window.location.search).has("qaSetupReady") ? "Mây QA" : window.localStorage.getItem(PLAYER_NAME_KEY) ?? "");
   const [nameError, setNameError] = useState("");
   const [completedRun, setCompletedRun] = useState<CompletedRun | null>(null);
   const [saveStatus, setSaveStatus] = useState<"idle" | "needsName" | "saving" | "ranked" | "outside" | "error">("idle");

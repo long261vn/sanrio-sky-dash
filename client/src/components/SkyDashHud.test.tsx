@@ -141,6 +141,11 @@ describe("SkyDashHud run flow", () => {
     expect(screen.getByLabelText("Ảnh mặt trước Cinnamoroll")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Chọn Cinnamoroll; ảnh mặt trước" })).toBeTruthy();
 
+    const setupMain = document.querySelector(".setup-main")!;
+    const orderedBlocks = [".setup-name", ".setup-character-step", ".setup-selected", ".mobile-setup-tip", ".character-grid", ".setup-actions"].map((selector) => setupMain.querySelector(selector));
+    expect(orderedBlocks).toEqual(orderedBlocks.map((block) => expect.any(HTMLElement)));
+    expect(orderedBlocks.map((block) => Array.from(setupMain.children).indexOf(block!))).toEqual([1, 2, 3, 4, 5, 6]);
+
     expect(screen.getByText("MASCOT MẶC ĐỊNH")).toBeTruthy();
     expect(screen.getByText(/Giữ Cinnamoroll mặc định hoặc chạm một nhân vật để đổi/)).toBeTruthy();
     fireEvent.click(runButton);

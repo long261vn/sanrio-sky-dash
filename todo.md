@@ -271,3 +271,7 @@
 - [x] Đổi làn giữa sang hồng đậm hơn hai làn ngoài để giảm chói mà vẫn giữ rõ ba làn.
 - [x] Sửa các lỗi overlap, clipping, tương phản hoặc phân cấp hiển thị được xác minh trong QA.
 - [x] Chạy regression/build, kiểm thử lại mọi màn hình, phát hành và không tạo điểm QA trong Top 20.
+- [x] Tái tạo setup đã nhập tên trên 360×800, 360×780, 390×844 và xác định vùng overlap cụ thể.
+- [x] Sửa dòng chảy bố cục ô tên, preview 360°, lưới mascot và CTA sau khi tên hợp lệ trên màn hẹp.
+- [x] Bổ sung regression sau khi tên hợp lệ; kiểm tra keyboard/chạm và không che input khi bàn phím mở.
+- [ ] Kiểm thử Galaxy S20 và các breakpoint lân cận, phát hành, không tạo điểm QA Top 20.

@@ -471,3 +471,7 @@ Lượt regression 360×780 phát hiện cầu vồng kỷ lục chồng nền m
 Lượt GitHub Pages sau checkpoint `4e2bdb51` vẫn trả bundle gameplay có lane giữa vàng/kem cũ, khác ảnh QA cục bộ hồng phấn. Đây là CDN stale được xác minh bằng ảnh cache-buster, nên không kết luận public pass và sẽ retry phát hành; URL demo không ghi dữ liệu Top 20.
 
 Sau retry `1f1d3655`, GitHub Pages đã nhận lane giữa hồng phấn nhẹ đúng palette `#D68EA5`; hai lane ngoài giữ hồng kem sáng hơn, seam vẫn rõ và mascot/vật phẩm/chướng ngại tách nền. Đây là bản public pass của gameplay QA; URL demo không nhập tên hoặc gửi điểm nên Top 20 không đổi.
+
+### Sửa lỗi setup sau nhập tên trên Galaxy S20 — 24/08/2026
+
+Đã tái tạo trạng thái tên hợp lệ qua cờ QA không ghi dữ liệu. Nguyên nhân là CTA `sticky` với `bottom` âm và các override mobile chồng nhau khiến khi preview/lưới được reveal đồng thời có thể phủ lại ô tên hoặc khối mascot. Trạng thái mở khóa nay ép toàn bộ khối vào dòng cuộn tuần tự, bỏ sticky CTA, giảm preview còn 68–76px ở màn hẹp và có padding đáy an toàn. Ảnh 360×800 (mốc Galaxy S20) và 360×780 đều hiển thị ô tên, banner Bước 2, preview, chỉ số, 8 mascot và 2 CTA theo thứ tự, không overlap/cắt chữ.
