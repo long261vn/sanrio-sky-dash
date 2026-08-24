@@ -432,3 +432,5 @@ Rà soát lại ảnh gameplay xác nhận bản trước có nền trắng chó
 Lượt public `f08ac9c6`: GitHub Pages đã nhận road cyan–trắng tương phản mới, bank mây theo cụm thưa và seam cyan đậm; Cinnamoroll, sao, đệm đỏ và cổng tím vẫn tách nền. Manus còn trả đường white/puff dense của bundle cũ dù dùng cache-buster, nên cần retry CDN trước khi kết luận hai domain. Không nhập tên hay gửi điểm ở cả hai lượt demo.
 
 Sau retry `9c439ea5`, Manus vẫn hiển thị version road trắng/puff dense cũ ở lượt kiểm tra đầu. Lệnh xem danh sách `document.scripts` trong tab canvas không trả entry asset để fingerprint độc lập, nên chỉ ghi nhận bằng ảnh, không suy đoán tên bundle. GitHub Pages tiếp tục là kênh public đã pass; cần thêm một lượt retry/đồng bộ Manus, các URL demo không ghi leaderboard.
+
+Sau retry `54b6918c`, ảnh Manus vẫn là scene puff dense cũ. Thử lấy HTML cùng URL bằng `fetch(..., { cache: "reload" })` trong console bị chặn với `TypeError: Failed to fetch`, nên không lặp lại hoặc suy diễn fingerprint. GitHub Pages vẫn là bản public đã xác minh scene mới; cần dùng retry phát hành thay vì kết luận cache-buster đã đủ.

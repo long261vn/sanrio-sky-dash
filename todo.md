@@ -260,4 +260,4 @@
 - [x] Rà soát điểm yếu thị giác của cloud runway hiện tại và xác định tiêu chí tương phản cho mascot/vật phẩm/chướng ngại.
 - [x] Thiết kế lại đường mây liền khối với mặt đường có chiều sâu, rìa mềm và ba làn dễ đọc thay vì chuỗi puff rời.
 - [x] Thêm mây trôi nhẹ dọc hai rìa và hiệu ứng cầu vồng đặc biệt khi người chơi phá kỷ lục.
-- [ ] Bổ sung regression, kiểm thử desktop/mobile/public và không tạo điểm QA trong Top 20.
+- [x] Bổ sung regression, kiểm thử desktop/mobile/public và không tạo điểm QA trong Top 20.
