@@ -252,4 +252,4 @@
 - [x] Thiết kế bước nhập tên đầu tiên nổi bật, có hướng dẫn và phản hồi validation rõ ràng trên desktop/mobile.
 - [x] Khóa preview, danh sách mascot và CTA chạy cho đến khi tên hợp lệ; sau đó mở Cinnamoroll mặc định hoặc đổi mascot.
 - [x] Bổ sung regression accessibility/keyboard cho cổng nhập tên và kiểm thử responsive các viewport mục tiêu.
-- [ ] Phát hành và xác minh Manus public/GitHub Pages, không tạo dữ liệu thử trong Top 20.
+- [x] Phát hành và xác minh Manus public/GitHub Pages, không tạo dữ liệu thử trong Top 20.
