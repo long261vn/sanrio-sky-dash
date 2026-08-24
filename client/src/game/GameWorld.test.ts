@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { GameWorld } from "./GameWorld";
+import { GAMEPLAY_LANES, GameWorld } from "./GameWorld";
 
 type TestEntityKind = "lowHurdle" | "cloudGate" | "star" | "shield" | "gust";
 
@@ -27,6 +27,11 @@ function collisionWorld(kind: TestEntityKind) {
 }
 
 describe("GameWorld keyboard input", () => {
+  it("keeps the three gameplay lane centers unchanged when road art is refreshed", () => {
+    expect(GAMEPLAY_LANES).toEqual([-2.6, 0, 2.6]);
+    expect(GAMEPLAY_LANES[1]).toBe(0);
+  });
+
   it("builds a raised cloud gate with a taller clear slide silhouette", () => {
     const world = Object.create(GameWorld.prototype) as GameWorld & { createStickerProp: ReturnType<typeof vi.fn>; createCloudGate: (root: unknown) => void };
     world.createStickerProp = vi.fn();

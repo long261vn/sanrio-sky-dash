@@ -253,3 +253,7 @@
 - [x] Khóa preview, danh sách mascot và CTA chạy cho đến khi tên hợp lệ; sau đó mở Cinnamoroll mặc định hoặc đổi mascot.
 - [x] Bổ sung regression accessibility/keyboard cho cổng nhập tên và kiểm thử responsive các viewport mục tiêu.
 - [x] Phát hành và xác minh Manus public/GitHub Pages, không tạo dữ liệu thử trong Top 20.
+- [x] Rà soát mesh, vật liệu, camera và các hằng số ba làn của đường chạy gameplay hiện tại.
+- [x] Thiết kế lại mặt đường mây, rìa mây và chiều sâu pastel để đồng bộ minh hoạ màn hình đầu.
+- [x] Giữ nguyên hitbox/ba làn/spawn và bổ sung regression cho hợp đồng đường chạy.
+- [ ] Kiểm thử trực quan gameplay desktop/mobile, phát hành Manus/GitHub Pages và không tạo điểm QA.

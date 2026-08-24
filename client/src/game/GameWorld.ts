@@ -23,7 +23,8 @@ interface WorldEntity {
   prompted?: boolean;
 }
 
-const LANES = [-2.6, 0, 2.6];
+export const GAMEPLAY_LANES = [-2.6, 0, 2.6] as const;
+const LANES = GAMEPLAY_LANES;
 const PLAYER_Z = 0;
 const PROP_TEXTURES = {
   lowHurdle: assetUrl("hana-low-jump-cushion_8c9af18d.png"),
@@ -558,44 +559,61 @@ export class GameWorld {
   }
 
   private buildTrack() {
-    const trackMaterial = this.material("cloudRibbon", "#D9BD7C", 0.025);
-    const laneCloudMaterial = this.material("laneCloudCream", "#F4DFA8", 0.04);
-    const laneSoftMaterial = this.material("laneCloudSoft", "#EAD09A", 0.04);
-    const laneMaterial = this.material("laneSeam", "#5AAED2", 0.1);
-    const edgeMaterial = this.material("trackEdge", "#FFFDF4", 0.02);
-    const wishTrimMaterial = this.material("wishStarTrim", "#F4C54B", 0.12);
-    const puffMaterial = this.material("trackCloudPuff", "#FFFDF4", 0.015);
-    const track = MeshBuilder.CreateGround("cloudRibbonTrack", { width: 9.15, height: 112, subdivisions: 2 }, this.scene);
-    track.position.z = 44;
-    track.material = trackMaterial;
-    [-2.6, 0, 2.6].forEach((x, index) => {
-      const lane = MeshBuilder.CreateGround(`cloudLane${index}`, { width: 2.47, height: 112, subdivisions: 1 }, this.scene);
-      lane.position = new Vector3(x, 0.012, 44);
-      lane.material = index === 1 ? laneCloudMaterial : laneSoftMaterial;
+    const cloudUnderside = this.material("cloudRunwayUnderside", "#D6EEF8", 0.07);
+    const cloudRunway = this.material("cloudRunwayWhite", "#FBFEFF", 0.025);
+    const laneMaterials = [
+      this.material("cloudLaneLeft", "#F4FBFF", 0.04),
+      this.material("cloudLaneCentre", "#EAF8FF", 0.07),
+      this.material("cloudLaneRight", "#F8FCFF", 0.04),
+    ];
+    const seamMaterial = this.material("cloudLaneWhisper", "#8BC8E1", 0.13);
+    const edgeCloudMaterial = this.material("cloudRunwayEdge", "#FFFFFF", 0.03);
+    const edgeShadowMaterial = this.material("cloudRunwayEdgeShadow", "#D4EEF8", 0.06);
+    const horizonMistMaterial = this.material("cloudRunwayHorizonMist", "#E3F5FB", 0.1);
+
+    const underside = MeshBuilder.CreateGround("cloudRunwayUndersideMesh", { width: 11.6, height: 124, subdivisions: 2 }, this.scene);
+    underside.position = new Vector3(0, -0.22, 50);
+    underside.material = cloudUnderside;
+
+    const track = MeshBuilder.CreateGround("cloudRibbonTrack", { width: 9.15, height: 120, subdivisions: 2 }, this.scene);
+    track.position = new Vector3(0, 0, 48);
+    track.material = cloudRunway;
+
+    LANES.forEach((x, index) => {
+      const lane = MeshBuilder.CreateGround(`cloudLane${index}`, { width: 2.47, height: 120, subdivisions: 1 }, this.scene);
+      lane.position = new Vector3(x, 0.014 + index * 0.001, 48);
+      lane.material = laneMaterials[index];
     });
+
     for (const x of [-1.3, 1.3]) {
-      const seam = MeshBuilder.CreateBox(`laneSeam${x}`, { width: 0.19, height: 0.13, depth: 112 }, this.scene);
-      seam.position = new Vector3(x, 0.065, 44);
-      seam.material = laneMaterial;
-    }
-    for (const x of [-4.62, 4.62]) {
-      const rail = MeshBuilder.CreateBox(`puffyRail${x}`, { width: 0.28, height: 0.27, depth: 112 }, this.scene);
-      rail.position = new Vector3(x, 0.18, 44);
-      rail.material = edgeMaterial;
-    }
-    for (const x of [-4.35, 4.35]) {
-      const trim = MeshBuilder.CreateBox(`wishTrim${x}`, { width: 0.1, height: 0.12, depth: 112 }, this.scene);
-      trim.position = new Vector3(x, 0.22, 44);
-      trim.material = wishTrimMaterial;
-    }
-    for (let index = 0; index < 16; index += 1) {
-      const z = index * 7.2 - 5;
-      for (const x of [-4.82, 4.82]) {
-        const puff = MeshBuilder.CreateSphere(`trackPuff${index}-${x}`, { diameter: 0.82, segments: 12 }, this.scene);
-        puff.position = new Vector3(x + (index % 2 === 0 ? 0.12 : -0.12), 0.18, z);
-        puff.scaling = new Vector3(1.1, 0.5, 0.86);
-        puff.material = puffMaterial;
+      for (let segment = 0; segment < 27; segment += 1) {
+        const seam = MeshBuilder.CreateBox(`cloudLaneWhisper${x}-${segment}`, { width: 0.11, height: 0.045, depth: 2.2 }, this.scene);
+        seam.position = new Vector3(x, 0.055, -9 + segment * 4.7);
+        seam.material = seamMaterial;
       }
+    }
+
+    for (let row = 0; row < 49; row += 1) {
+      const z = -8 + row * 2.5;
+      for (const side of [-1, 1]) {
+        const sideOffset = (row % 2 === 0 ? 0.16 : -0.12) * side;
+        const edgePuff = MeshBuilder.CreateSphere(`cloudRunwayEdgePuff${side}-${row}`, { diameter: 1.3, segments: 10 }, this.scene);
+        edgePuff.position = new Vector3(side * 4.34 + sideOffset, 0.2 + (row % 3) * 0.025, z);
+        edgePuff.scaling = new Vector3(1.34, 0.52, 1.2);
+        edgePuff.material = edgeCloudMaterial;
+
+        const outerPuff = MeshBuilder.CreateSphere(`cloudRunwayOuterPuff${side}-${row}`, { diameter: 1.42, segments: 10 }, this.scene);
+        outerPuff.position = new Vector3(side * 4.94 - sideOffset * 0.4, 0.06, z + 1.05);
+        outerPuff.scaling = new Vector3(1.28, 0.42, 1.08);
+        outerPuff.material = edgeShadowMaterial;
+      }
+    }
+
+    for (let index = 0; index < 5; index += 1) {
+      const mist = MeshBuilder.CreateSphere(`cloudRunwayHorizonMist${index}`, { diameter: 4.1, segments: 16 }, this.scene);
+      mist.position = new Vector3((index - 2) * 2.25, 0.38, 104 + Math.abs(index - 2) * 0.4);
+      mist.scaling = new Vector3(1.28, 0.32, 0.66);
+      mist.material = horizonMistMaterial;
     }
   }
 
@@ -632,6 +650,11 @@ export class GameWorld {
     const canonical = createMascotModel(this.scene, canonicalCharacter, "runner");
     orientMascotForGameplay(canonical);
     canonical.root.position = new Vector3(LANES[this.playerLane], 0, PLAYER_Z);
+    const runwayShadow = MeshBuilder.CreateSphere("runnerCloudShadow", { diameter: 1.38, segments: 18 }, this.scene);
+    runwayShadow.parent = canonical.root;
+    runwayShadow.position = new Vector3(0, 0.028, 0);
+    runwayShadow.scaling = new Vector3(1.12, 0.06, 0.66);
+    runwayShadow.material = this.material(`runnerCloudShadow-${canonicalCharacter.id}`, "#87BED5", 0.04);
     this.player = canonical.root;
     this.playerVisual = canonical.visual;
     return;

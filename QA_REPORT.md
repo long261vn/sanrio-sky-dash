@@ -404,3 +404,11 @@ Retry checkpoint `01ca1480` và lượt tải cache-buster thứ hai của Manus
 Fingerprint đọc trực tiếp trong tab Manus sau đó xác nhận DOM không có copy mở khóa, document root không có class trạng thái mới, và HTML tải bằng `fetch(..., { cache: "reload" })` vẫn tham chiếu `assets/index-CrfWLHJS.js`. Đây là entry cũ, nên kết quả stale được xác nhận độc lập với cache-buster URL. Cần một retry phát hành nữa để CDN nhận entry mới trước khi kiểm tra lại hai domain.
 
 Sau retry checkpoint `ccc1b236` và thời gian đồng bộ, cả **Manus public** lẫn **GitHub Pages** tại URL cache-buster mới đều chỉ còn header, nội dung Bước 1, trường tên bắt buộc và khung nhắc **“Bước 2 · Bộ sưu tập mascot — Sẽ mở ngay sau khi bạn nhập tên hợp lệ.”**. Không có canvas preview, card mascot hoặc CTA chạy trong cây tương tác khi tên trống. Không nhập tên hay gửi điểm trong QA public, nên Top 20 không thay đổi.
+
+### Rà soát đồng bộ đường chạy mây — 24/08/2026
+
+Hình minh hoạ landing dùng một lối đi mây trắng, dải rìa bông mềm, gradient pastel và điểm tụ sâu ở chân trời. `GameWorld.buildTrack()` hiện dùng nền ribbon vàng kem, ba dải lane, seam xanh, trim vàng và puff viền; cấu trúc lane/hitbox đang tách khỏi mesh tạo hình. Lượt capture `?demo=1&qaDense=1` đầu tiên ghi được HUD nhưng canvas trắng, còn browser mở ngay sau navigation vẫn ở landing do timeout demo chưa hoàn tất; không có lỗi mới trong log runtime. Việc tái kiểm tra sau khi cập nhật road sẽ dùng capture ổn định hơn và không tạo entry Top 20.
+
+Capture gameplay mới tại desktop 1280×720 và mobile 390×844 đã hiển thị lối mây trắng sâu dần tới chân trời, ba làn pastel/seam xanh nhạt, rìa puff, cụm mây/rainbow và vật cản rõ trên nền. Mascot trắng vẫn có bóng cyan ở chân để tách khỏi lối đi. Rìa puff đầu tiên còn đọc như từng viên tách rời ở tiền cảnh, nên sẽ giảm khoảng cách và cho các puff chồng mềm để giống dải mây liền mạch của landing hơn; lane/hitbox/spawn chưa thay đổi.
+
+Sau tinh chỉnh, ảnh desktop 1280×720 và mobile 390×844 cho thấy rìa đường là các puff chồng liền thành dải mây, thu nhỏ đều về chân trời; mặt đường trắng và cụm mây pastel đọc cùng ngôn ngữ với minh hoạ landing. Seam xanh nhạt giữ ba làn có thể phân biệt, còn bóng cyan dưới mascot trắng giữ độ tách nền. Demo `qaDense` vẫn hiển thị đệm thấp, cổng mây và vật phẩm ở ba làn; regression 64/64 và TypeScript đạt, không thay đổi hitbox/spawn.
