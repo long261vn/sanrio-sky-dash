@@ -188,7 +188,37 @@ export default function SkyDashHud() {
   const isRunning = snapshot.status === "playing";
   const leaderboardRows = leaderboard.data?.rows ?? [];
   const skyRecord = leaderboardRows[0]?.score ?? 0;
+  const isNameReady = !needsLeaderboardName(playerName);
   const canLaunch = canStartSkyDashRun(playerName);
+
+  useEffect(() => {
+    const isLocked = menuStep === "setup" && !isNameReady;
+    const root = document.documentElement;
+    const lockedAreas = document.querySelectorAll<HTMLElement>(
+      ".setup-character-step, .setup-selected, .mobile-setup-tip, .character-grid, .setup-actions, .setup-requirements",
+    );
+
+    root.classList.toggle("skydash-name-pending", isLocked);
+    root.classList.toggle("skydash-name-ready", menuStep === "setup" && isNameReady);
+    lockedAreas.forEach((area) => {
+      area.toggleAttribute("inert", isLocked);
+      area.setAttribute("aria-hidden", isLocked ? "true" : "false");
+    });
+
+    let focusFrame = 0;
+    if (isLocked) {
+      focusFrame = window.requestAnimationFrame(() => document.querySelector<HTMLInputElement>(".setup-name input")?.focus());
+    }
+
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      root.classList.remove("skydash-name-pending", "skydash-name-ready");
+      lockedAreas.forEach((area) => {
+        area.removeAttribute("inert");
+        area.removeAttribute("aria-hidden");
+      });
+    };
+  }, [isNameReady, menuStep]);
   const guidePages = [
     { eyebrow: "NHÓM 1 / 2 · VẬT PHẨM NÊN LẤY", title: "Đổi làn để nhận quà.", summary: "Những vật sáng này không gây hại. Chạm đúng làn để nhận công dụng riêng.", shortRule: "Vật sáng: đổi làn để lấy", items: [{ name: "Sao xu", detail: `+${SCORE_RULES.starBasePoints} điểm cố định`, image: GUIDE_STAR_URL, alt: "Sao xu vàng" }, { name: "Khiên cầu vồng", detail: "Chặn 1 va chạm", image: GUIDE_SHIELD_URL, alt: "Khiên cầu vồng" }, { name: "Vòng gió mint", detail: `+${SCORE_RULES.gustBasePoints} điểm cố định`, image: GUIDE_GUST_URL, alt: "Vòng gió mint" }] },
     { eyebrow: "NHÓM 2 / 2 · CHƯỚNG NGẠI CẦN VƯỢT", title: "Nhìn độ cao, làm đúng.", summary: "Vật chặn đường luôn có biển cảnh báo. Hành động đúng giúp bạn vượt qua và nhận điểm.", shortRule: "Vật thấp: nhảy · Cổng cao: trượt", items: [{ name: "Đệm dâu thấp", detail: `Nhảy qua · +${SCORE_RULES.hurdleClearPoints} điểm`, image: GUIDE_JUMP_URL, alt: "Đệm dâu hồng thấp" }, { name: "Cổng mây cao", detail: `Trượt dưới · +${SCORE_RULES.hurdleClearPoints} điểm`, image: GUIDE_SLIDE_URL, alt: "Cổng mây cao có khoảng hở bên dưới" }] },

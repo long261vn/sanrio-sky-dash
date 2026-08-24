@@ -248,3 +248,8 @@
 - [x] Chỉnh factory My Melody thành mặt/thân trắng, đuôi tròn trắng phía sau và hood hồng chỉ từ đầu đến cổ, đồng bộ gameplay/preview 360°.
 - [x] Bổ sung regression luồng setup và silhouette My Melody; kiểm thử responsive, gameplay và preview trên các viewport mục tiêu.
 - [x] Phát hành và xác minh Manus public/GitHub Pages, không tạo dữ liệu thử trong Top 20.
+- [x] Rà soát vùng setup và các điểm chọn mascot/chạy cần khóa khi tên chưa hợp lệ.
+- [x] Thiết kế bước nhập tên đầu tiên nổi bật, có hướng dẫn và phản hồi validation rõ ràng trên desktop/mobile.
+- [x] Khóa preview, danh sách mascot và CTA chạy cho đến khi tên hợp lệ; sau đó mở Cinnamoroll mặc định hoặc đổi mascot.
+- [x] Bổ sung regression accessibility/keyboard cho cổng nhập tên và kiểm thử responsive các viewport mục tiêu.
+- [ ] Phát hành và xác minh Manus public/GitHub Pages, không tạo dữ liệu thử trong Top 20.

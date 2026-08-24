@@ -115,7 +115,7 @@ describe("SkyDashHud run flow", () => {
     window.removeEventListener("skydash:menu-interact", menuAudioListener);
   });
 
-  it("requires a name but lets the player start with default Cinnamoroll without reselection", () => {
+  it("opens mascot selection only after the required name is valid, then starts with default Cinnamoroll", () => {
     const commandListener = vi.fn();
     const prepareListener = vi.fn();
     window.addEventListener("skydash:command", commandListener);
@@ -123,8 +123,17 @@ describe("SkyDashHud run flow", () => {
     render(<SkyDashHud />);
 
     fireEvent.click(screen.getByRole("button", { name: "Bắt đầu hành trình" }));
+    const nameInput = screen.getByRole("textbox");
+    expect(document.documentElement.classList.contains("skydash-name-pending")).toBe(true);
+    expect(document.querySelector(".character-grid")?.hasAttribute("inert")).toBe(true);
+    expect(screen.queryByRole("button", { name: "Chọn Cinnamoroll; ảnh mặt trước" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Chạy cùng Cinnamoroll" })).toBeNull();
+
+    fireEvent.change(nameInput, { target: { value: "Mây Nhỏ" } });
     const runButton = screen.getByRole("button", { name: "Chạy cùng Cinnamoroll" });
-    expect((runButton as HTMLButtonElement).disabled).toBe(true);
+    expect(document.documentElement.classList.contains("skydash-name-ready")).toBe(true);
+    expect(document.querySelector(".character-grid")?.hasAttribute("inert")).toBe(false);
+    expect((runButton as HTMLButtonElement).disabled).toBe(false);
     expect(document.querySelectorAll(".setup-selected .runner-perks span")).toHaveLength(3);
     expect(screen.getByRole("img", { name: "Mô hình 3D Cinnamoroll đang dùng khi chạy. Kéo để xoay." })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Xoay Cinnamoroll thêm 90 độ" })).toBeTruthy();
@@ -134,8 +143,6 @@ describe("SkyDashHud run flow", () => {
 
     expect(screen.getByText("MASCOT MẶC ĐỊNH")).toBeTruthy();
     expect(screen.getByText(/Giữ Cinnamoroll mặc định hoặc chạm một nhân vật để đổi/)).toBeTruthy();
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Mây Nhỏ" } });
-    expect((runButton as HTMLButtonElement).disabled).toBe(false);
     fireEvent.click(runButton);
 
     expect(commandListener.mock.calls.map(([event]) => (event as CustomEvent).detail)).toEqual([
@@ -156,14 +163,15 @@ describe("SkyDashHud run flow", () => {
     expect(portraitImage?.parentElement?.textContent).toContain("☁");
   });
 
-  it("shows a mandatory name field in setup before a run can begin", () => {
+  it("shows a mandatory and visually gated name field before mascot setup", () => {
     render(<SkyDashHud />);
 
     fireEvent.click(screen.getByRole("button", { name: "Bắt đầu hành trình" }));
 
     expect(screen.getByText("BƯỚC 1 · TÊN NGƯỜI CHƠI")).toBeTruthy();
     expect(screen.getByText("BẮT BUỘC")).toBeTruthy();
-    expect(screen.getByText(/Cần nhập tên/)).toBeTruthy();
+    expect(document.documentElement.classList.contains("skydash-name-pending")).toBe(true);
+    expect(document.querySelector(".character-grid")?.getAttribute("aria-hidden")).toBe("true");
   });
 
   it("opens a short paged tutorial and lets the player skip it at any step", () => {

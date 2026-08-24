@@ -383,3 +383,16 @@ Sau checkpoint phát hành lại `c49df66a`, CDN đã trả entry mới: Manus `
 Sau khi xóa cache tab, Manus public đã render đúng UI mới: “BƯỚC 1 / 2 · TÊN NGƯỜI CHƠI”, “MASCOT TÙY CHỌN”, “MASCOT MẶC ĐỊNH” và điều kiện chỉ yêu cầu nhập tên. Lưới card hai cột không overlap ở viewport browser; không có tên/điểm được gửi. GitHub Pages vẫn cần lượt UI xác minh độc lập sau cache-buster.
 
 GitHub Pages với cache-buster mới cũng render UI tên trước/mascot tùy chọn/Cinnamoroll mặc định. Manus demo My Melody xác nhận gameplay có hood hồng đến cổ, tai hồng, thân trắng và đuôi tròn trắng nhìn từ camera sau. Hai bản public đã dùng bundle mới; URL QA không nhập tên hoặc gửi điểm nên Top 20 giữ nguyên.
+
+### QA cổng nhập tên bắt buộc — 24/08/2026
+
+| Viewport | Bằng chứng quan sát | Kết quả |
+| --- | --- | --- |
+| Desktop 1280×720 | Setup chỉ hiện khối **Bước 1 · Tên người chơi · Bắt buộc** với ô nhập cao, viền hồng focus, hướng dẫn 2–20 ký tự và placeholder **Bước 2 · Bộ sưu tập mascot**. | Đạt; không có card mascot, preview hay CTA chạy để tương tác trước tên hợp lệ. |
+| Mobile 360×780 | Ô tên, nhãn bắt buộc và placeholder Bước 2 xếp dọc, không che header hay bị cắt ở chiều cao Galaxy S22. | Đạt; không overlap, chữ placeholder tự xuống dòng hợp lệ. |
+
+Regression HUD xác nhận khi tên trống, vùng mascot/CTA có `inert` và `aria-hidden`, không còn nút chọn Cinnamoroll trong cây tương tác. Ngay khi tên dài từ hai ký tự, vùng này mở lại cùng Cinnamoroll mặc định; người chơi có thể chạy ngay hoặc đổi mascot. Full suite 63/63 test và TypeScript đã đạt trước kiểm tra trực quan.
+
+Ảnh bổ sung tại **390×844** và **412×915** giữ cùng thứ bậc: tiêu đề, ô tên có viền hồng, lời nhắc mở khóa và khung Bước 2. Không xuất hiện thanh cuộn ngang, chồng nhãn hoặc cắt text; khoảng cách theo chiều dọc vẫn đủ cho thao tác chạm.
+
+Ảnh **768×1024** giữ form tên rộng, lời nhắc Bước 2 căn giữa và header không chồng lấn. Build production hoàn tất; cảnh báo duy nhất là chunk Babylon đã biết (khoảng 1,77 MB raw / 416 KB gzip), không phải lỗi build.
