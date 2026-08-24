@@ -18,7 +18,7 @@ export type GameHandle = {
 };
 
 export const GAMEPLAY_CAMERA_POSITION = new Vector3(0, 5.7, -12.8);
-export const GAMEPLAY_CAMERA_TARGET = new Vector3(0, 1.4, 3.6);
+export const GAMEPLAY_CAMERA_TARGET = new Vector3(0, 1.5, 6.4);
 
 export async function createGameScene(engine: Engine, canvas: HTMLCanvasElement, audio?: AudioManager): Promise<GameHandle> {
   const scene = new Scene(engine);
