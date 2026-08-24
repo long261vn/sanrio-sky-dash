@@ -418,3 +418,5 @@ Sau checkpoint `f1ca502a`, Manus public và GitHub Pages với cache-buster đ�
 Sau retry `8e3fd6ca`, Manus vẫn trả ribbon vàng cũ ở lượt kiểm tra đầu; GitHub Pages đã nhận đúng cloud runway trắng với rìa puff chồng mềm, seam xanh nhạt và silhouette Cinnamoroll/tất cả vật thể vẫn rõ. Không có thao tác ghi điểm. Cần kiểm tra lại Manus sau thêm một chu kỳ CDN trước khi đóng phát hành hai domain.
 
 Lượt Manus sau thời gian chờ vẫn render ribbon vàng. Fingerprint console của tab xác nhận entry `assets/index-Bjt9yEh4.js`, khác bundle mới đã build cục bộ; đây là CDN stale được xác nhận độc lập với URL cache-buster. GitHub Pages vẫn là bằng chứng public pass cho cloud runway, còn Manus cần một retry publish nữa; các URL demo không gọi API submit.
+
+Sau retry `f7c68d87`, lượt view Manus hoàn tất khởi tạo và đã render đúng cloud runway trắng: đường sâu tới chân trời, rìa puff chồng mềm, seam cyan ba làn và bóng cyan dưới Cinnamoroll; đệm thấp, cổng mây và vật phẩm vẫn đọc rõ. GitHub Pages đã xác minh cùng tạo hình ở lượt trước. Toàn bộ QA public dùng `?demo=1&qaDense=1`, không nhập tên hoặc gọi API submit nên Top 20 không đổi.

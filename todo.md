@@ -256,4 +256,4 @@
 - [x] Rà soát mesh, vật liệu, camera và các hằng số ba làn của đường chạy gameplay hiện tại.
 - [x] Thiết kế lại mặt đường mây, rìa mây và chiều sâu pastel để đồng bộ minh hoạ màn hình đầu.
 - [x] Giữ nguyên hitbox/ba làn/spawn và bổ sung regression cho hợp đồng đường chạy.
-- [ ] Kiểm thử trực quan gameplay desktop/mobile, phát hành Manus/GitHub Pages và không tạo điểm QA.
+- [x] Kiểm thử trực quan gameplay desktop/mobile, phát hành Manus/GitHub Pages và không tạo điểm QA.
