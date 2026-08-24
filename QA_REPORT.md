@@ -430,3 +430,5 @@ Rà soát lại ảnh gameplay xác nhận bản trước có nền trắng chó
 Ảnh mobile 390×844 xác nhận cầu vồng thu gọn theo panel, tiêu đề/chỉ số vẫn đọc được và bốn thao tác kết quả xếp dọc, không bị effect che. Full suite 65/65, TypeScript và build production đạt; cảnh báo bundle Babylon vẫn là cảnh báo kích thước lazy-load đã biết.
 
 Lượt public `f08ac9c6`: GitHub Pages đã nhận road cyan–trắng tương phản mới, bank mây theo cụm thưa và seam cyan đậm; Cinnamoroll, sao, đệm đỏ và cổng tím vẫn tách nền. Manus còn trả đường white/puff dense của bundle cũ dù dùng cache-buster, nên cần retry CDN trước khi kết luận hai domain. Không nhập tên hay gửi điểm ở cả hai lượt demo.
+
+Sau retry `9c439ea5`, Manus vẫn hiển thị version road trắng/puff dense cũ ở lượt kiểm tra đầu. Lệnh xem danh sách `document.scripts` trong tab canvas không trả entry asset để fingerprint độc lập, nên chỉ ghi nhận bằng ảnh, không suy đoán tên bundle. GitHub Pages tiếp tục là kênh public đã pass; cần thêm một lượt retry/đồng bộ Manus, các URL demo không ghi leaderboard.
