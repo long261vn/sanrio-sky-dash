@@ -270,4 +270,4 @@
 - [x] Lập ma trận QA cho landing, setup, hướng dẫn, gameplay, kết quả và Top 20 trên desktop/mobile.
 - [x] Đổi làn giữa sang hồng đậm hơn hai làn ngoài để giảm chói mà vẫn giữ rõ ba làn.
 - [x] Sửa các lỗi overlap, clipping, tương phản hoặc phân cấp hiển thị được xác minh trong QA.
-- [ ] Chạy regression/build, kiểm thử lại mọi màn hình, phát hành và không tạo điểm QA trong Top 20.
+- [x] Chạy regression/build, kiểm thử lại mọi màn hình, phát hành và không tạo điểm QA trong Top 20.
