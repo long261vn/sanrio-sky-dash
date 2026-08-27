@@ -278,4 +278,4 @@
 - [x] Mở bản Vercel, ghi nhận lỗi console/network và tái tạo các lỗi người chơi gặp.
 - [x] Rà soát cấu hình build, routes, asset URL và tRPC/backend khi chạy trên Vercel.
 - [x] Sửa lỗi tương thích Vercel có thể khắc phục trong repository và bổ sung regression cần thiết.
-- [ ] Kiểm thử build/deploy, xác minh lại bản Vercel và ghi rõ mọi cấu hình tài khoản còn cần người dùng thao tác.
+- [x] Kiểm thử build/deploy, xác minh lại bản Vercel và ghi rõ mọi cấu hình tài khoản còn cần người dùng thao tác.

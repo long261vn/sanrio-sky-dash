@@ -489,3 +489,7 @@ URL Vercel hiện không render app mà trả thẳng JavaScript bundle bắt đ
 Kiểm tra Vercel sau push xác nhận lỗi source bundle đã hết: trang đã render UI game và các nút tương tác xuất hiện. Tuy nhiên ảnh nền/logo/minh hoạ đang request dưới đường dẫn tương đối `/manus-storage/...` trên chính origin Vercel, nên 404 và để lại vùng trống. Cần mở rộng asset resolver để ở Vercel dùng origin storage Manus tuyệt đối, tương tự GitHub Pages, rồi redeploy xác minh.
 
 Đã sửa resolver: `*.vercel.app` và `*.github.io` nay dùng asset URL tuyệt đối từ origin storage Manus, trong khi Manus và local giữ URL tương đối. Test resolver bao phủ Vercel/GitHub/Manus và override cấu hình; toàn bộ 70 tests, TypeScript và `build:vercel` đạt. Build mới tham chiếu bundle entry `index-BfILG72K.js`/`scene-DazWmrDA.js`, sẵn sàng redeploy Vercel.
+
+Sau redeploy `e98b84dd`, Vercel hiển thị lại trang game với title/UI/nút tương tác. Lượt tải đầu cho thấy URL asset đã tuyệt đối nhưng ảnh còn đang tải; lượt chờ kế tiếp xác nhận logo, bối cảnh và minh hoạ đường mây đều render đầy đủ, không còn vùng trống hoặc broken image. Không có thao tác lưu điểm trong xác minh.
+
+Kiểm tra read-only Top 20 trên Vercel xác nhận rewrite `/api/*` chuyển đúng về backend Manus: panel tải đủ 20 hạng theo thứ tự, record bầu trời 25.998 khớp hạng 1 và trạng thái tải hoàn tất. Không có mutation/submit nào được gọi. Vercel hiện đã phục vụ frontend Vite, asset tuyệt đối và dữ liệu Top 20 đúng trên domain production.
