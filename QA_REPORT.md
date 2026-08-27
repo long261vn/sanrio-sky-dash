@@ -479,3 +479,9 @@ Sau retry `1f1d3655`, GitHub Pages đã nhận lane giữa hồng phấn nhẹ �
 Lượt GitHub Pages cache-buster đầu tiên sau checkpoint `e2a38791` vẫn hiển thị setup cũ (không nhận cờ `qaSetupReady` và vẫn khóa mascot). Đây là CDN stale, nên chưa ghi public pass; cần retry phát hành. URL QA không nhập tên hoặc gửi điểm.
 
 Sau retry `6896c532`, GitHub Pages đã nhận cờ `qaSetupReady`: tên Mây QA, preview 360°, đủ 8 mascot và cả hai CTA xuất hiện theo luồng setup mở khóa mới. QA mobile 360×800/360×780/390×844 trước đó xác minh các khối cùng bundle xếp tuần tự trong panel cuộn, không overlap. Cờ QA chỉ khởi tạo state cục bộ, không ghi tên hoặc điểm vào Top 20.
+
+### Điều tra Vercel — 27/08/2026
+
+URL Vercel hiện không render app mà trả thẳng JavaScript bundle bắt đầu bằng `// server/_core/index.ts`; browser không có phần tử tương tác và trang dài hơn 15.000px. Đây là lỗi cấu hình output: build frontend nằm tại `dist/public` trong khi bundle Express server là `dist/index.js`. Repository chưa có `vercel.json`, nên Vercel đang trỏ sai output/entry. Cần buộc Vercel xuất bản `dist/public` và proxy `/api/*` về backend Manus để Top 20 tiếp tục dùng dữ liệu thật.
+
+Đã thêm `vercel.json` với preset Vite, build command frontend riêng và `outputDirectory: dist/public`; rewrite `/api/:path*` giữ endpoint Top 20 qua backend Manus còn SPA fallback trả `index.html`. Regression cấu hình, full test, TypeScript và `build:vercel` đều đạt; build tạo `dist/public/index.html` cùng assets game. Cảnh báo duy nhất là chunk Babylon lazy-load lớn, không gây lỗi deploy.

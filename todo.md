@@ -275,3 +275,7 @@
 - [x] Sửa dòng chảy bố cục ô tên, preview 360°, lưới mascot và CTA sau khi tên hợp lệ trên màn hẹp.
 - [x] Bổ sung regression sau khi tên hợp lệ; kiểm tra keyboard/chạm và không che input khi bàn phím mở.
 - [x] Kiểm thử Galaxy S20 và các breakpoint lân cận, phát hành, không tạo điểm QA Top 20.
+- [x] Mở bản Vercel, ghi nhận lỗi console/network và tái tạo các lỗi người chơi gặp.
+- [x] Rà soát cấu hình build, routes, asset URL và tRPC/backend khi chạy trên Vercel.
+- [x] Sửa lỗi tương thích Vercel có thể khắc phục trong repository và bổ sung regression cần thiết.
+- [ ] Kiểm thử build/deploy, xác minh lại bản Vercel và ghi rõ mọi cấu hình tài khoản còn cần người dùng thao tác.
